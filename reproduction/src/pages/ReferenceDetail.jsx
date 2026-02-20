@@ -219,25 +219,31 @@ const ReferenceDetail = () => {
                                     </div>
                                 </div>
 
-                                <div className="overflow-hidden rounded-3xl">
+                                {/* Viewport: clips the sliding track horizontally */}
+                                <div className="overflow-hidden">
+                                    {/* Track: slides horizontally, py-6 gives shadow breathing room */}
                                     <div
-                                        className="flex transition-transform duration-700 ease-in-out"
+                                        className="flex transition-transform duration-700 ease-in-out py-6"
                                         style={{ transform: `translateX(-${currentGalleryIndex * 50}%)` }}
                                     >
                                         {project.galleryImages?.map((img, idx) => (
                                             <div
                                                 key={idx}
-                                                className="min-w-[50%] p-2 cursor-zoom-in"
+                                                className="min-w-[50%] px-2 md:px-3 cursor-zoom-in"
                                                 onClick={() => openLightbox(idx)}
                                             >
-                                                <div className="relative aspect-video rounded-2xl overflow-hidden shadow-lg group/img">
-                                                    <img
-                                                        src={img}
-                                                        alt={`${project.title} - ${idx + 1}`}
-                                                        className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110"
-                                                    />
-                                                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
-                                                        <span className="material-symbols-outlined text-white text-4xl">zoom_in</span>
+                                                {/* Shadow container — no overflow rule so shadow paints freely */}
+                                                <div className="relative aspect-video shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group/img rounded-2xl">
+                                                    {/* Clip container — rounds corners and hides image bleed */}
+                                                    <div className="w-full h-full rounded-2xl overflow-hidden relative bg-slate-100 backface-hidden">
+                                                        <img
+                                                            src={img}
+                                                            alt={`${project.title} - ${idx + 1}`}
+                                                            className="w-full h-full object-cover scale-[1.05] transition-transform duration-700 group-hover/img:scale-[1.15]"
+                                                        />
+                                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                                                            <span className="material-symbols-outlined text-white text-4xl">zoom_in</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

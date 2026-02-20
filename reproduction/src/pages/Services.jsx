@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../i18n/useLanguage';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import BaumpflegeIcon from '../components/BaumpflegeIcon';
+import BaumfaellungIcon from '../components/BaumfaellungIcon';
+import GartenpflegeIcon from '../components/GartenpflegeIcon';
+import BepflanzungIcon from '../components/BepflanzungIcon';
 import { useParallax } from '../hooks/useParallax';
 import baumpflegeImg from '../assets/images/services/baumpflege.png';
 import baumfaellungImg from '../assets/images/services/baumfaellung.png';
@@ -53,6 +57,19 @@ const StatCounter = ({ value, label, language }) => {
     );
 };
 
+const ServiceImage = ({ src, alt }) => {
+    const ref = useRef(null);
+    useParallax(ref, { speed: 0.04, maxTravel: 20, scale: 1.1 });
+    return (
+        <img
+            ref={ref}
+            alt={alt}
+            className="w-full h-full object-cover"
+            src={src}
+        />
+    );
+};
+
 const Services = () => {
     const { language } = useLanguage();
     useScrollReveal();
@@ -60,7 +77,7 @@ const Services = () => {
     const servicesList = [
         {
             title: { DE: 'Professionelle Baumpflege', FR: 'Arboriculture Professionnelle' },
-            icon: 'nature',
+            id: 'baumpflege',
             desc: {
                 DE: 'Eine fachgerechte Baumpflege ist essenziell für die Vitalität und Verkehrssicherheit deiner Bäume. Ich führe Kronenpflege, Totholzbeseitigung und Lichtraumprofilschnitte nach ZTV-Baumpflege Richtlinien durch.',
                 FR: 'Un entretien professionnel des arbres est essentiel pour la vitalité et la sécurité de vos arbres. Nous effectuons la taille de la couronne, l\'élimination du bois mort et la taille de profil selon les directives ZTV-Baumpflege.'
@@ -70,12 +87,10 @@ const Services = () => {
                 FR: ['Taille de couronne et délestage professionnels', 'Grimpe (SKT) pour les endroits difficiles', 'Préservation de l\'architecture naturelle de l\'arbre']
             },
             image: baumpflegeImg,
-            reverse: false,
-            id: 'baumpflege'
+            reverse: false
         },
         {
             title: { DE: 'Präzise Baumfällung', FR: 'Abattage Précis' },
-            icon: 'psychiatry',
             desc: {
                 DE: 'Wenn Bäume zur Gefahr werden oder Platz für Neues weichen müssen, bin ich dein Partner für sichere Fällungen. Ich arbeite präzise, auch auf engstem Raum, und kümmere mich um die Entsorgung.',
                 FR: 'Lorsque les arbres deviennent un danger ou doivent laisser place à la nouveauté, nous sommes votre partenaire pour des abattages sûrs. Nous travaillons avec précision, même dans des espaces restreints, et nous occupons de l\'évacuation.'
@@ -90,7 +105,7 @@ const Services = () => {
         },
         {
             title: { DE: 'Individuelle Gartenpflege', FR: 'Entretien de jardin individuel' },
-            icon: 'potted_plant',
+            id: 'gartenpflege',
             desc: {
                 DE: 'Ein schöner Garten braucht regelmäßige Zuwendung. Ich übernehme die Pflege deiner Grünanlagen, damit du deine freie Zeit in deiner persönlichen Oase genießen kannst.',
                 FR: 'Un beau jardin nécessite une attention régulière. Nous nous occupons de l\'entretien de vos espaces verts afin que vous puissiez profiter de votre temps libre dans votre oasis personnelle.'
@@ -100,12 +115,11 @@ const Services = () => {
                 FR: ['Taille des haies & entretien des arbustes', 'Entretien de la pelouse & préparation des parterres', 'Forfaits d\'entretien saisonniers']
             },
             image: gartenpflegeImg,
-            reverse: false,
-            id: 'gartenpflege'
+            reverse: false
         },
         {
             title: { DE: 'Nachhaltige Bepflanzung', FR: 'Plantation durable' },
-            icon: 'garden_cart',
+            id: 'bepflanzung',
             desc: {
                 DE: 'Wir schaffen Lebensräume. Durch die Auswahl standortgerechter Gehölze und Stauden sorgen wir für ein gesundes Wachstum und eine ästhetische Gestaltung deines Außenbereichs.',
                 FR: 'Nous créons des habitats. En choisissant des arbustes et des vivaces adaptés au site, nous assurons une croissance saine et un aménagement esthétique de votre espace extérieur.'
@@ -116,13 +130,12 @@ const Services = () => {
             },
             image: wurzelnImg,
             reverse: true,
-            bg: true,
-            id: 'bepflanzung'
+            bg: true
         }
     ];
 
     const heroRef = useRef(null);
-    useParallax(heroRef, { speed: 0.15, scaleBase: 1.1, scaleSpeed: 0.0001 });
+    useParallax(heroRef, { speed: 0.08, maxTravel: 40, scale: 1.1 });
 
     return (
         <main>
@@ -132,10 +145,6 @@ const Services = () => {
                     alt="Lush green canopy"
                     className="absolute inset-0 w-full h-full object-cover"
                     src={servicesHeroImg}
-                    style={{
-                        transform: 'translate3d(0, 0, 0) scale(1.1)',
-                        willChange: 'transform'
-                    }}
                 />
                 <div className="absolute inset-0 bg-black/30"></div>
                 <div className="relative z-10 text-center reveal">
@@ -155,17 +164,23 @@ const Services = () => {
                         <div className="max-w-7xl mx-auto">
                             <div className={`flex flex-col lg:flex-row items-center gap-16 ${service.reverse ? 'lg:flex-row-reverse' : ''}`}>
                                 <div className="w-full lg:w-1/2">
-                                    <div className="relative rounded-xl overflow-hidden shadow-2xl reveal">
-                                        <img
-                                            alt={service.title[language]}
-                                            className="w-full h-[500px] object-cover hover:scale-105 transition-transform duration-700"
-                                            src={service.image}
-                                        />
+                                    <div className="relative rounded-xl overflow-hidden shadow-2xl reveal h-[500px]">
+                                        <ServiceImage src={service.image} alt={service.title[language]} />
                                     </div>
                                 </div>
                                 <div className="w-full lg:w-1/2 space-y-8 reveal stagger-1">
                                     <div className="space-y-6">
-                                        <span className="material-symbols-outlined text-primary text-6xl font-light">{service.icon}</span>
+                                        {service.id === 'baumpflege' ? (
+                                            <BaumpflegeIcon className="w-16 h-16 flex items-center justify-center text-6xl text-primary" />
+                                        ) : service.id === 'baumfaellung' ? (
+                                            <BaumfaellungIcon className="w-16 h-16 text-primary" />
+                                        ) : service.id === 'gartenpflege' ? (
+                                            <GartenpflegeIcon className="w-16 h-16 flex items-center justify-center text-6xl text-primary" />
+                                        ) : service.id === 'bepflanzung' ? (
+                                            <BepflanzungIcon className="w-16 h-16 flex items-center justify-center text-6xl text-primary" />
+                                        ) : (
+                                            <span className="material-symbols-outlined text-primary text-6xl font-light">{service.icon}</span>
+                                        )}
                                         <h2 className="text-4xl font-serif text-primary leading-tight font-medium">{service.title[language]}</h2>
                                     </div>
                                     <p className="text-lg leading-relaxed text-slate-600 dark:text-slate-400">

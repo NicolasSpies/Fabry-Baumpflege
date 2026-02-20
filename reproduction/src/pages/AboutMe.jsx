@@ -1,54 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../i18n/useLanguage';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useParallax } from '../hooks/useParallax';
 import portrait from '../assets/images/vincent_portrait.png';
 import baumpflegeImg from '../assets/images/services/baumpflege.png';
 import baumfaellungImg from '../assets/images/services/baumfaellung.png';
 import gartenpflegeImg from '../assets/images/services/gartenpflege.png';
 
+const ParallaxImage = ({ src, alt, className = "", speed = 0.04, maxTravel = 24 }) => {
+    const ref = useRef(null);
+    useParallax(ref, { speed, maxTravel, scale: 1.15 });
+    return (
+        <img
+            ref={ref}
+            alt={alt}
+            className={`w-full h-full object-cover ${className}`}
+            src={src}
+        />
+    );
+};
+
 const AboutMe = () => {
     const { language } = useLanguage();
     useScrollReveal();
 
-    const [scrollY, setScrollY] = useState(0);
-    useEffect(() => {
-        const handleScroll = () => setScrollY(window.scrollY);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    const heroPortraitRef = useRef(null);
+    useParallax(heroPortraitRef, { speed: 0.08, maxTravel: 40, scale: 1.12 });
 
     return (
-        <main className="pt-32">
-            {/* Philosophy Section with Portrait Overlap */}
-            <section className="relative py-32 px-6 overflow-hidden" id="about">
-                <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+        <main className="pt-20">
+            {/* Philosophy Section - Desktop Hero (100vh) */}
+            <section className="relative lg:min-h-[calc(100vh-80px)] flex items-center py-20 lg:py-0 px-6 overflow-hidden bg-background-light dark:bg-background-dark" id="about">
+                <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center w-full">
                     <div className="relative order-2 lg:order-1">
                         <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl reveal">
                             <img
+                                ref={heroPortraitRef}
                                 alt="Vincent Fabry"
-                                className="w-full aspect-[3/4] object-cover"
+                                className="w-full aspect-square object-cover"
                                 src={portrait}
-                                style={{
-                                    transform: `translateY(${scrollY * -0.05}px)`,
-                                    transition: 'transform 0.1s ease-out'
-                                }}
+                                style={{ transition: 'none' }}
                             />
                         </div>
                         {/* Decorative background element for depth */}
                         <div
-                            className="absolute -top-10 -left-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl"
-                            style={{ transform: `translateY(${scrollY * 0.05}px)` }}
+                            className="absolute -top-10 -left-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl -z-10"
                         ></div>
                     </div>
                     <div className="text-left order-1 lg:order-2">
                         <span className="text-primary font-semibold tracking-[0.3em] uppercase text-xs mb-8 block reveal">
                             {language === 'DE' ? 'Die Philosophie' : 'La Philosophie'}
                         </span>
-                        <h2 className="text-4xl md:text-5xl font-serif text-primary mb-12 leading-tight italic reveal stagger-1">
+                        <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-primary mb-12 leading-tight italic reveal stagger-1">
                             {language === 'DE' ? '"Ein Baum ist mehr als nur Holz. Er ist ein Vermächtnis."' : '"Un arbre est plus que du bois. C\'est un héritage."'}
                         </h2>
-                        <p className="text-xl leading-relaxed text-slate-600 dark:text-slate-400 font-light reveal stagger-2">
+                        <p className="text-lg md:text-xl leading-relaxed text-slate-600 dark:text-slate-400 font-light reveal stagger-2">
                             {language === 'DE'
                                 ? 'Mit Leidenschaft und Fachkenntnis klettere ich in die Kronen, um das Gleichgewicht zwischen urbaner Entwicklung und natürlichem Erhalt zu wahren. Meine Arbeit ist geprägt von tiefem Respekt vor der Vitalität jedes einzelnen Baumes.'
                                 : 'C\'est avec passion et expertise que je grimpe dans les cimes pour maintenir l\'équilibre entre le développement urbain et la préservation naturelle. Mon travail est imprégné d\'un profond respect pour la vitalité de chaque arbre.'}
@@ -57,17 +64,19 @@ const AboutMe = () => {
                 </div>
             </section>
 
-            {/* Image Grid with Offset */}
-            <section className="pb-32 px-6">
+            {/* Image Grid with Offset - Increased spacing from hero */}
+            <section className="py-24 lg:py-32 px-6">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                         {/* Column 1 */}
                         <div className="space-y-6 group">
                             <div className="aspect-[4/5] overflow-hidden rounded-xl bg-slate-100 shadow-xl">
-                                <img
-                                    alt="Detail Tree Care"
-                                    className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-110"
+                                <ParallaxImage
                                     src={baumpflegeImg}
+                                    alt="Detail Tree Care"
+                                    speed={0.02}
+                                    maxTravel={20}
+                                    className="grayscale hover:grayscale-0 transition-opacity duration-700 scale-[1.05]"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -85,10 +94,12 @@ const AboutMe = () => {
                         {/* Column 2 (Offset) */}
                         <div className="space-y-6 group md:mt-24 reveal stagger-1">
                             <div className="aspect-[4/5] overflow-hidden rounded-xl bg-slate-100 shadow-xl">
-                                <img
-                                    alt="Nature conservation"
-                                    className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-110"
+                                <ParallaxImage
                                     src={baumfaellungImg}
+                                    alt="Nature conservation"
+                                    speed={0.06}
+                                    maxTravel={40}
+                                    className="grayscale hover:grayscale-0 transition-opacity duration-700 scale-[1.05]"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -106,10 +117,12 @@ const AboutMe = () => {
                         {/* Column 3 */}
                         <div className="space-y-6 group">
                             <div className="aspect-[4/5] overflow-hidden rounded-xl bg-slate-100 shadow-xl">
-                                <img
-                                    alt="Technical expert"
-                                    className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-110"
+                                <ParallaxImage
                                     src={gartenpflegeImg}
+                                    alt="Technical expert"
+                                    speed={0.10}
+                                    maxTravel={60}
+                                    className="grayscale hover:grayscale-0 transition-opacity duration-700 scale-[1.05]"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -134,8 +147,8 @@ const AboutMe = () => {
                         {language === 'DE' ? 'Lass uns gemeinsam für deine Bäume sorgen.' : 'Prenons soin de vos arbres ensemble.'}
                     </h2>
                     <div className="mb-16 reveal stagger-1">
-                        <p className="text-primary font-signature text-7xl md:text-9xl select-none leading-none">Fabry</p>
-                        <p className="text-xs tracking-[0.4em] uppercase text-slate-400 mt-2">
+                        <p className="text-primary font-signature text-5xl md:text-8xl select-none leading-none whitespace-nowrap">Vincent Fabry</p>
+                        <p className="text-[10px] tracking-[0.4em] uppercase text-slate-400 mt-6 font-bold">
                             {language === 'DE' ? 'Inhaber & Baumpfleger' : 'Propriétaire & Arboriculteur'}
                         </p>
                     </div>

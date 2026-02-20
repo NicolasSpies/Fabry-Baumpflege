@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../i18n/useLanguage';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import BaumpflegeIcon from '../components/BaumpflegeIcon';
+import BaumfaellungIcon from '../components/BaumfaellungIcon';
+import GartenpflegeIcon from '../components/GartenpflegeIcon';
+import BepflanzungIcon from '../components/BepflanzungIcon';
 import { useParallax } from '../hooks/useParallax';
 import servicesHeroImg from '../assets/images/hero/services_hero.png';
 
@@ -18,10 +22,10 @@ const Contact = () => {
     };
 
     const services = [
-        { id: 'Baumpflege', label: { DE: 'Baumpflege', FR: 'Arboriculture' }, sub: { DE: 'Kronenschnitt & Erhalt', FR: 'Taille & Maintien' }, icon: 'park' },
-        { id: 'Baumfällung', label: { DE: 'Baumfällung', FR: 'Abattage' }, sub: { DE: 'Sichere Abtragung', FR: 'Évacuation Sûre' }, icon: 'nature' },
-        { id: 'Gartenpflege', label: { DE: 'Gartenpflege', FR: 'Entretien' }, sub: { DE: 'Gesamtkonzepte', FR: 'Concepts Globaux' }, icon: 'grass' },
-        { id: 'Bepflanzung', label: { DE: 'Bepflanzung', FR: 'Plantation' }, sub: { DE: 'Nachhaltige Neuanlage', FR: 'Nouvelle Plantation' }, icon: 'potted_plant' },
+        { id: 'Baumpflege', label: { DE: 'Baumpflege', FR: 'Arboriculture' }, sub: { DE: 'Kronenschnitt & Erhalt', FR: 'Taille & Maintien' } },
+        { id: 'Baumfällung', label: { DE: 'Baumfällung', FR: 'Abattage' }, sub: { DE: 'Sichere Abtragung', FR: 'Évacuation Sûre' } },
+        { id: 'Gartenpflege', label: { DE: 'Gartenpflege', FR: 'Entretien' }, sub: { DE: 'Gesamtkonzepte', FR: 'Concepts Globaux' } },
+        { id: 'Bepflanzung', label: { DE: 'Bepflanzung', FR: 'Plantation' }, sub: { DE: 'Nachhaltige Neuanlage', FR: 'Nouvelle Plantation' } },
     ];
 
 
@@ -115,13 +119,18 @@ const Contact = () => {
                                                     }`}
                                                 onClick={() => toggleService(s.id)}
                                             >
-                                                {selectedServices.includes(s.id) && (
-                                                    <div className="absolute top-4 right-4 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center">
-                                                        <span className="material-symbols-outlined text-sm font-bold">check</span>
-                                                    </div>
+                                                {s.id === 'Baumpflege' ? (
+                                                    <BaumpflegeIcon className={`w-8 h-8 md:w-12 md:h-12 flex items-center justify-center text-3xl md:text-5xl font-light ${selectedServices.includes(s.id) ? 'text-primary' : 'text-slate-400'}`} />
+                                                ) : s.id === 'Baumfällung' ? (
+                                                    <BaumfaellungIcon className={`w-8 h-8 md:w-12 md:h-12 ${selectedServices.includes(s.id) ? 'text-primary' : 'text-slate-400'}`} />
+                                                ) : s.id === 'Gartenpflege' ? (
+                                                    <GartenpflegeIcon className={`w-8 h-8 md:w-12 md:h-12 flex items-center justify-center text-3xl md:text-5xl font-light ${selectedServices.includes(s.id) ? 'text-primary' : 'text-slate-400'}`} />
+                                                ) : s.id === 'Bepflanzung' ? (
+                                                    <BepflanzungIcon className={`w-8 h-8 md:w-12 md:h-12 flex items-center justify-center text-3xl md:text-5xl font-light ${selectedServices.includes(s.id) ? 'text-primary' : 'text-slate-400'}`} />
+                                                ) : (
+                                                    <span className={`material-symbols-outlined text-3xl md:text-5xl font-light ${selectedServices.includes(s.id) ? 'text-primary' : 'text-slate-400'
+                                                        }`}>{s.icon}</span>
                                                 )}
-                                                <span className={`material-symbols-outlined text-3xl md:text-5xl font-light ${selectedServices.includes(s.id) ? 'text-primary' : 'text-slate-400'
-                                                    }`}>{s.icon}</span>
                                                 <div>
                                                     <p className={`text-[10px] md:text-sm font-bold uppercase tracking-widest mb-1 ${selectedServices.includes(s.id) ? 'text-primary' : 'text-slate-700 dark:text-slate-200'
                                                         }`}>{s.label[language]}</p>

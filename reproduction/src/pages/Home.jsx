@@ -5,6 +5,10 @@ import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useParallax } from '../hooks/useParallax';
 import { references } from '../data/references';
 import ReferenceCard from '../components/ReferenceCard';
+import BaumpflegeIcon from '../components/BaumpflegeIcon';
+import BaumfaellungIcon from '../components/BaumfaellungIcon';
+import GartenpflegeIcon from '../components/GartenpflegeIcon';
+import BepflanzungIcon from '../components/BepflanzungIcon';
 import baumpflegeImg from '../assets/images/services/baumpflege.png';
 
 const StatCounter = ({ value, label, language }) => {
@@ -67,31 +71,77 @@ const Home = () => {
         {
             title: { DE: 'Baumpflege', FR: 'Arboriculture' },
             desc: { DE: 'Kronenpflege, Totholzentfernung und Lichtraumprofilschnitt für die Gesundheit deiner Bäume.', FR: 'Taille de la couronne, enlèvement du bois mort et taille de profil pour la santé de vos arbres.' },
-            icon: 'park',
             id: 'baumpflege'
         },
         {
             title: { DE: 'Baumfällung', FR: 'Abattage' },
             desc: { DE: 'Sichere Fällungen auch an schwierigen Standorten mittels Seilklettertechnik oder Hubsteiger.', FR: 'Abattage sécurisé même dans des endroits difficiles grâce à la grimpe ou à la nacelle.' },
-            icon: 'forest',
             id: 'baumfaellung'
         },
         {
             title: { DE: 'Gartenpflege', FR: 'Entretien de jardin' },
             desc: { DE: 'Ganzheitliche Pflege für deinen Garten, von Hecke schneiden bis zur Rasenpflege.', FR: 'Entretien complet de votre jardin, de la taille des haies à la tonte de la pelouse.' },
-            icon: 'yard',
             id: 'gartenpflege'
         },
         {
             title: { DE: 'Bepflanzung', FR: 'Plantation' },
             desc: { DE: 'Fachgerechte Neupflanzungen von Bäumen, Sträuchern und Stauden für nachhaltiges Grün.', FR: 'Plantations expertes d\'arbres, d\'arbustes et de vivaces pour une verdure durable.' },
-            icon: 'potted_plant',
             id: 'bepflanzung'
         },
     ];
 
+    const testimonials = [
+        {
+            author: 'William Wehr',
+            rating: 5,
+            time: 'il y a 2 semaines',
+            text: 'Travail effectué avec professionnalisme dans le respect des délais et du budget. A recommander à 100%.'
+        },
+        {
+            author: 'Natascha Hilbrink',
+            label: 'Local Guide',
+            rating: 5,
+            time: 'il y a 2 semaines',
+            text: 'Nos travaux d’abattage d’arbres ont été réalisés avec le plus grand soin. Nous sommes pleinement satisfaits et recommandons Fabry Tree Care sans hésitation. Merci pour l’excellent travail !'
+        }
+    ];
+
+    const carouselRef = useRef(null);
+    const [isHovered, setIsHovered] = useState(false);
+    const scrollAmount = 0.5; // Smooth slow scroll
+
+    useEffect(() => {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReducedMotion) return;
+
+        let animationFrameId;
+        const scroll = () => {
+            if (carouselRef.current && !isHovered) {
+                carouselRef.current.scrollLeft += scrollAmount;
+
+                // Infinite loop check: when we reach the end of the middle third, jump back to the start of the middle third
+                const singleSetWidth = carouselRef.current.scrollWidth / 3;
+                if (carouselRef.current.scrollLeft >= singleSetWidth * 2) {
+                    carouselRef.current.scrollLeft -= singleSetWidth;
+                }
+            }
+            animationFrameId = requestAnimationFrame(scroll);
+        };
+
+        animationFrameId = requestAnimationFrame(scroll);
+        return () => cancelAnimationFrame(animationFrameId);
+    }, [isHovered]);
+
+    const scrollCarousel = (direction) => {
+        if (!carouselRef.current) return;
+        const amount = direction === 'left' ? -480 : 480;
+        carouselRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    };
+
     const heroRef = useRef(null);
-    useParallax(heroRef, { speed: 0.2, scaleBase: 1.1, scaleSpeed: 0.0002 });
+    const expertiseRef = useRef(null);
+    useParallax(heroRef, { speed: 0.08, maxTravel: 40, scale: 1.1 });
+    useParallax(expertiseRef, { speed: 0.04, maxTravel: 20, scale: 1.1 });
 
     return (
         <main>
@@ -158,7 +208,17 @@ const Home = () => {
                         {services.map((service, idx) => (
                             <div key={idx} className={`group p-8 rounded-2xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 reveal stagger-${(idx % 4) + 1}`}>
                                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
-                                    <span className="material-symbols-outlined text-3xl text-primary group-hover:text-white transition-colors">{service.icon}</span>
+                                    {service.id === 'baumpflege' ? (
+                                        <BaumpflegeIcon className="w-7 h-7 flex items-center justify-center text-3xl text-primary group-hover:text-white transition-colors" />
+                                    ) : service.id === 'baumfaellung' ? (
+                                        <BaumfaellungIcon className="w-7 h-7 text-primary group-hover:text-white transition-colors" />
+                                    ) : service.id === 'gartenpflege' ? (
+                                        <GartenpflegeIcon className="w-7 h-7 flex items-center justify-center text-3xl text-primary group-hover:text-white transition-colors" />
+                                    ) : service.id === 'bepflanzung' ? (
+                                        <BepflanzungIcon className="w-7 h-7 flex items-center justify-center text-3xl text-primary group-hover:text-white transition-colors" />
+                                    ) : (
+                                        <span className="material-symbols-outlined text-3xl text-primary group-hover:text-white transition-colors">{service.icon}</span>
+                                    )}
                                 </div>
                                 <h3 className="text-xl font-serif text-primary mb-3">{service.title[language]}</h3>
                                 <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
@@ -209,16 +269,78 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* Testimonials Section */}
+            <section className="py-24 bg-background-light dark:bg-background-dark overflow-hidden">
+                <div className="max-w-7xl mx-auto px-6 mb-16">
+                    <div className="text-center space-y-4">
+                        <span className="text-primary font-bold tracking-widest uppercase text-xs">
+                            {language === 'DE' ? 'Kundenstimmen' : 'Témoignages'}
+                        </span>
+                        <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">
+                            {language === 'DE' ? 'Was meine Kunden sagen' : 'Ce que disent nos clients'}
+                        </h2>
+                    </div>
+                </div>
+
+                <div className="relative group/carousel">
+                    {/* Fixed Arrows - Desktop Only */}
+                    <button
+                        onClick={() => scrollCarousel('left')}
+                        className="absolute left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 items-center justify-center text-primary opacity-0 group-hover/carousel:opacity-100 transition-opacity hidden md:flex hover:bg-primary hover:text-white"
+                        aria-label="Previous testimonial"
+                    >
+                        <span className="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <button
+                        onClick={() => scrollCarousel('right')}
+                        className="absolute right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 items-center justify-center text-primary opacity-0 group-hover/carousel:opacity-100 transition-opacity hidden md:flex hover:bg-primary hover:text-white"
+                        aria-label="Next testimonial"
+                    >
+                        <span className="material-symbols-outlined">arrow_forward</span>
+                    </button>
+
+                    <div
+                        ref={carouselRef}
+                        className="flex gap-8 px-6 py-6 overflow-x-auto overflow-y-hidden no-scrollbar scroll-smooth"
+                        onMouseEnter={() => setIsHovered(true)}
+                        onMouseLeave={() => setIsHovered(false)}
+                    >
+                        {/* Tripled list for infinite loop feel */}
+                        {[...testimonials, ...testimonials, ...testimonials].map((t, idx) => (
+                            <div
+                                key={idx}
+                                className="flex-shrink-0 w-full md:w-[450px] bg-white dark:bg-surface-dark p-8 md:p-10 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-shadow"
+                            >
+                                <div className="flex items-center gap-1 text-amber-400 mb-4">
+                                    {[...Array(t.rating)].map((_, i) => (
+                                        <span key={i} className="material-symbols-outlined text-sm icon-fill">star</span>
+                                    ))}
+                                </div>
+                                <p className="text-slate-700 dark:text-slate-300 italic mb-8 leading-relaxed font-sans">
+                                    "{t.text}"
+                                </p>
+                                <div className="flex items-center justify-between border-t border-slate-50 dark:border-slate-800 pt-6">
+                                    <div>
+                                        <h4 className="font-serif text-primary text-lg">{t.author}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* About Section Teaser */}
-            <section className="py-24 px-6 overflow-hidden bg-background-light dark:bg-background-dark" id="about">
+            <section className="py-24 px-6 overflow-hidden bg-surface-light dark:bg-surface-dark/50" id="about">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
                         <div className="w-full lg:w-1/2 relative">
                             <div className="absolute -top-10 -left-10 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -z-10"></div>
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
                                 <img
+                                    ref={expertiseRef}
                                     alt="Professional Arborist Climbing"
-                                    className="w-full h-[650px] object-cover transition-transform duration-700 group-hover:scale-105"
+                                    className="w-full h-[650px] object-cover"
                                     src={baumpflegeImg}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent p-10 flex items-end">

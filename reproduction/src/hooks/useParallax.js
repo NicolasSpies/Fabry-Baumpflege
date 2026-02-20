@@ -1,57 +1,113 @@
 import { useEffect } from 'react';
 
-/**
- * useParallax Hook
- * 
- * Provides a high-performance parallax effect using requestAnimationFrame and transform3d.
- * Avoids React state updates on scroll to prevent re-renders.
- * 
- * @param {React.RefObject} ref - The ref of the element to apply parallax to.
- * @param {Object} options - Configuration options.
- * @param {number} options.speed - Speed factor for translation (default: 0.2).
- * @param {number} options.scaleBase - Base scale of the image (default: 1.1).
- * @param {number} options.scaleSpeed - Speed factor for scaling (default: 0.0001).
- * @param {boolean} options.disabled - Manually disable the effect.
- */
-export const useParallax = (ref, { speed = 0.2, scaleBase = 1.1, scaleSpeed = 0.0002, disabled = false } = {}) => {
+const registry = new Set();
+let rafId = null;
+let isRunning = false;
+let lastScrollY = 0;
+let scrollTimeout = null;
+
+const updateLayouts = () => {
+    registry.forEach(item => {
+        if (item.ref.current) {
+            const rect = item.ref.current.getBoundingClientRect();
+            item.layout = {
+                top: rect.top + window.pageYOffset,
+                height: rect.height
+            };
+        }
+    });
+};
+
+const runLoop = () => {
+    const scrollY = window.pageYOffset;
+    const vh = window.innerHeight;
+
+    // Only update if we've actually scrolled or are in a small buffer
+    registry.forEach(item => {
+        const el = item.ref.current;
+        if (!el || !item.layout) return;
+
+        const { speed, maxTravel, scale } = item.options;
+        const top = item.layout.top - scrollY;
+        const bottom = top + item.layout.height;
+
+        if (bottom > -100 && top < vh + 100) {
+            const centerOffset = (top + item.layout.height / 2) - (vh / 2);
+            const travel = centerOffset * -speed;
+            const clampedTravel = Math.max(-maxTravel, Math.min(maxTravel, travel));
+
+            el.style.setProperty('transform', `translate3d(0, ${clampedTravel}px, 0) scale(${scale})`, 'important');
+        }
+    });
+
+    if (isRunning) {
+        rafId = requestAnimationFrame(runLoop);
+    }
+};
+
+const startLoop = () => {
+    if (!isRunning) {
+        isRunning = true;
+        rafId = requestAnimationFrame(runLoop);
+    }
+};
+
+const stopLoop = () => {
+    isRunning = false;
+    if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+    }
+};
+
+if (typeof window !== 'undefined') {
+    const handleScroll = () => {
+        startLoop();
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(stopLoop, 1000); // Keep running for 1s after scroll
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', () => {
+        updateLayouts();
+    }, { passive: true });
+}
+
+export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, disabled = false } = {}) => {
     useEffect(() => {
-        if (!ref.current || disabled) return;
+        const el = ref.current;
+        if (!el || disabled) return;
 
-        // Check for prefers-reduced-motion
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        // Check for mobile (simple check)
         const isMobile = window.innerWidth < 768;
-
         if (prefersReducedMotion || isMobile) return;
 
-        let animationFrameId;
-        let lastScrollY = window.scrollY;
+        // Force transition none to prevent lag
+        el.style.setProperty('transition', 'none', 'important');
+        el.style.setProperty('will-change', 'transform', 'important');
 
-        const updateParallax = () => {
-            const currentScrollY = window.scrollY;
-
-            // Only update if scroll position changed
-            if (currentScrollY !== lastScrollY) {
-                const yPos = currentScrollY * speed;
-                const scale = scaleBase + currentScrollY * scaleSpeed;
-
-                if (ref.current) {
-                    // Use translate3d for GPU acceleration
-                    ref.current.style.transform = `translate3d(0, ${yPos}px, 0) scale(${scale})`;
-                }
-
-                lastScrollY = currentScrollY;
-            }
-
-            animationFrameId = requestAnimationFrame(updateParallax);
+        const item = {
+            ref,
+            options: { speed, maxTravel, scale },
+            layout: null
         };
 
-        animationFrameId = requestAnimationFrame(updateParallax);
+        const rect = el.getBoundingClientRect();
+        item.layout = {
+            top: rect.top + window.pageYOffset,
+            height: rect.height
+        };
+
+        registry.add(item);
+
+        // Ensure loop starts on first use
+        startLoop();
 
         return () => {
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
+            registry.delete(item);
+            if (registry.size === 0) {
+                stopLoop();
             }
         };
-    }, [ref, speed, scaleBase, scaleSpeed, disabled]);
+    }, [ref, speed, maxTravel, scale, disabled]);
 };

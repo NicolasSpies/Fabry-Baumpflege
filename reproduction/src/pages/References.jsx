@@ -22,15 +22,20 @@ const References = () => {
         ? references
         : references.filter(p => p.categories?.includes(activeFilter));
 
-    // Handle potential empty state from transient state errors
-    useEffect(() => {
-        if (filteredProjects.length === 0 && activeFilter !== 'Alle' && activeFilter !== 'Tous') {
-            console.warn(`Filtering for "${activeFilter}" returned no results. Resetting to "Alle".`);
-            setActiveFilter('Alle');
-        }
-    }, [filteredProjects, activeFilter]);
+    const [hasAnimated, setHasAnimated] = useState(false);
+    const [isInitialRender, setIsInitialRender] = useState(true);
 
-    useScrollReveal([activeFilter]);
+    useEffect(() => {
+        // Only run stagger on initial mount
+        const timer = setTimeout(() => {
+            setIsInitialRender(false);
+            setHasAnimated(true);
+        }, 1500); // Sufficient time for staggered entrance to complete
+        return () => clearTimeout(timer);
+    }, []);
+
+    // We no longer use useScrollReveal here to prevent visibility bugs
+    // useScrollReveal([activeFilter]);
 
     return (
         <main className="pt-28">
@@ -66,8 +71,14 @@ const References = () => {
             <section className="pb-32 px-6">
                 <div className="max-w-7xl mx-auto">
                     <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
-                        {filteredProjects.map((project) => (
-                            <ReferenceCard key={project.id} project={project} language={language} />
+                        {filteredProjects.map((project, index) => (
+                            <ReferenceCard
+                                key={project.id}
+                                project={project}
+                                language={language}
+                                animateEntry={isInitialRender}
+                                staggerIndex={index}
+                            />
                         ))}
                     </div>
 
