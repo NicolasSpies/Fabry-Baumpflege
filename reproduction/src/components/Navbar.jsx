@@ -9,15 +9,18 @@ const Navbar = () => {
     const [isScrolled, setIsScrolled] = React.useState(false);
 
     React.useEffect(() => {
+        let lastScrolled = false;
         const handleScroll = () => {
-            if (window.scrollY > 20) {
-                setIsScrolled(true);
-            } else {
-                setIsScrolled(false);
+            const scrolly = window.scrollY;
+            const shouldBeScrolled = scrolly > 20;
+
+            if (shouldBeScrolled !== lastScrolled) {
+                lastScrolled = shouldBeScrolled;
+                setIsScrolled(shouldBeScrolled);
             }
         };
 
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         // Initial check
         handleScroll();
 
@@ -47,8 +50,8 @@ const Navbar = () => {
 
     return (
         <nav className={`fixed top-0 w-full z-[100] transition-all duration-500 ease-in-out ${isScrolled || isMenuOpen
-                ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 py-0 shadow-sm'
-                : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-100/50 dark:border-slate-800/50 py-2'
+            ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 py-0 shadow-sm'
+            : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-100/50 dark:border-slate-800/50 py-2'
             }`}>
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 <Link to="/" className="flex items-center gap-2">

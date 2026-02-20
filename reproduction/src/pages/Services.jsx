@@ -120,23 +120,50 @@ const Services = () => {
         }
     ];
 
-    const [scrollY, setScrollY] = useState(0);
+    const heroRef = useRef(null);
+
     useEffect(() => {
-        const handleScroll = () => setScrollY(window.scrollY);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        let rafId;
+        const handleScroll = () => {
+            if (!heroRef.current) return;
+
+            const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const isMobile = window.innerWidth <= 768;
+
+            if (isReducedMotion || isMobile) {
+                heroRef.current.style.transform = 'scale(1.1) translateY(0px)';
+                return;
+            }
+
+            const scrollY = window.scrollY;
+            const scale = 1.1 + scrollY * 0.0001;
+            const translate = scrollY * 0.15;
+
+            heroRef.current.style.transform = `scale3d(${scale}, ${scale}, 1) translate3d(0, ${translate}px, 0)`;
+        };
+
+        const onScroll = () => {
+            cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(handleScroll);
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            cancelAnimationFrame(rafId);
+        };
     }, []);
 
     return (
         <main>
             <section className="relative h-[60vh] flex items-center justify-center pt-20 overflow-hidden">
                 <img
+                    ref={heroRef}
                     alt="Lush green canopy"
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover will-change-transform"
                     src={servicesHeroImg}
                     style={{
-                        transform: `scale(${1.1 + scrollY * 0.0001}) translateY(${scrollY * 0.15}px)`,
-                        transition: 'transform 0.1s ease-out'
+                        transform: 'scale(1.1) translateY(0px)'
                     }}
                 />
                 <div className="absolute inset-0 bg-black/30"></div>

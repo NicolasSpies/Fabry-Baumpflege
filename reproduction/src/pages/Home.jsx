@@ -89,11 +89,38 @@ const Home = () => {
         },
     ];
 
-    const [scrollY, setScrollY] = useState(0);
+    const heroRef = useRef(null);
+
     useEffect(() => {
-        const handleScroll = () => setScrollY(window.scrollY);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        let rafId;
+        const handleScroll = () => {
+            if (!heroRef.current) return;
+
+            const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const isMobile = window.innerWidth <= 768;
+
+            if (isReducedMotion || isMobile) {
+                heroRef.current.style.transform = 'scale(1.1) translateY(0px)';
+                return;
+            }
+
+            const scrollY = window.scrollY;
+            const scale = 1.1 + scrollY * 0.0002;
+            const translate = scrollY * 0.2;
+
+            heroRef.current.style.transform = `scale3d(${scale}, ${scale}, 1) translate3d(0, ${translate}px, 0)`;
+        };
+
+        const onScroll = () => {
+            cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(handleScroll);
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            cancelAnimationFrame(rafId);
+        };
     }, []);
 
     return (
@@ -102,12 +129,12 @@ const Home = () => {
             <section className="relative h-screen w-full overflow-hidden flex items-center">
                 <div className="absolute inset-0 z-0">
                     <img
+                        ref={heroRef}
                         alt="Professional tree work"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover will-change-transform"
                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKWkuceu9VZWOD9mKiRLyewvI7P3g4WSt4KcxdFVfkfQehbCUL6Uybyf9OClVUkICnp1gw08a07G5aj8gos3IJcp84FdxC50xMYpSd2qVlY3QmubVByqpv7PS53aO44xZ_NwCJNg55mmnndIiMoMO7P3P89_1CQklbcu2kOoolomCv8mJdnG_BJKC_slopZSLtQuKBQbJ0VSeQKPXPpxg0sayypaz-apH-zqTY35IrZaKPB1aPu-y5_P9t7ZrDlZw9ZLbgtxiX4MWM"
                         style={{
-                            transform: `scale(${1.1 + scrollY * 0.0002}) translateY(${scrollY * 0.2}px)`,
-                            transition: 'transform 0.1s ease-out'
+                            transform: 'scale(1.1) translateY(0px)'
                         }}
                     />
                     {/* Modern cinematic radial/depth overlay */}
