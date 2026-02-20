@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../i18n/useLanguage';
 import { references } from '../data/references';
 
 import { useScrollReveal } from '../hooks/useScrollReveal';

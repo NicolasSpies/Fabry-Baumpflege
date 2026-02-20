@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../i18n/useLanguage';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import servicesHeroImg from '../assets/images/hero/services_hero.png';
 

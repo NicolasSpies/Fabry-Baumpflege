@@ -1,3 +1,6 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useLanguage } from '../i18n/useLanguage';
 import logo from '../assets/Baumpflege-Fabry-Logo.svg';
 
 const Footer = () => {

@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import { useLanguage } from '../i18n/useLanguage';
 import logo from '../assets/Baumpflege-Fabry-Logo.svg';
 
 const Navbar = () => {

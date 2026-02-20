@@ -1,3 +1,5 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '../i18n/useLanguage';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import baumpflegeImg from '../assets/images/services/baumpflege.png';
 import baumfaellungImg from '../assets/images/services/baumfaellung.png';

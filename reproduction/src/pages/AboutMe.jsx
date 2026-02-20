@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useLanguage } from '../i18n/useLanguage';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import portrait from '../assets/images/vincent_portrait.png';
 import baumpflegeImg from '../assets/images/services/baumpflege.png';

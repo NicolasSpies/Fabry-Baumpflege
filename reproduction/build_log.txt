@@ -1,0 +1,25 @@
+
+> reproduction@0.0.0 build
+> vite build
+
+vite v7.3.1 building client environment for production...
+transforming...
+✓ 4 modules transformed.
+✗ Build failed in 192ms
+error during build:
+src/i18n/useLanguage.js (15:8): Expression expected
+file: /Users/nicolasspies/Desktop/antigravity test/Fabry-Baumpflege/reproduction/src/i18n/useLanguage.js:15:8
+
+13: 
+14:     return (
+15:         <LanguageContext.Provider value={{ language, setLanguage }}>
+            ^
+16:             {children}
+17:         </LanguageContext.Provider>
+
+    at getRollupError (file:///Users/nicolasspies/Desktop/antigravity%20test/Fabry-Baumpflege/reproduction/node_modules/rollup/dist/es/shared/parseAst.js:402:41)
+    at ParseError.initialise (file:///Users/nicolasspies/Desktop/antigravity%20test/Fabry-Baumpflege/reproduction/node_modules/rollup/dist/es/shared/node-entry.js:14465:28)
+    at convertNode (file:///Users/nicolasspies/Desktop/antigravity%20test/Fabry-Baumpflege/reproduction/node_modules/rollup/dist/es/shared/node-entry.js:16437:10)
+    at convertProgram (file:///Users/nicolasspies/Desktop/antigravity%20test/Fabry-Baumpflege/reproduction/node_modules/rollup/dist/es/shared/node-entry.js:15677:12)
+    at Module.setSource (file:///Users/nicolasspies/Desktop/antigravity%20test/Fabry-Baumpflege/reproduction/node_modules/rollup/dist/es/shared/node-entry.js:17392:24)
+    at async ModuleLoader.addModuleSource (file:///Users/nicolasspies/Desktop/antigravity%20test/Fabry-Baumpflege/reproduction/node_modules/rollup/dist/es/shared/node-entry.js:21474:13)
