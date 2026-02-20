@@ -119,54 +119,51 @@ const Navbar = () => {
                     </span>
                 </button>
 
-                {/* Mobile Menu Overlay */}
-                <div
-                    className={`fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[90] transition-all duration-500 md:hidden ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                        }`}
-                    onClick={closeMenu}
-                ></div>
+                {/* Mobile Menu Dropdown */}
+                {isMenuOpen && (
+                    <div className="absolute top-[100%] left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl border-b border-slate-100 dark:border-slate-800 md:hidden flex flex-col items-center py-8 gap-8 z-[100]">
+                        <div className="flex flex-col items-center gap-6 w-full px-6">
+                            {navItems.map((item) => (
+                                <NavLink
+                                    key={item.path}
+                                    to={item.path}
+                                    onClick={closeMenu}
+                                    className={({ isActive }) =>
+                                        `text-lg font-serif uppercase tracking-widest transition-colors ${isActive ? 'text-primary' : 'text-slate-500 hover:text-primary'}`
+                                    }
+                                >
+                                    {item.name[language]}
+                                </NavLink>
+                            ))}
+                        </div>
 
-                {/* Mobile Menu Panel */}
-                <div className={`fixed top-0 right-0 h-full w-[300px] bg-white/95 dark:bg-background-dark/95 backdrop-blur-xl z-[100] flex flex-col p-10 transform transition-transform duration-500 ease-in-out md:hidden shadow-2xl ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-                    }`}>
-                    <div className="flex flex-col gap-8 mt-16 flex-grow">
-                        {navItems.map((item) => (
-                            <NavLink
-                                key={item.path}
-                                to={item.path}
+                        <div className="w-full px-6 flex justify-center mt-2">
+                            <Link
+                                to="/kontakt"
                                 onClick={closeMenu}
-                                className={({ isActive }) =>
-                                    `text-xl font-serif uppercase tracking-widest transition-colors ${isActive ? 'text-primary' : 'text-slate-500 hover:text-primary'}`
-                                }
+                                className="bg-primary text-white px-8 py-3 rounded-full text-sm uppercase tracking-widest font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all text-center w-full max-w-[200px]"
                             >
-                                {item.name[language]}
-                            </NavLink>
-                        ))}
-                        <Link
-                            to="/kontakt"
-                            onClick={closeMenu}
-                            className="bg-primary text-white px-8 py-3 rounded-full text-sm uppercase tracking-widest font-bold mt-4 shadow-lg hover:bg-opacity-90 inline-block text-center"
-                        >
-                            {language === 'DE' ? 'Kontakt' : 'Contact'}
-                        </Link>
-                    </div>
+                                {language === 'DE' ? 'Kontakt' : 'Contact'}
+                            </Link>
+                        </div>
 
-                    <div className="flex items-center justify-center gap-8 mt-auto pt-8 border-t border-slate-100 dark:border-slate-800 text-sm tracking-[0.3em] font-bold">
-                        <button
-                            onClick={() => { setLanguage('DE'); closeMenu(); }}
-                            className={`transition-all duration-300 ${language === 'DE' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
-                        >
-                            DE
-                        </button>
-                        <span className="opacity-10 text-xl font-light">|</span>
-                        <button
-                            onClick={() => { setLanguage('FR'); closeMenu(); }}
-                            className={`transition-all duration-300 ${language === 'FR' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
-                        >
-                            FR
-                        </button>
+                        <div className="flex items-center justify-center gap-6 mt-4 pt-6 border-t border-slate-100 dark:border-slate-800/50 w-full text-sm tracking-[0.3em] font-bold">
+                            <button
+                                onClick={() => { setLanguage('DE'); closeMenu(); }}
+                                className={`transition-all duration-300 ${language === 'DE' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
+                            >
+                                DE
+                            </button>
+                            <span className="opacity-20 text-xl font-light">|</span>
+                            <button
+                                onClick={() => { setLanguage('FR'); closeMenu(); }}
+                                className={`transition-all duration-300 ${language === 'FR' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
+                            >
+                                FR
+                            </button>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </nav>
     );

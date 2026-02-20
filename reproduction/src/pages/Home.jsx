@@ -56,6 +56,8 @@ const StatCounter = ({ value, label, language }) => {
     );
 };
 
+import homeHeroImg from '../assets/images/hero/home_hero_highres.png';
+
 const Home = () => {
     const { language } = useLanguage();
     useScrollReveal();
@@ -106,16 +108,20 @@ const Home = () => {
         }
     ];
 
-    /* ── Marquee (pixel-per-second driven) ── */
+    /* ── Marquee (pixel-per-second driven + touch drag) ── */
     const marqueeRef = useRef(null);
     const [marqueePaused, setMarqueePaused] = useState(false);
     const SPEED_PX_PER_SEC = 40;
+
+    // Touch state refs to avoid re-triggering dependency array 
+    const isDragging = useRef(false);
+    const startX = useRef(0);
+    const currentOffset = useRef(0);
 
     useEffect(() => {
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (prefersReducedMotion) return;
 
-        let offset = 0;
         let prevTimestamp = null;
         let rafId;
 
@@ -124,16 +130,22 @@ const Home = () => {
             const delta = (timestamp - prevTimestamp) / 1000; // seconds
             prevTimestamp = timestamp;
 
-            if (!marqueePaused && marqueeRef.current) {
-                offset += SPEED_PX_PER_SEC * delta;
+            // Only auto-scroll if not hovered AND not currently dragging
+            if (!marqueePaused && !isDragging.current && marqueeRef.current) {
+                currentOffset.current += SPEED_PX_PER_SEC * delta;
 
                 // Reset seamlessly at one-third of track width (one full set)
                 const singleSetWidth = marqueeRef.current.scrollWidth / 3;
-                if (singleSetWidth > 0 && offset >= singleSetWidth) {
-                    offset -= singleSetWidth;
+                if (singleSetWidth > 0 && currentOffset.current >= singleSetWidth) {
+                    currentOffset.current -= singleSetWidth;
                 }
 
-                marqueeRef.current.style.transform = `translate3d(-${offset}px, 0, 0)`;
+                // Handle reverse drag loops
+                if (singleSetWidth > 0 && currentOffset.current < 0) {
+                    currentOffset.current += singleSetWidth;
+                }
+
+                marqueeRef.current.style.transform = `translate3d(-${currentOffset.current}px, 0, 0)`;
             }
 
             rafId = requestAnimationFrame(tick);
@@ -142,6 +154,31 @@ const Home = () => {
         rafId = requestAnimationFrame(tick);
         return () => cancelAnimationFrame(rafId);
     }, [marqueePaused]);
+
+    // Touch Handlers
+    const handleTouchStart = (e) => {
+        isDragging.current = true;
+        startX.current = e.touches[0].clientX;
+    };
+
+    const handleTouchMove = (e) => {
+        if (!isDragging.current || !marqueeRef.current) return;
+
+        const currentX = e.touches[0].clientX;
+        const diffX = startX.current - currentX;
+
+        // Update offset immediately for smooth drag
+        currentOffset.current += diffX;
+        marqueeRef.current.style.transform = `translate3d(-${currentOffset.current}px, 0, 0)`;
+
+        // Reset startX for continuous calculation
+        startX.current = currentX;
+    };
+
+    const handleTouchEnd = () => {
+        isDragging.current = false;
+        // The rAF loop will automatically pick up from the new currentOffset.current
+    };
 
     const heroRef = useRef(null);
     const expertiseRef = useRef(null);
@@ -157,30 +194,29 @@ const Home = () => {
                         ref={heroRef}
                         alt="Professional tree work"
                         className="w-full h-full object-cover"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKWkuceu9VZWOD9mKiRLyewvI7P3g4WSt4KcxdFVfkfQehbCUL6Uybyf9OClVUkICnp1gw08a07G5aj8gos3IJcp84FdxC50xMYpSd2qVlY3QmubVByqpv7PS53aO44xZ_NwCJNg55mmnndIiMoMO7P3P89_1CQklbcu2kOoolomCv8mJdnG_BJKC_slopZSLtQuKBQbJ0VSeQKPXPpxg0sayypaz-apH-zqTY35IrZaKPB1aPu-y5_P9t7ZrDlZw9ZLbgtxiX4MWM"
+                        src={homeHeroImg}
                         style={{
                             transform: 'translate3d(0, 0, 0) scale(1.1)',
                             willChange: 'transform'
                         }}
                     />
-                    {/* Modern cinematic radial/depth overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent"></div>
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/40 via-transparent to-transparent opacity-70"></div>
+                    {/* Refined subtle vertical gradient — lets more image through */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10"></div>
                 </div>
-                <div className="relative z-10 max-w-7xl mx-auto px-6 w-full pt-20">
-                    <div className="max-w-3xl space-y-6">
-                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white leading-tight drop-shadow-sm reveal">
-                            {language === 'DE' ? <>Präzision <br /><span className="italic text-white/90">trifft Natur</span></> : <>Précision <br /><span className="italic text-white/90">rencontre Nature</span></>}
+                <div className="relative z-10 max-w-7xl mx-auto px-6 w-full pt-32">
+                    <div className="max-w-3xl space-y-5">
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white leading-[1.1] reveal">
+                            {language === 'DE' ? <>Präzision <br /><span className="text-white/90">trifft Natur</span></> : <>Précision <br /><span className="text-white/90">rencontre Nature</span></>}
                         </h1>
-                        <p className="text-xl text-white/95 font-sans max-w-xl leading-[1.7] drop-shadow-md reveal stagger-1">
+                        <p className="text-lg text-white/80 font-sans font-normal max-w-xl leading-relaxed reveal stagger-1">
                             {language === 'DE'
                                 ? 'Nachhaltige Baumpflege und Fällarbeiten mit höchster Sorgfalt und Expertise. Für gesunde Bäume und sichere Gärten.'
                                 : 'Entretien durable des arbres et abattages effectués avec le plus grand soin et expertise. Pour des arbres sains et des jardins sécurisés.'}
                         </p>
-                        <div className="pt-8 reveal stagger-2">
+                        <div className="pt-6 reveal stagger-2">
                             <Link
                                 to="/kontakt"
-                                className="inline-block bg-[#3E5F25] text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase text-sm hover:bg-[#2e471b] transition-all transform hover:-translate-y-1 shadow-xl"
+                                className="inline-block bg-[#3E5F25] text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase text-sm hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
                             >
                                 {language === 'DE' ? 'Kostenloses Angebot' : 'Devis Gratuit'}
                             </Link>
@@ -202,7 +238,7 @@ const Home = () => {
             <section className="py-24 px-6 bg-background-light dark:bg-background-dark" id="services">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-20 space-y-4">
-                        <span className="text-primary font-bold tracking-widest uppercase text-xs">
+                        <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">
                             {language === 'DE' ? 'Unsere Expertise' : 'Notre Expertise'}
                         </span>
                         <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">
@@ -211,7 +247,7 @@ const Home = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {services.map((service, idx) => (
-                            <div key={idx} className={`group p-8 rounded-2xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 reveal stagger-${(idx % 4) + 1}`}>
+                            <div key={idx} className={`group p-8 rounded-2xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left reveal stagger-${(idx % 4) + 1}`}>
                                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
                                     {service.id === 'baumpflege' ? (
                                         <BaumpflegeIcon className="w-7 h-7 flex items-center justify-center text-3xl text-primary group-hover:text-white transition-colors" />
@@ -248,7 +284,7 @@ const Home = () => {
             <section className="py-24 px-6 bg-surface-light dark:bg-surface-dark/50" id="references-preview">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-20 space-y-4">
-                        <span className="text-primary font-bold tracking-widest uppercase text-xs">
+                        <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">
                             {language === 'DE' ? 'Ausgewählte Projekte' : 'Projets Sélectionnés'}
                         </span>
                         <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">
@@ -278,7 +314,7 @@ const Home = () => {
             <section className="py-24 bg-background-light dark:bg-background-dark overflow-hidden">
                 <div className="max-w-7xl mx-auto px-6 mb-16">
                     <div className="text-center space-y-4">
-                        <span className="text-primary font-bold tracking-widest uppercase text-xs">
+                        <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">
                             {language === 'DE' ? 'Kundenstimmen' : 'Témoignages'}
                         </span>
                         <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">
@@ -292,8 +328,12 @@ const Home = () => {
                         <div
                             ref={marqueeRef}
                             className="marquee-track gap-8 px-6 py-6"
+                            style={{ touchAction: 'pan-y' }}
                             onMouseEnter={() => setMarqueePaused(true)}
                             onMouseLeave={() => setMarqueePaused(false)}
+                            onTouchStart={handleTouchStart}
+                            onTouchMove={handleTouchMove}
+                            onTouchEnd={handleTouchEnd}
                         >
                             {/* Tripled list for infinite loop feel */}
                             {[...testimonials, ...testimonials, ...testimonials].map((t, idx) => (
@@ -343,7 +383,7 @@ const Home = () => {
                         </div>
                         <div className="w-full lg:w-1/2 space-y-10">
                             <div className="space-y-4">
-                                <span className="text-primary font-bold tracking-widest uppercase text-xs block">
+                                <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs block">
                                     {language === 'DE' ? 'Tradition trifft Präzision' : 'Tradition rencontre Précision'}
                                 </span>
                                 <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight reveal">

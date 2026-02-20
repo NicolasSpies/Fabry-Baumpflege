@@ -50,7 +50,7 @@ const StatCounter = ({ value, label, language }) => {
             <div className="text-4xl md:text-5xl font-serif text-primary mb-2">
                 {count}{value.includes('+') ? '+' : value.includes('%') ? '%' : ''}
             </div>
-            <div className="text-xs md:text-sm text-slate-500 uppercase tracking-widest font-medium">
+            <div className="text-xs md:text-sm text-[#9bb221] uppercase tracking-widest font-medium">
                 {label[language]}
             </div>
         </div>
@@ -189,7 +189,7 @@ const Services = () => {
                                     <ul className="space-y-3">
                                         {service.features[language].map((feature, fIdx) => (
                                             <li key={fIdx} className="flex items-center gap-3">
-                                                <span className="material-symbols-outlined text-primary">check_circle</span>
+                                                <span className="material-symbols-outlined text-[#9bb221]">check_circle</span>
                                                 <span>{feature}</span>
                                             </li>
                                         ))}

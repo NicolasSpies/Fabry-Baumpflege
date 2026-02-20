@@ -89,13 +89,13 @@ const Contact = () => {
                             </section>
 
                             <section className="bg-primary/5 dark:bg-primary/10 p-8 rounded-xl border border-primary/10 transition-colors duration-300">
-                                <h3 className="text-[10px] uppercase tracking-[0.3em] text-primary/70 font-bold mb-4">
+                                <h3 className="text-[10px] uppercase tracking-[0.3em] text-[#9bb221] font-bold mb-4">
                                     {language === 'DE' ? 'Einsatzgebiet' : 'Zone d\'Intervention'}
                                 </h3>
                                 <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">
                                     {language === 'DE'
-                                        ? 'Ich bin in der gesamten Region Limbourg und Umgebung für dich im Einsatz. Fachgerechte Beratung vor Ort.'
-                                        : 'Je suis à votre service dans toute la région du Limbourg et ses environs. Conseils professionnels sur place.'}
+                                        ? 'Ich bin in der gesamten Region Ostbelgien und Umgebung für dich im Einsatz und berate dich fachgerecht direkt vor Ort.'
+                                        : 'Je suis à votre service dans toute la région d’Ostbelgie et ses environs, et je vous conseille professionnellement directement sur place.'}
                                 </p>
                             </section>
                         </div>
