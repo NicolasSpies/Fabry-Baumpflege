@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fabry Baumpflege | Präzision trifft Natur</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Montserrat:wght@400;500;600&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#395824",
+              "primary-dark": "#2a421b",
+              "background-light": "#f7f7f6",
+              "background-dark": "#181d15",
+              "surface-light": "#F8FAF5",
+              "surface-dark": "#1E1E1E",
+              "accent-green": "#3E5F25",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+              serif: ["Playfair Display", "serif"],
+              sans: ["Montserrat", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px"
+            },
+          },
+        },
+      };
+    </script>
+<style type="text/tailwindcss">
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-auto-rows: 250px;
+            gap: 1.5rem;
+        }
+        .masonry-item-large {
+            grid-row: span 2;
+        }
+        .masonry-item-wide {
+            grid-column: span 2;
+        }
+        @media (max-width: 768px) {
+            .masonry-item-wide {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display transition-colors duration-300">
+<nav class="fixed top-0 w-full z-50 bg-white/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 shadow-sm">
+<div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<img alt="Fabry Baumpflege Logo" class="h-14 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASpbI6twNVuEct7AyMe-IoeeoyPDr1_O9uNEgexjwCIkHNmlAKUxMyA1MpOPIadyz0HCEeIPnPfq_bvfm-gNhPtIYNRpsKAD3lMCg6uo6vhMEKxpTp_UB885mO1lQa-IS5QjeV2Gf9F5RKV8YREPJFzQdLOSriNb8qGeErEda2zs6Fc_7wEIKAk5vvzPEINo6y2ZtZrYeQzohc7-myB_hRJ9CVPJR8vjKVXCFq7Ic8degAgElfUstTvRDR26eA9llEPaKFrc8jfXtX"/>
+</div>
+<div class="hidden lg:flex items-center space-x-10 text-sm font-medium uppercase tracking-widest text-slate-600 dark:text-slate-300">
+<a class="hover:text-primary transition-colors" href="#">Startseite</a>
+<a class="hover:text-primary transition-colors" href="#services">Leistungen</a>
+<a class="hover:text-primary transition-colors" href="#about">Über Mich</a>
+<a class="hover:text-primary transition-colors" href="#references">Referenzen</a>
+<div class="flex items-center pl-4 border-l border-slate-200 dark:border-slate-700 h-6">
+<div class="flex items-center space-x-2 text-xs mr-6">
+<a class="font-semibold text-primary border-b-2 border-primary pb-0.5" href="#">DE</a>
+<span class="text-slate-400">|</span>
+<a class="text-slate-500 hover:text-primary transition-colors" href="#">FR</a>
+</div>
+<a class="bg-primary text-white px-8 py-3 rounded-full hover:bg-primary-dark transition-all text-xs font-bold tracking-widest shadow-lg shadow-primary/20" href="#">Kontakt</a>
+</div>
+</div>
+<button class="lg:hidden text-primary">
+<span class="material-symbols-outlined text-3xl">menu</span>
+</button>
+</div>
+</nav>
+<main>
+<section class="relative h-screen w-full overflow-hidden flex items-center">
+<div class="absolute inset-0 z-0">
+<img alt="Professional tree work" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKWkuceu9VZWOD9mKiRLyewvI7P3g4WSt4KcxdFVfkfQehbCUL6Uybyf9OClVUkICnp1gw08a07G5aj8gos3IJcp84FdxC50xMYpSd2qVlY3QmubVByqpv7PS53aO44xZ_NwCJNg55mmnndIiMoMO7P3P89_1CQklbcu2kOoolomCv8mJdnG_BJKC_slopZSLtQuKBQbJ0VSeQKPXPpxg0sayypaz-apH-zqTY35IrZaKPB1aPu-y5_P9t7ZrDlZw9ZLbgtxiX4MWM"/>
+<div class="absolute inset-0 bg-black/40"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background-light dark:from-background-dark via-transparent to-transparent opacity-90"></div>
+</div>
+<div class="relative z-10 max-w-7xl mx-auto px-6 w-full pt-20">
+<div class="max-w-3xl space-y-6">
+<span class="text-white/90 font-medium tracking-[0.2em] uppercase text-sm animate-fade-in-up">Professionelle Baumpflege NRW</span>
+<h1 class="text-5xl md:text-7xl lg:text-8xl font-serif text-white leading-tight drop-shadow-sm">
+                    Präzision <br/><span class="italic text-white/90">trifft Natur</span>
+</h1>
+<p class="text-xl text-white/90 font-sans max-w-xl leading-relaxed">
+                    Nachhaltige Baumpflege und Fällarbeiten mit höchster Sorgfalt und Expertise. Für gesunde Bäume und sichere Gärten.
+                </p>
+<div class="pt-8">
+<a class="inline-block bg-[#3E5F25] text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase text-sm hover:bg-[#2e471b] transition-all transform hover:-translate-y-1 shadow-xl" href="#contact">
+                        Kostenloses Angebot
+                    </a>
+</div>
+</div>
+</div>
+</section>
+<section class="py-16 bg-surface-light dark:bg-surface-dark border-b border-slate-100 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-slate-200 dark:divide-slate-700/50">
+<div class="text-center px-4">
+<div class="text-4xl md:text-5xl font-serif text-primary mb-2">500+</div>
+<div class="text-xs md:text-sm text-slate-500 uppercase tracking-widest font-medium">Zufriedene Kunden</div>
+</div>
+<div class="text-center px-4">
+<div class="text-4xl md:text-5xl font-serif text-primary mb-2">2500+</div>
+<div class="text-xs md:text-sm text-slate-500 uppercase tracking-widest font-medium">Gepflegte Bäume</div>
+</div>
+<div class="text-center px-4">
+<div class="text-4xl md:text-5xl font-serif text-primary mb-2">22</div>
+<div class="text-xs md:text-sm text-slate-500 uppercase tracking-widest font-medium">Jahre Erfahrung</div>
+</div>
+<div class="text-center px-4">
+<div class="text-4xl md:text-5xl font-serif text-primary mb-2">100%</div>
+<div class="text-xs md:text-sm text-slate-500 uppercase tracking-widest font-medium">Einsatz &amp; Sicherheit</div>
+</div>
+</div>
+</section>
+<section class="py-24 px-6 bg-background-light dark:bg-background-dark" id="services">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-20 space-y-4">
+<span class="text-primary font-bold tracking-widest uppercase text-xs">Unsere Expertise</span>
+<h2 class="text-4xl md:text-5xl font-serif text-primary">Leistungen im Überblick</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="group p-8 rounded-2xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+<div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-3xl text-primary group-hover:text-white transition-colors">park</span>
+</div>
+<h3 class="text-xl font-serif text-primary mb-3">Baumpflege</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
+                        Kronenpflege, Totholzentfernung und Lichtraumprofilschnitt für die Gesundheit Ihrer Bäume.
+                    </p>
+<a class="inline-flex items-center text-xs font-bold uppercase tracking-widest text-primary hover:text-primary-dark group-hover:underline decoration-2 underline-offset-4" href="#">
+                        Mehr erfahren <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span>
+</a>
+</div>
+<div class="group p-8 rounded-2xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+<div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-3xl text-primary group-hover:text-white transition-colors">forest</span>
+</div>
+<h3 class="text-xl font-serif text-primary mb-3">Baumfällung</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
+                        Sichere Fällungen auch an schwierigen Standorten mittels Seilklettertechnik oder Hubsteiger.
+                    </p>
+<a class="inline-flex items-center text-xs font-bold uppercase tracking-widest text-primary hover:text-primary-dark group-hover:underline decoration-2 underline-offset-4" href="#">
+                        Mehr erfahren <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span>
+</a>
+</div>
+<div class="group p-8 rounded-2xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+<div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-3xl text-primary group-hover:text-white transition-colors">yard</span>
+</div>
+<h3 class="text-xl font-serif text-primary mb-3">Gartenpflege</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
+                        Ganzheitliche Pflege für Ihren Garten, von Hecke schneiden bis zur Rasenpflege.
+                    </p>
+<a class="inline-flex items-center text-xs font-bold uppercase tracking-widest text-primary hover:text-primary-dark group-hover:underline decoration-2 underline-offset-4" href="#">
+                        Mehr erfahren <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span>
+</a>
+</div>
+<div class="group p-8 rounded-2xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+<div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-3xl text-primary group-hover:text-white transition-colors">potted_plant</span>
+</div>
+<h3 class="text-xl font-serif text-primary mb-3">Bepflanzung</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
+                        Fachgerechte Neupflanzungen von Bäumen, Sträuchern und Stauden für nachhaltiges Grün.
+                    </p>
+<a class="inline-flex items-center text-xs font-bold uppercase tracking-widest text-primary hover:text-primary-dark group-hover:underline decoration-2 underline-offset-4" href="#">
+                        Mehr erfahren <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 px-6 overflow-hidden bg-surface-light dark:bg-surface-dark/30" id="about">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+<div class="w-full lg:w-1/2 relative">
+<div class="absolute -top-10 -left-10 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -z-10"></div>
+<div class="relative rounded-2xl overflow-hidden shadow-2xl group">
+<img alt="Professional Arborist Climbing" class="w-full h-[650px] object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKWkuceu9VZWOD9mKiRLyewvI7P3g4WSt4KcxdFVfkfQehbCUL6Uybyf9OClVUkICnp1gw08a07G5aj8gos3IJcp84FdxC50xMYpSd2qVlY3QmubVByqpv7PS53aO44xZ_NwCJNg55mmnndIiMoMO7P3P89_1CQklbcu2kOoolomCv8mJdnG_BJKC_slopZSLtQuKBQbJ0VSeQKPXPpxg0sayypaz-apH-zqTY35IrZaKPB1aPu-y5_P9t7ZrDlZw9ZLbgtxiX4MWM"/>
+<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-10">
+<p class="text-white italic font-serif text-2xl border-l-4 border-primary pl-4">"Qualität, die über Generationen wächst."</p>
+</div>
+</div>
+<div class="absolute -bottom-6 -right-6 w-32 h-32 bg-pattern-dots opacity-20 hidden lg:block"></div>
+</div>
+<div class="w-full lg:w-1/2 space-y-10">
+<div class="space-y-4">
+<span class="text-primary font-bold tracking-widest uppercase text-xs block">Tradition trifft Präzision</span>
+<h2 class="text-4xl md:text-5xl font-serif text-primary leading-tight">Expertise in jedem Astschlag</h2>
+</div>
+<p class="text-lg leading-relaxed text-slate-600 dark:text-slate-400 font-sans">
+                        Seit über zwei Jahrzehnten widmet sich Fabry Baumpflege dem Erhalt und der Pflege urbaner Naturräume. Wir verstehen Bäume nicht nur als Gestaltungselemente, sondern als wertvolle Lebewesen, die Sicherheit, Schatten und Lebensqualität spenden.
+                    </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+<div class="flex items-start gap-4 p-5 rounded-xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-primary text-3xl">verified_user</span>
+<div>
+<h4 class="font-bold text-primary mb-1">Sicherheit</h4>
+<p class="text-xs text-slate-500 leading-relaxed">Zertifizierte Seilklettertechnik und modernste Ausrüstung.</p>
+</div>
+</div>
+<div class="flex items-start gap-4 p-5 rounded-xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-primary text-3xl">eco</span>
+<div>
+<h4 class="font-bold text-primary mb-1">Nachhaltigkeit</h4>
+<p class="text-xs text-slate-500 leading-relaxed">Schonende Baumpflege im Einklang mit der Natur.</p>
+</div>
+</div>
+<div class="flex items-start gap-4 p-5 rounded-xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-primary text-3xl">psychology</span>
+<div>
+<h4 class="font-bold text-primary mb-1">Erfahrung</h4>
+<p class="text-xs text-slate-500 leading-relaxed">Über 20 Jahre Fachwissen in der Gehölzpflege.</p>
+</div>
+</div>
+<div class="flex items-start gap-4 p-5 rounded-xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-primary text-3xl">handshake</span>
+<div>
+<h4 class="font-bold text-primary mb-1">Zuverlässigkeit</h4>
+<p class="text-xs text-slate-500 leading-relaxed">Termintreue und saubere Arbeitsweise garantiert.</p>
+</div>
+</div>
+</div>
+<div class="pt-4">
+<a class="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all group border-b border-primary/30 pb-1 hover:border-primary" href="#">
+                            Erfahren Sie mehr über mich 
+                            <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-background-light dark:bg-background-dark" id="references">
+<div class="max-w-7xl mx-auto px-6">
+<div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+<span class="text-primary font-bold tracking-widest uppercase text-xs">Portfolio</span>
+<h2 class="text-4xl md:text-5xl font-serif text-primary">Unsere Referenzen</h2>
+<p class="text-slate-600 dark:text-slate-400 font-sans">Ein Einblick in unsere jüngsten Projekte. Von der privaten Gartenpflege bis hin zu großflächigen kommunalen Baumfällungen.</p>
+</div>
+<div class="masonry-grid">
+<div class="group relative overflow-hidden rounded-xl masonry-item-large bg-slate-200 dark:bg-slate-800">
+<img alt="Baumpflege Schlossgarten" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLTnK67nYSQJdGBr6olT7noTAdSve1UhHH2PYYkxx7dO-ghy06HeiajLWXoy2N23qAM5NaIpr6CnsOucYXHhOjdloB2QdU-y9yisoFCjQw5EFUkUefylPCBrfdRCNi1Wff9l7gnjXR91wClvXj7e2FOc9qiJaI4zv1nMPng4_3zWE9HTK6b3Zj-5qLvVINpeWQ8u0pZtrtM4NmU3rbPQ4-szc1WgfbQNghsOd9DBo7NzG19m2FWWsKDbBNaPxkiHabdke8oF5jvjb6"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8 text-white">
+<span class="text-xs uppercase tracking-widest mb-2 font-bold text-white/80">Kronenschnitt</span>
+<h3 class="text-2xl font-serif mb-1">Schlossgarten Park</h3>
+<p class="text-sm text-white/80 mt-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Sicherheitsformung alter Eichenbestände.</p>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-xl bg-slate-200 dark:bg-slate-800">
+<img alt="Gartengestaltung Privat" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYxymgFZNohbpj1o9G51GsQASChVCKwn_yMkMAPIWz1MYIDzubInyBregzTzA9LSLrepZV3JIJCoglshtaumZeE8uBoVWdr8DDVm5oggaFKgoJVsIYG73MCxXIxCWJjLd9CI2HabNdokFUo7oQjtvypJ8_Xj61h6m8TZxAiH5e1JnRL9EbUAbXIZzuWQsimZBreFNlYvq128pe4xRALapwv6f62ZplIvnhSCk0NQuBDD7hsh5POFcmlqaUr5M-3Hkqx8l10sKQNMnl"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 text-white">
+<span class="text-xs uppercase tracking-widest mb-1 font-bold text-white/80">Gartenbau</span>
+<h3 class="text-xl font-serif">Residenz am See</h3>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-xl masonry-item-wide bg-slate-200 dark:bg-slate-800">
+<img alt="Gefahrbaumfällung" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABEPeUJjBVH4jpuPMKOrB8PVvzhnorX6qvJ33LCB8jnoLF7VUEkmqTNhJTaSAO6gO8HVEHEgdV0gATuSCWbDIBb_PElHKBdngi1VZlKHaNHf7rS9HlvbYx0AZAFghaMTvAkLQqXCOfN3f3ec0Ls6wrZxRaoOz5GKNG07KVsrccw_oGUXu2R5qQktrfUAjfzpdsSIJrMV4QJeMEz8H38RsXlzr6YJGRsDec_lzr2SgOkSzBM5KHFSQ17X4O3WXtnlgTwXbM19szdGDl"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8 text-white">
+<span class="text-xs uppercase tracking-widest mb-2 font-bold text-white/80">Fällarbeiten</span>
+<h3 class="text-3xl font-serif mb-1">Spezialfällung Steilhang</h3>
+<p class="text-sm text-white/80 mt-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Präzisionsarbeit unter schwierigsten Bedingungen.</p>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-xl bg-slate-200 dark:bg-slate-800">
+<img alt="Baumkontrolle" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPe4pj-E5G0G4kWH3lJeJUMUXWUnykdJeXb2mi9y3QI7gfL6Xb17MElwtWDVk2J4pq8uuIBpKKN81yZhfA_EGH5KiKRc-kGnt0hZLeoXOxVuv-eElwcgL0-CxDG8oEextuwLZxUkMSUkbI_EI4uB3pAxrt3cUtkTli5h-m5feiTiHPSFzqv5I2dYxIsLQX-nB0uryYfWCuvLflldnjdRjbxZnfalFFLhk89Pk0bGRq221ijOUE_UA_ucq5WOiEbEl6UOFcEHlp7-ll"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 text-white">
+<span class="text-xs uppercase tracking-widest mb-1 font-bold text-white/80">Gutachten</span>
+<h3 class="text-xl font-serif">Standsicherheitsprüfung</h3>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-xl bg-slate-200 dark:bg-slate-800">
+<img alt="Pflanzung" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXJvQCBColiGzS6pBvra4VertDmqaz8ygtXNlO8T4dGYqfoQFQhwgl3XSr5yE6xBVtbK1VrJ8Kfj1qxXRAGJh2aii_vdTIIlJx7MZQA_uXQgqP5vEMIDWx2pauD2HwGNMHWvcSeKOp5hbD8Xm-Wg70JGWHxwQo0jDUvjzAWuY-QB9isH7gH1l5BL_aVqFuP-AdOBSae7nYv0-Zaq5aPAgtpQ450cipZJQcDrrjBCuWrNHXNkw099rJ_ELTf6-eaGMHIbsE7qoYU_oI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 text-white">
+<span class="text-xs uppercase tracking-widest mb-1 font-bold text-white/80">Neupflanzung</span>
+<h3 class="text-xl font-serif">Stadtallee Begrünung</h3>
+</div>
+</div>
+</div>
+<div class="mt-16 text-center">
+<a class="inline-block border-2 border-primary text-primary px-10 py-3 rounded-full font-bold hover:bg-primary hover:text-white transition-all duration-300 uppercase tracking-wider text-sm" href="#">
+                    Alle Projekte ansehen
+                </a>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-primary text-white py-20 px-6">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="col-span-1 md:col-span-1 space-y-6">
+<img alt="Fabry Logo White" class="h-16 brightness-0 invert opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASpbI6twNVuEct7AyMe-IoeeoyPDr1_O9uNEgexjwCIkHNmlAKUxMyA1MpOPIadyz0HCEeIPnPfq_bvfm-gNhPtIYNRpsKAD3lMCg6uo6vhMEKxpTp_UB885mO1lQa-IS5QjeV2Gf9F5RKV8YREPJFzQdLOSriNb8qGeErEda2zs6Fc_7wEIKAk5vvzPEINo6y2ZtZrYeQzohc7-myB_hRJ9CVPJR8vjKVXCFq7Ic8degAgElfUstTvRDR26eA9llEPaKFrc8jfXtX"/>
+<p class="text-white/70 text-sm leading-relaxed font-sans">
+                Ihr verlässlicher Partner für professionelle Baumpflege, Fällungen und Gartenarbeiten im gesamten Raum NRW. Kompetenz für Ihre grüne Oase.
+            </p>
+<div class="flex gap-4 pt-2">
+<a class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all text-white" href="#">
+<span class="material-symbols-outlined text-lg">public</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all text-white" href="#">
+<span class="material-symbols-outlined text-lg">share</span>
+</a>
+</div>
+</div>
+<div class="md:col-span-1">
+<h4 class="font-bold text-lg mb-6 font-serif">Leistungen</h4>
+<ul class="space-y-3 text-white/70 text-sm">
+<li><a class="hover:text-white transition-colors flex items-center gap-2" href="#"><span class="w-1 h-1 bg-white/50 rounded-full"></span>Baumpflege</a></li>
+<li><a class="hover:text-white transition-colors flex items-center gap-2" href="#"><span class="w-1 h-1 bg-white/50 rounded-full"></span>Baumfällung</a></li>
+<li><a class="hover:text-white transition-colors flex items-center gap-2" href="#"><span class="w-1 h-1 bg-white/50 rounded-full"></span>Wurzelstockfräsen</a></li>
+<li><a class="hover:text-white transition-colors flex items-center gap-2" href="#"><span class="w-1 h-1 bg-white/50 rounded-full"></span>Pflanzungen</a></li>
+<li><a class="hover:text-white transition-colors flex items-center gap-2" href="#"><span class="w-1 h-1 bg-white/50 rounded-full"></span>Gartenpflege</a></li>
+</ul>
+</div>
+<div class="md:col-span-1">
+<h4 class="font-bold text-lg mb-6 font-serif">Unternehmen</h4>
+<ul class="space-y-3 text-white/70 text-sm">
+<li><a class="hover:text-white transition-colors flex items-center gap-2" href="#"><span class="w-1 h-1 bg-white/50 rounded-full"></span>Über uns</a></li>
+<li><a class="hover:text-white transition-colors flex items-center gap-2" href="#"><span class="w-1 h-1 bg-white/50 rounded-full"></span>Team</a></li>
+<li><a class="hover:text-white transition-colors flex items-center gap-2" href="#"><span class="w-1 h-1 bg-white/50 rounded-full"></span>Karriere</a></li>
+<li><a class="hover:text-white transition-colors flex items-center gap-2" href="#"><span class="w-1 h-1 bg-white/50 rounded-full"></span>Partner</a></li>
+</ul>
+</div>
+<div class="md:col-span-1">
+<h4 class="font-bold text-lg mb-6 font-serif">Kontakt</h4>
+<ul class="space-y-4 text-white/70 text-sm">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-lg mt-0.5">location_on</span>
+<span>Musterstraße 123<br/>40210 Düsseldorf</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-lg">phone</span>
+<a class="hover:text-white" href="tel:+49123456789">+49 123 456789</a>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-lg">mail</span>
+<a class="hover:text-white" href="mailto:info@fabry-baumpflege.de">info@fabry-baumpflege.de</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/40 uppercase tracking-widest font-medium">
+<p>© 2024 Fabry Baumpflege. Alle Rechte vorbehalten.</p>
+<div class="flex gap-8">
+<a class="hover:text-white transition-colors" href="#">Impressum</a>
+<a class="hover:text-white transition-colors" href="#">Datenschutz</a>
+<a class="hover:text-white transition-colors" href="#">AGB</a>
+</div>
+</div>
+</footer>
+
+</body></html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Referenzen | Fabry Baumpflege</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3E5F25",
+              deepolive: "#4B4A16",
+              "background-light": "#FFFFFF",
+              "background-dark": "#121212",
+              "surface-light": "#F8FAF5",
+              "surface-dark": "#1E1E1E",
+            },
+            fontFamily: {
+              display: ["Playfair Display", "serif"],
+              sans: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+            },
+          },
+        },
+      };
+    </script>
+<style type="text/tailwindcss">
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-auto-rows: 300px;
+            gap: 1.5rem;
+        }
+        .masonry-item-tall {
+            grid-row: span 2;
+        }
+        .masonry-item-wide {
+            grid-column: span 2;
+        }
+        @media (max-width: 768px) {
+            .masonry-item-wide {
+                grid-column: span 1;
+            }
+            .masonry-grid {
+                grid-template-columns: 1fr;
+                grid-auto-rows: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
+<nav class="fixed top-0 w-full z-50 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<img alt="Fabry Baumpflege Logo" class="h-12 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASpbI6twNVuEct7AyMe-IoeeoyPDr1_O9uNEgexjwCIkHNmlAKUxMyA1MpOPIadyz0HCEeIPnPfq_bvfm-gNhPtIYNRpsKAD3lMCg6uo6vhMEKxpTp_UB885mO1lQa-IS5QjeV2Gf9F5RKV8YREPJFzQdLOSriNb8qGeErEda2zs6Fc_7wEIKAk5vvzPEINo6y2ZtZrYeQzohc7-myB_hRJ9CVPJR8vjKVXCFq7Ic8degAgElfUstTvRDR26eA9llEPaKFrc8jfXtX"/>
+</div>
+<div class="hidden md:flex items-center space-x-10 text-sm font-medium uppercase tracking-widest">
+<a class="hover:text-primary transition-colors" href="#">Startseite</a>
+<a class="hover:text-primary transition-colors" href="#">Leistungen</a>
+<a class="hover:text-primary transition-colors" href="#">Über Uns</a>
+<a class="text-primary border-b-2 border-primary pb-1" href="#">Referenzen</a>
+<a class="bg-primary text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all" href="#">Kontakt</a>
+</div>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined text-3xl">menu</span>
+</button>
+</div>
+</nav>
+<main class="pt-20">
+<section class="pt-24 pb-12 px-6">
+<div class="max-w-7xl mx-auto text-center space-y-6">
+<span class="text-primary font-semibold tracking-[0.2em] uppercase text-sm block">Portfolio</span>
+<h1 class="text-5xl md:text-6xl font-display text-primary leading-tight">Unsere Projekte &amp; Referenzen</h1>
+<p class="max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-400">
+                Entdecken Sie eine Auswahl unserer Arbeiten. Von präziser Baumpflege bis hin zu komplexen Fällungen und hochwertiger Gartengestaltung.
+            </p>
+</div>
+</section>
+<section class="sticky top-20 z-40 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-y border-slate-100 dark:border-slate-800 mb-12">
+<div class="max-w-7xl mx-auto px-6 py-4 overflow-x-auto">
+<div class="flex items-center justify-center min-w-max gap-4 md:gap-8">
+<button class="px-6 py-2 rounded-full bg-primary text-white text-sm font-medium uppercase tracking-widest transition-all">Alle</button>
+<button class="px-6 py-2 rounded-full text-slate-500 hover:text-primary text-sm font-medium uppercase tracking-widest transition-all border border-transparent hover:border-primary/20">Baumpflege</button>
+<button class="px-6 py-2 rounded-full text-slate-500 hover:text-primary text-sm font-medium uppercase tracking-widest transition-all border border-transparent hover:border-primary/20">Baumfällung</button>
+<button class="px-6 py-2 rounded-full text-slate-500 hover:text-primary text-sm font-medium uppercase tracking-widest transition-all border border-transparent hover:border-primary/20">Gartenbau</button>
+<button class="px-6 py-2 rounded-full text-slate-500 hover:text-primary text-sm font-medium uppercase tracking-widest transition-all border border-transparent hover:border-primary/20">Pflanzung</button>
+</div>
+</div>
+</section>
+<section class="pb-32 px-6">
+<div class="max-w-7xl mx-auto">
+<div class="masonry-grid">
+<div class="group relative overflow-hidden rounded-2xl masonry-item-tall bg-slate-100 dark:bg-slate-800">
+<img alt="Project 1" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLTnK67nYSQJdGBr6olT7noTAdSve1UhHH2PYYkxx7dO-ghy06HeiajLWXoy2N23qAM5NaIpr6CnsOucYXHhOjdloB2QdU-y9yisoFCjQw5EFUkUefylPCBrfdRCNi1Wff9l7gnjXR91wClvXj7e2FOc9qiJaI4zv1nMPng4_3zWE9HTK6b3Zj-5qLvVINpeWQ8u0pZtrtM4NmU3rbPQ4-szc1WgfbQNghsOd9DBo7NzG19m2FWWsKDbBNaPxkiHabdke8oF5jvjb6"/>
+<div class="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[2px] flex flex-col justify-end p-10 text-white">
+<span class="text-xs uppercase tracking-widest mb-2 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100">Düsseldorf</span>
+<h3 class="text-3xl font-display mb-1 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-200">Schlossgarten Park</h3>
+<p class="text-sm opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-300">Kronensicherung &amp; Erhaltungsschnitt</p>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800">
+<img alt="Project 2" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYxymgFZNohbpj1o9G51GsQASChVCKwn_yMkMAPIWz1MYIDzubInyBregzTzA9LSLrepZV3JIJCoglshtaumZeE8uBoVWdr8DDVm5oggaFKgoJVsIYG73MCxXIxCWJjLd9CI2HabNdokFUo7oQjtvypJ8_Xj61h6m8TZxAiH5e1JnRL9EbUAbXIZzuWQsimZBreFNlYvq128pe4xRALapwv6f62ZplIvnhSCk0NQuBDD7hsh5POFcmlqaUr5M-3Hkqx8l10sKQNMnl"/>
+<div class="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[2px] flex flex-col justify-end p-8 text-white">
+<span class="text-xs uppercase tracking-widest mb-1">Essen</span>
+<h3 class="text-2xl font-display">Residenz am Baldeneysee</h3>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-2xl masonry-item-wide bg-slate-100 dark:bg-slate-800">
+<img alt="Project 3" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABEPeUJjBVH4jpuPMKOrB8PVvzhnorX6qvJ33LCB8jnoLF7VUEkmqTNhJTaSAO6gO8HVEHEgdV0gATuSCWbDIBb_PElHKBdngi1VZlKHaNHf7rS9HlvbYx0AZAFghaMTvAkLQqXCOfN3f3ec0Ls6wrZxRaoOz5GKNG07KVsrccw_oGUXu2R5qQktrfUAjfzpdsSIJrMV4QJeMEz8H38RsXlzr6YJGRsDec_lzr2SgOkSzBM5KHFSQ17X4O3WXtnlgTwXbM19szdGDl"/>
+<div class="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[2px] flex flex-col justify-end p-10 text-white">
+<span class="text-xs uppercase tracking-widest mb-2">Wuppertal</span>
+<h3 class="text-4xl font-display mb-1">Spezialfällung Steilhang</h3>
+<p class="text-sm">Präzisionsarbeit mittels Seilklettertechnik</p>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800">
+<img alt="Project 4" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPe4pj-E5G0G4kWH3lJeJUMUXWUnykdJeXb2mi9y3QI7gfL6Xb17MElwtWDVk2J4pq8uuIBpKKN81yZhfA_EGH5KiKRc-kGnt0hZLeoXOxVuv-eElwcgL0-CxDG8oEextuwLZxUkMSUkbI_EI4uB3pAxrt3cUtkTli5h-m5feiTiHPSFzqv5I2dYxIsLQX-nB0uryYfWCuvLflldnjdRjbxZnfalFFLhk89Pk0bGRq221ijOUE_UA_ucq5WOiEbEl6UOFcEHlp7-ll"/>
+<div class="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[2px] flex flex-col justify-end p-8 text-white">
+<span class="text-xs uppercase tracking-widest mb-1">Ratingen</span>
+<h3 class="text-2xl font-display">Historische Baumallee</h3>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800">
+<img alt="Project 5" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXJvQCBColiGzS6pBvra4VertDmqaz8ygtXNlO8T4dGYqfoQFQhwgl3XSr5yE6xBVtbK1VrJ8Kfj1qxXRAGJh2aii_vdTIIlJx7MZQA_uXQgqP5vEMIDWx2pauD2HwGNMHWvcSeKOp5hbD8Xm-Wg70JGWHxwQo0jDUvjzAWuY-QB9isH7gH1l5BL_aVqFuP-AdOBSae7nYv0-Zaq5aPAgtpQ450cipZJQcDrrjBCuWrNHXNkw099rJ_ELTf6-eaGMHIbsE7qoYU_oI"/>
+<div class="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[2px] flex flex-col justify-end p-8 text-white">
+<span class="text-xs uppercase tracking-widest mb-1">Düsseldorf</span>
+<h3 class="text-2xl font-display">Stadtbegrünung Zentrum</h3>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-2xl masonry-item-tall bg-slate-100 dark:bg-slate-800">
+<img alt="Project 6" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKWkuceu9VZWOD9mKiRLyewvI7P3g4WSt4KcxdFVfkfQehbCUL6Uybyf9OClVUkICnp1gw08a07G5aj8gos3IJcp84FdxC50xMYpSd2qVlY3QmubVByqpv7PS53aO44xZ_NwCJNg55mmnndIiMoMO7P3P89_1CQklbcu2kOoolomCv8mJdnG_BJKC_slopZSLtQuKBQbJ0VSeQKPXPpxg0sayypaz-apH-zqTY35IrZaKPB1aPu-y5_P9t7ZrDlZw9ZLbgtxiX4MWM"/>
+<div class="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[2px] flex flex-col justify-end p-10 text-white">
+<span class="text-xs uppercase tracking-widest mb-2">Meerbusch</span>
+<h3 class="text-3xl font-display mb-1">Privatgarten Luxus</h3>
+<p class="text-sm">Ganzjährige Pflege &amp; Formgestaltung</p>
+</div>
+</div>
+</div>
+<div class="mt-20 text-center">
+<button class="inline-flex items-center gap-3 px-12 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300">
+                    Mehr Projekte laden
+                    <span class="material-symbols-outlined">refresh</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-primary text-white py-24 px-6">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-16">
+<div class="col-span-1 md:col-span-2 space-y-8">
+<img alt="Fabry Logo White" class="h-14 brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASpbI6twNVuEct7AyMe-IoeeoyPDr1_O9uNEgexjwCIkHNmlAKUxMyA1MpOPIadyz0HCEeIPnPfq_bvfm-gNhPtIYNRpsKAD3lMCg6uo6vhMEKxpTp_UB885mO1lQa-IS5QjeV2Gf9F5RKV8YREPJFzQdLOSriNb8qGeErEda2zs6Fc_7wEIKAk5vvzPEINo6y2ZtZrYeQzohc7-myB_hRJ9CVPJR8vjKVXCFq7Ic8degAgElfUstTvRDR26eA9llEPaKFrc8jfXtX"/>
+<p class="max-w-md text-white/80 leading-relaxed">
+                Als zertifizierter Fachbetrieb für Baumpflege und Gartengestaltung stehen wir für höchste Qualität und nachhaltigen Erhalt Ihrer Grünanlagen im Raum NRW.
+            </p>
+<div class="flex gap-4">
+<a class="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center hover:bg-white/10 transition-all" href="#">
+<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"></path></svg>
+</a>
+</div>
+</div>
+<div>
+<h4 class="font-bold text-lg mb-8 tracking-wider uppercase text-white/90">Navigation</h4>
+<ul class="space-y-4 text-white/70">
+<li><a class="hover:text-white transition-colors" href="#">Startseite</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Leistungen</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Über Uns</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Referenzen</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Kontakt</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-lg mb-8 tracking-wider uppercase text-white/90">Kontakt</h4>
+<ul class="space-y-5 text-white/70">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-white/80">location_on</span>
+<span>Musterstraße 123,<br/>40210 Düsseldorf</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-white/80">phone</span>
+<span>+49 123 456789</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-white/80">mail</span>
+<span>info@fabry-baumpflege.de</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto mt-24 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] text-white/40 uppercase tracking-[0.3em]">
+<p>© 2024 Fabry Baumpflege. Alle Rechte vorbehalten.</p>
+<div class="flex gap-12">
+<a class="hover:text-white transition-colors" href="#">Impressum</a>
+<a class="hover:text-white transition-colors" href="#">Datenschutz</a>
+</div>
+</div>
+</footer>
+</body></html>

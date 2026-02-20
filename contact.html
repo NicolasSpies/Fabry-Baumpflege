@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kontakt | Fabry Baumpflege</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+        :root {
+            --primary-dark-green: #3E5F25;
+            --medium-fresh-green: #97B21F;
+            --warm-ochre: #A77A0F;
+            --background-airy: #F9FBF7;
+            --border-light: #E2E8F0;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+        .form-input-minimal {
+            @apply w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-slate-300 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300;
+        }
+        .service-card-minimal {
+            @apply border border-slate-200 p-6 transition-all duration-300 cursor-pointer hover:border-primary flex flex-col items-center text-center gap-4;
+        }
+        .service-card-minimal.selected {
+            @apply border-primary bg-[var(--background-airy)] ring-1 ring-primary;
+        }
+    </style>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3E5F25",
+                        fresh: "#97B21F",
+                        ochre: "#A77A0F",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[var(--background-airy)] text-slate-800 antialiased">
+<nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-8 h-24 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<img alt="Fabry Baumpflege Logo" class="h-14 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASpbI6twNVuEct7AyMe-IoeeoyPDr1_O9uNEgexjwCIkHNmlAKUxMyA1MpOPIadyz0HCEeIPnPfq_bvfm-gNhPtIYNRpsKAD3lMCg6uo6vhMEKxpTp_UB885mO1lQa-IS5QjeV2Gf9F5RKV8YREPJFzQdLOSriNb8qGeErEda2zs6Fc_7wEIKAk5vvzPEINo6y2ZtZrYeQzohc7-myB_hRJ9CVPJR8vjKVXCFq7Ic8degAgElfUstTvRDR26eA9llEPaKFrc8jfXtX"/>
+</div>
+<div class="hidden md:flex items-center space-x-12 text-[11px] font-bold uppercase tracking-[0.25em]">
+<a class="hover:text-primary transition-colors" href="#">Startseite</a>
+<a class="hover:text-primary transition-colors" href="#">Leistungen</a>
+<a class="hover:text-primary transition-colors" href="#">Über Mich</a>
+<a class="hover:text-primary transition-colors" href="#">Referenzen</a>
+<a class="text-primary border-b-2 border-primary pb-1" href="#">Kontakt</a>
+</div>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined text-3xl">menu</span>
+</button>
+</div>
+</nav>
+<main class="pt-48 pb-32 px-8">
+<div class="max-w-5xl mx-auto">
+<div class="mb-24 text-center">
+<h1 class="text-5xl md:text-6xl font-display text-primary mb-8">Kontaktieren Sie mich</h1>
+<div class="w-24 h-px bg-primary mx-auto opacity-30"></div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-20">
+<div class="lg:col-span-4 space-y-16">
+<section>
+<h3 class="text-[10px] uppercase tracking-[0.3em] text-primary font-bold mb-8">Kontakt Details</h3>
+<ul class="space-y-10">
+<li class="group">
+<p class="text-[10px] uppercase tracking-widest text-slate-400 mb-2">Telefon</p>
+<a class="text-xl font-light hover:text-primary transition-colors" href="tel:+49123456789">+49 123 456789</a>
+</li>
+<li class="group">
+<p class="text-[10px] uppercase tracking-widest text-slate-400 mb-2">Email</p>
+<a class="text-xl font-light hover:text-primary transition-colors" href="mailto:info@fabry-baumpflege.de">info@fabry-baumpflege.de</a>
+</li>
+<li class="group">
+<p class="text-[10px] uppercase tracking-widest text-slate-400 mb-2">Büro</p>
+<p class="text-xl font-light leading-relaxed">Musterstraße 123,<br/>40210 Düsseldorf</p>
+</li>
+</ul>
+</section>
+<section>
+<h3 class="text-[10px] uppercase tracking-[0.3em] text-primary font-bold mb-8">Einsatzgebiet</h3>
+<div class="relative group grayscale hover:grayscale-0 transition-all duration-700 rounded-sm overflow-hidden border border-slate-200">
+<img alt="Map Location" class="w-full h-64 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZoQhgNiDuOS64kLB7dNQY1RLNhRIJXQB7ORK4hcVKYHnm0JD4POmfQO60xZrA6dYmNn-4_gaSd5RCNaCB9cijZTAbV-Ba8X-txoy9yLOBY7lZ_Tu311f7T2h0RrrYbqdTFyB3gn2s2brAR95Rp_30EP0fsxUg_KIhfhqgdoAyYZzckEl_SgtnZX0eGmVTr_4u0rAroy7tbCdsCyi-tLryKpjdpGczcU8WaIwsqqu0fSQHM18HEf1ioIr8xmAzpJ58VBBc-bDEMDTo"/>
+<div class="absolute inset-0 bg-primary/5"></div>
+</div>
+<p class="text-[10px] uppercase tracking-widest text-slate-400 mt-4">Düsseldorf &amp; Umgebung</p>
+</section>
+</div>
+<div class="lg:col-span-8">
+<div class="bg-white p-10 md:p-16 border border-slate-100 shadow-sm">
+<div class="mb-16 flex items-center justify-between text-[10px] uppercase tracking-[0.2em] font-bold text-slate-400">
+<div class="flex items-center gap-4">
+<span class="text-primary">01</span>
+<span class="w-12 h-px bg-primary"></span>
+<span>Service</span>
+</div>
+<div class="flex items-center gap-4 opacity-40">
+<span>02</span>
+<span class="w-12 h-px bg-slate-300"></span>
+<span>Details</span>
+</div>
+<div class="flex items-center gap-4 opacity-40">
+<span>03</span>
+<span class="w-12 h-px bg-slate-300"></span>
+<span>Senden</span>
+</div>
+</div>
+<form class="space-y-12">
+<div class="space-y-8">
+<h2 class="text-2xl font-display italic text-primary">Womit kann ich Ihnen helfen?</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<label class="service-card-minimal selected">
+<input checked="" class="hidden" name="service" type="radio"/>
+<span class="material-symbols-outlined text-4xl font-light text-primary">park</span>
+<div>
+<p class="text-sm font-bold uppercase tracking-widest mb-1">Baumpflege</p>
+<p class="text-[11px] text-slate-400 uppercase">Kronenschnitt &amp; Erhalt</p>
+</div>
+</label>
+<label class="service-card-minimal">
+<input class="hidden" name="service" type="radio"/>
+<span class="material-symbols-outlined text-4xl font-light text-slate-400">nature</span>
+<div>
+<p class="text-sm font-bold uppercase tracking-widest mb-1 text-slate-700">Baumfällung</p>
+<p class="text-[11px] text-slate-400 uppercase">Sichere Abtragung</p>
+</div>
+</label>
+<label class="service-card-minimal">
+<input class="hidden" name="service" type="radio"/>
+<span class="material-symbols-outlined text-4xl font-light text-slate-400">agriculture</span>
+<div>
+<p class="text-sm font-bold uppercase tracking-widest mb-1 text-slate-700">Wurzeln</p>
+<p class="text-[11px] text-slate-400 uppercase">Stumpfentfernung</p>
+</div>
+</label>
+<label class="service-card-minimal">
+<input class="hidden" name="service" type="radio"/>
+<span class="material-symbols-outlined text-4xl font-light text-slate-400">grass</span>
+<div>
+<p class="text-sm font-bold uppercase tracking-widest mb-1 text-slate-700">Gartenpflege</p>
+<p class="text-[11px] text-slate-400 uppercase">Gesamtkonzepte</p>
+</div>
+</label>
+</div>
+</div>
+<div class="space-y-10 pt-8">
+<div class="relative">
+<label class="text-[10px] uppercase tracking-widest font-bold text-slate-400 block mb-1">Ihr Name</label>
+<input class="form-input-minimal" placeholder="Vor- und Nachname" type="text"/>
+</div>
+<div class="relative">
+<label class="text-[10px] uppercase tracking-widest font-bold text-slate-400 block mb-1">E-Mail Adresse</label>
+<input class="form-input-minimal" placeholder="beispiel@mail.de" type="email"/>
+</div>
+</div>
+<div class="pt-12 flex justify-end">
+<button class="bg-primary text-white px-14 py-5 text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-opacity-90 transition-all flex items-center gap-4 group" type="button">
+                                Nächster Schritt
+                                <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-[var(--primary-dark-green)] text-white pt-24 pb-12 px-8">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-16">
+<div class="col-span-1 md:col-span-2 space-y-8">
+<img alt="Fabry Logo White" class="h-16 brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC07cVLMcxY3iy8L5F8DdwPF-iLjfuOvRkM1DllFjhbxK5UFhIG-leqfR6QSsVB0VpdNRKmWqG4CB0F83JFb4Vb1GmrDOwWTpem8VPJ7EcFYPiraG15a0zvAPag8WvTZtFhAmV3idKMhsQ7d5bX7WuxOAyKNSzUyihvmJ3aSJcgnGj9BB6WlYmDK6QquZ_lYI8JbJUhQ-o3beHpqJ_VMu3NxZmiVUlM4YDhG73DYG_NS8Wz9xF6djHvm-JEsaOqWnXAVJX865kpXnNL"/>
+<p class="max-w-md text-white/70 font-light leading-loose text-sm">
+                Professionelle Baumpflege und Gartengestaltung mit höchstem Anspruch an Ästhetik und Naturerhalt. Ihr Partner für grüne Visionen im Raum NRW.
+            </p>
+</div>
+<div>
+<h4 class="text-[11px] font-bold uppercase tracking-[0.3em] mb-8 text-fresh">Navigation</h4>
+<ul class="space-y-4 text-sm font-light">
+<li><a class="hover:text-fresh transition-colors" href="#">Baumpflege</a></li>
+<li><a class="hover:text-fresh transition-colors" href="#">Baumfällung</a></li>
+<li><a class="hover:text-fresh transition-colors" href="#">Wurzelstockfräsen</a></li>
+<li><a class="hover:text-fresh transition-colors" href="#">Referenzen</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-[11px] font-bold uppercase tracking-[0.3em] mb-8 text-fresh">Rechtliches</h4>
+<ul class="space-y-4 text-sm font-light">
+<li><a class="hover:text-fresh transition-colors" href="#">Impressum</a></li>
+<li><a class="hover:text-fresh transition-colors" href="#">Datenschutz</a></li>
+<li><a class="hover:text-fresh transition-colors" href="#">Kontakt</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto mt-24 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-[9px] uppercase tracking-[0.3em] text-white/40 gap-6">
+<p>© 2024 Fabry Baumpflege. Kompetenz am Baum.</p>
+<div class="flex gap-8">
+<a class="hover:text-white transition-colors" href="#">Instagram</a>
+<a class="hover:text-white transition-colors" href="#">LinkedIn</a>
+</div>
+<p>Premium Webdesign</p>
+</div>
+</footer>
+
+</body></html>
