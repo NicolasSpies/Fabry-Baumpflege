@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../i18n/useLanguage';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useParallax } from '../hooks/useParallax';
 import baumpflegeImg from '../assets/images/services/baumpflege.png';
 import baumfaellungImg from '../assets/images/services/baumfaellung.png';
 import gartenpflegeImg from '../assets/images/services/gartenpflege.png';
@@ -119,40 +120,6 @@ const Services = () => {
             id: 'bepflanzung'
         }
     ];
-
-    const heroRef = useRef(null);
-
-    useEffect(() => {
-        let rafId;
-        const handleScroll = () => {
-            if (!heroRef.current) return;
-
-            const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const isMobile = window.innerWidth <= 768;
-
-            if (isReducedMotion || isMobile) {
-                heroRef.current.style.transform = 'scale(1.1) translateY(0px)';
-                return;
-            }
-
-            const scrollY = window.scrollY;
-            const scale = 1.1 + scrollY * 0.0001;
-            const translate = scrollY * 0.15;
-
-            heroRef.current.style.transform = `scale3d(${scale}, ${scale}, 1) translate3d(0, ${translate}px, 0)`;
-        };
-
-        const onScroll = () => {
-            cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(handleScroll);
-        };
-
-        window.addEventListener('scroll', onScroll, { passive: true });
-        return () => {
-            window.removeEventListener('scroll', onScroll);
-            cancelAnimationFrame(rafId);
-        };
-    }, []);
 
     return (
         <main>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../i18n/useLanguage';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useParallax } from '../hooks/useParallax';
 import { references } from '../data/references';
 import ReferenceCard from '../components/ReferenceCard';
 import baumpflegeImg from '../assets/images/services/baumpflege.png';
@@ -89,39 +90,7 @@ const Home = () => {
         },
     ];
 
-    const heroRef = useRef(null);
-
-    useEffect(() => {
-        let rafId;
-        const handleScroll = () => {
-            if (!heroRef.current) return;
-
-            const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const isMobile = window.innerWidth <= 768;
-
-            if (isReducedMotion || isMobile) {
-                heroRef.current.style.transform = 'scale(1.1) translateY(0px)';
-                return;
-            }
-
-            const scrollY = window.scrollY;
-            const scale = 1.1 + scrollY * 0.0002;
-            const translate = scrollY * 0.2;
-
-            heroRef.current.style.transform = `scale3d(${scale}, ${scale}, 1) translate3d(0, ${translate}px, 0)`;
-        };
-
-        const onScroll = () => {
-            cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(handleScroll);
-        };
-
-        window.addEventListener('scroll', onScroll, { passive: true });
-        return () => {
-            window.removeEventListener('scroll', onScroll);
-            cancelAnimationFrame(rafId);
-        };
-    }, []);
+    const heroRef = useParallax(0.0002, 0.2);
 
     return (
         <main>

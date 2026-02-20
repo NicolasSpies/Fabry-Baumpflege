@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../i18n/useLanguage';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useParallax } from '../hooks/useParallax';
 import servicesHeroImg from '../assets/images/hero/services_hero.png';
 
 const Contact = () => {
     const { language } = useLanguage();
     useScrollReveal();
+    const heroRef = useParallax(0.0001, 0.1);
     const [selectedServices, setSelectedServices] = useState(['Baumpflege']);
 
     const services = [
@@ -21,24 +23,17 @@ const Contact = () => {
         );
     };
 
-    const [scrollY, setScrollY] = useState(0);
-    useEffect(() => {
-        const handleScroll = () => setScrollY(window.scrollY);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
     return (
         <main className="bg-[#F9FBF7] dark:bg-background-dark transition-colors duration-300">
             {/* Header Section */}
             <section className="relative h-[45vh] flex items-center justify-center pt-20 overflow-hidden">
                 <img
+                    ref={heroRef}
                     alt="Contact"
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover will-change-transform"
                     src={servicesHeroImg}
                     style={{
-                        transform: `scale(${1.1 + scrollY * 0.0001}) translateY(${scrollY * 0.1}px)`,
-                        transition: 'transform 0.1s ease-out'
+                        transform: 'scale(1.1) translateY(0px)'
                     }}
                 />
                 <div className="absolute inset-0 bg-black/40"></div>
