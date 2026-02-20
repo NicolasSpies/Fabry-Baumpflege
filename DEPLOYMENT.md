@@ -1,13 +1,12 @@
-# Vercel Deployment Guide
+# Vercel Deployment Settings
 
-To fix the "vite: command not found" error, you must set the **Root Directory** in Vercel to `reproduction`.
+For a successful deployment, configure the following in the Vercel Project Dashboard:
 
-### Vercel Dashboard Settings:
 - **Root Directory**: `reproduction`
 - **Framework Preset**: `Vite`
+- **Install Command**: `npm install`
 - **Build Command**: `npm run build`
 - **Output Directory**: `dist`
-- **Install Command**: `npm install`
 
-### Why this fixes the error:
-When **Root Directory** is set to `reproduction`, Vercel will install the dependencies (including Vite) directly inside that folder. Currently, it is trying to build from the root without having Vite installed.
+### Why this is required
+The application source code lives in the `reproduction` folder. Setting this as the Root Directory ensures Vercel installs dependencies (like Vite) correctly and builds from the right location.
