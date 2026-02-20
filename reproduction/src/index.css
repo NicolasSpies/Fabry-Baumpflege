@@ -112,6 +112,33 @@
   .icon-fill {
     font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
+
+  /* Testimonial marquee — Safari-safe CSS animation */
+  @keyframes marquee-scroll {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+
+    100% {
+      transform: translate3d(-33.333%, 0, 0);
+    }
+  }
+
+  .marquee-track {
+    display: flex;
+    animation: marquee-scroll 60s linear infinite;
+    will-change: transform;
+  }
+
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+  }
 }
 
 /* Custom range input slider styling to match the reference */

@@ -106,38 +106,6 @@ const Home = () => {
         }
     ];
 
-    const carouselRef = useRef(null);
-    const [isHovered, setIsHovered] = useState(false);
-    const scrollAmount = 0.5; // Smooth slow scroll
-
-    useEffect(() => {
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (prefersReducedMotion) return;
-
-        let animationFrameId;
-        const scroll = () => {
-            if (carouselRef.current && !isHovered) {
-                carouselRef.current.scrollLeft += scrollAmount;
-
-                // Infinite loop check: when we reach the end of the middle third, jump back to the start of the middle third
-                const singleSetWidth = carouselRef.current.scrollWidth / 3;
-                if (carouselRef.current.scrollLeft >= singleSetWidth * 2) {
-                    carouselRef.current.scrollLeft -= singleSetWidth;
-                }
-            }
-            animationFrameId = requestAnimationFrame(scroll);
-        };
-
-        animationFrameId = requestAnimationFrame(scroll);
-        return () => cancelAnimationFrame(animationFrameId);
-    }, [isHovered]);
-
-    const scrollCarousel = (direction) => {
-        if (!carouselRef.current) return;
-        const amount = direction === 'left' ? -480 : 480;
-        carouselRef.current.scrollBy({ left: amount, behavior: 'smooth' });
-    };
-
     const heroRef = useRef(null);
     const expertiseRef = useRef(null);
     useParallax(heroRef, { speed: 0.08, maxTravel: 40, scale: 1.1 });
@@ -282,50 +250,31 @@ const Home = () => {
                     </div>
                 </div>
 
-                <div className="relative group/carousel">
-                    {/* Fixed Arrows - Desktop Only */}
-                    <button
-                        onClick={() => scrollCarousel('left')}
-                        className="absolute left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 items-center justify-center text-primary opacity-0 group-hover/carousel:opacity-100 transition-opacity hidden md:flex hover:bg-primary hover:text-white"
-                        aria-label="Previous testimonial"
-                    >
-                        <span className="material-symbols-outlined">arrow_back</span>
-                    </button>
-                    <button
-                        onClick={() => scrollCarousel('right')}
-                        className="absolute right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 items-center justify-center text-primary opacity-0 group-hover/carousel:opacity-100 transition-opacity hidden md:flex hover:bg-primary hover:text-white"
-                        aria-label="Next testimonial"
-                    >
-                        <span className="material-symbols-outlined">arrow_forward</span>
-                    </button>
-
-                    <div
-                        ref={carouselRef}
-                        className="flex gap-8 px-6 py-6 overflow-x-auto overflow-y-hidden no-scrollbar scroll-smooth"
-                        onMouseEnter={() => setIsHovered(true)}
-                        onMouseLeave={() => setIsHovered(false)}
-                    >
-                        {/* Tripled list for infinite loop feel */}
-                        {[...testimonials, ...testimonials, ...testimonials].map((t, idx) => (
-                            <div
-                                key={idx}
-                                className="flex-shrink-0 w-full md:w-[450px] bg-white dark:bg-surface-dark p-8 md:p-10 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-shadow"
-                            >
-                                <div className="flex items-center gap-1 text-amber-400 mb-4">
-                                    {[...Array(t.rating)].map((_, i) => (
-                                        <span key={i} className="material-symbols-outlined text-sm icon-fill">star</span>
-                                    ))}
-                                </div>
-                                <p className="text-slate-700 dark:text-slate-300 italic mb-8 leading-relaxed font-sans">
-                                    "{t.text}"
-                                </p>
-                                <div className="flex items-center justify-between border-t border-slate-50 dark:border-slate-800 pt-6">
-                                    <div>
-                                        <h4 className="font-serif text-primary text-lg">{t.author}</h4>
+                <div className="relative">
+                    <div className="overflow-hidden">
+                        <div className="marquee-track gap-8 px-6 py-6">
+                            {/* Tripled list for infinite loop feel */}
+                            {[...testimonials, ...testimonials, ...testimonials].map((t, idx) => (
+                                <div
+                                    key={idx}
+                                    className="flex-shrink-0 w-[90vw] md:w-[450px] bg-white dark:bg-surface-dark p-8 md:p-10 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-shadow"
+                                >
+                                    <div className="flex items-center gap-1 text-amber-400 mb-4">
+                                        {[...Array(t.rating)].map((_, i) => (
+                                            <span key={i} className="material-symbols-outlined text-sm icon-fill">star</span>
+                                        ))}
+                                    </div>
+                                    <p className="text-slate-700 dark:text-slate-300 italic mb-8 leading-relaxed font-sans">
+                                        "{t.text}"
+                                    </p>
+                                    <div className="flex items-center justify-between border-t border-slate-50 dark:border-slate-800 pt-6">
+                                        <div>
+                                            <h4 className="font-serif text-primary text-lg">{t.author}</h4>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>

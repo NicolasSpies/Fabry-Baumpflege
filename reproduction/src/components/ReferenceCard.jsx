@@ -9,14 +9,15 @@ const ReferenceCard = ({ project, language, forceSquare = false, animateEntry = 
             style={animateEntry ? { animationDelay: `${staggerIndex * 0.1}s` } : {}}
         >
             {/* Inner wrapper: handles rounded corners and image clipping — Safari-safe */}
-            <div className="relative w-full rounded-2xl overflow-hidden backface-hidden">
+            <div className="relative w-full rounded-2xl overflow-hidden backface-hidden" style={{ transform: 'translateZ(0)' }}>
                 <img
                     alt={project.title}
                     className={`w-full object-cover scale-[1.05] transition-transform duration-700 group-hover:scale-[1.15] ${forceSquare ? 'aspect-square' : (project.tall ? 'aspect-[3/5]' : 'aspect-square')
                         }`}
+                    style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
                     src={project.thumbnailImage}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-primary/70 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[1px] flex flex-col justify-end p-8 text-white">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-primary/70 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 text-white" style={{ willChange: 'opacity' }}>
                     <span className="text-[10px] uppercase tracking-widest mb-2 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100">
                         {project.location}
                     </span>
