@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../i18n/useLanguage';
 import { references } from '../data/references';
+import ReferenceCard from '../components/ReferenceCard';
 
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
 const References = () => {
     const { language } = useLanguage();
-    useScrollReveal();
     const [activeFilter, setActiveFilter] = useState('Alle');
 
     const filters = [
@@ -21,6 +21,16 @@ const References = () => {
     const filteredProjects = activeFilter === 'Alle' || activeFilter === 'Tous'
         ? references
         : references.filter(p => p.categories?.includes(activeFilter));
+
+    // Handle potential empty state from transient state errors
+    useEffect(() => {
+        if (filteredProjects.length === 0 && activeFilter !== 'Alle' && activeFilter !== 'Tous') {
+            console.warn(`Filtering for "${activeFilter}" returned no results. Resetting to "Alle".`);
+            setActiveFilter('Alle');
+        }
+    }, [filteredProjects, activeFilter]);
+
+    useScrollReveal([activeFilter]);
 
     return (
         <main className="pt-28">
@@ -57,36 +67,7 @@ const References = () => {
                 <div className="max-w-7xl mx-auto">
                     <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
                         {filteredProjects.map((project) => (
-                            <Link
-                                key={project.id}
-                                to={`/referenzen/${project.id}`}
-                                className="group relative overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800 transition-all duration-500 break-inside-avoid mb-8 block shadow-sm hover:shadow-2xl reveal"
-                            >
-                                <img
-                                    alt={project.title}
-                                    className={`w-full object-cover transition-transform duration-700 group-hover:scale-110 ${project.tall ? 'aspect-[3/5]' : 'aspect-square'
-                                        }`}
-                                    src={project.image}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-primary/70 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[1px] flex flex-col justify-end p-8 text-white">
-                                    <span className="text-[10px] uppercase tracking-widest mb-2 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100">
-                                        {project.location}
-                                    </span>
-                                    <h3 className="font-serif text-2xl mb-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-200">
-                                        {project.title}
-                                    </h3>
-                                    <p className="text-xs opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-300 line-clamp-2">
-                                        {project.description}
-                                    </p>
-
-                                    <div className="mt-4 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-2 group-hover:translate-y-0 transition-all duration-500 delay-400">
-                                        <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest border-b border-white/40 pb-1">
-                                            {language === 'DE' ? 'Projekt ansehen' : 'Voir le projet'}
-                                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </Link>
+                            <ReferenceCard key={project.id} project={project} language={language} />
                         ))}
                     </div>
 

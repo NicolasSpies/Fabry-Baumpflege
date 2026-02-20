@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../i18n/useLanguage';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { references } from '../data/references';
+import ReferenceCard from '../components/ReferenceCard';
 import baumpflegeImg from '../assets/images/services/baumpflege.png';
 
 const StatCounter = ({ value, label, language }) => {
@@ -64,22 +66,26 @@ const Home = () => {
         {
             title: { DE: 'Baumpflege', FR: 'Arboriculture' },
             desc: { DE: 'Kronenpflege, Totholzentfernung und Lichtraumprofilschnitt für die Gesundheit deiner Bäume.', FR: 'Taille de la couronne, enlèvement du bois mort et taille de profil pour la santé de vos arbres.' },
-            icon: 'park'
+            icon: 'park',
+            id: 'baumpflege'
         },
         {
             title: { DE: 'Baumfällung', FR: 'Abattage' },
             desc: { DE: 'Sichere Fällungen auch an schwierigen Standorten mittels Seilklettertechnik oder Hubsteiger.', FR: 'Abattage sécurisé même dans des endroits difficiles grâce à la grimpe ou à la nacelle.' },
-            icon: 'forest'
+            icon: 'forest',
+            id: 'baumfaellung'
         },
         {
             title: { DE: 'Gartenpflege', FR: 'Entretien de jardin' },
             desc: { DE: 'Ganzheitliche Pflege für deinen Garten, von Hecke schneiden bis zur Rasenpflege.', FR: 'Entretien complet de votre jardin, de la taille des haies à la tonte de la pelouse.' },
-            icon: 'yard'
+            icon: 'yard',
+            id: 'gartenpflege'
         },
         {
             title: { DE: 'Bepflanzung', FR: 'Plantation' },
             desc: { DE: 'Fachgerechte Neupflanzungen von Bäumen, Sträuchern und Stauden für nachhaltiges Grün.', FR: 'Plantations expertes d\'arbres, d\'arbustes et de vivaces pour une verdure durable.' },
-            icon: 'potted_plant'
+            icon: 'potted_plant',
+            id: 'bepflanzung'
         },
     ];
 
@@ -161,7 +167,7 @@ const Home = () => {
                                     {service.desc[language]}
                                 </p>
                                 <Link
-                                    to="/leistungen"
+                                    to={`/leistungen#${service.id}`}
                                     className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-primary hover:text-primary-dark"
                                 >
                                     <span className="underline-anim">
@@ -175,8 +181,38 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* References Preview Section */}
+            <section className="py-24 px-6 bg-surface-light dark:bg-surface-dark/50" id="references-preview">
+                <div className="max-w-7xl mx-auto">
+                    <div className="text-center mb-20 space-y-4">
+                        <span className="text-primary font-bold tracking-widest uppercase text-xs">
+                            {language === 'DE' ? 'Ausgewählte Projekte' : 'Projets Sélectionnés'}
+                        </span>
+                        <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">
+                            {language === 'DE' ? 'Neueste Referenzen' : 'Dernières Références'}
+                        </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {references.slice(0, 3).map((project) => (
+                            <ReferenceCard key={project.id} project={project} language={language} forceSquare={true} />
+                        ))}
+                    </div>
+
+                    <div className="mt-16 text-center reveal">
+                        <Link
+                            to="/referenzen"
+                            className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 uppercase tracking-widest text-xs"
+                        >
+                            {language === 'DE' ? 'Alle Referenzen ansehen' : 'Voir toutes les références'}
+                            <span className="material-symbols-outlined">arrow_forward</span>
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
             {/* About Section Teaser */}
-            <section className="py-24 px-6 overflow-hidden bg-surface-light dark:bg-surface-dark/30" id="about">
+            <section className="py-24 px-6 overflow-hidden bg-background-light dark:bg-background-dark" id="about">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
                         <div className="w-full lg:w-1/2 relative">

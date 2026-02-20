@@ -6,6 +6,23 @@ import logo from '../assets/Baumpflege-Fabry-Logo.svg';
 const Navbar = () => {
     const { language, setLanguage } = useLanguage();
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+    const [isScrolled, setIsScrolled] = React.useState(false);
+
+    React.useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 20) {
+                setIsScrolled(true);
+            } else {
+                setIsScrolled(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        // Initial check
+        handleScroll();
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const navItems = [
         { name: { DE: 'Startseite', FR: 'Accueil' }, path: '/' },
@@ -29,12 +46,16 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="fixed top-0 w-full z-50 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800">
+        <nav className={`fixed top-0 w-full z-[100] transition-all duration-500 ease-in-out ${isScrolled || isMenuOpen
+                ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 py-0 shadow-sm'
+                : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-100/50 dark:border-slate-800/50 py-2'
+            }`}>
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 <Link to="/" className="flex items-center gap-2">
                     <img
                         alt="Fabry Baumpflege Logo"
-                        className="h-14 w-auto object-contain"
+                        className={`w-auto object-contain transition-all duration-500 ${isScrolled ? 'h-12' : 'h-16'
+                            }`}
                         src={logo}
                     />
                 </Link>
@@ -88,12 +109,13 @@ const Navbar = () => {
 
                 {/* Mobile Menu Overlay */}
                 <div
-                    className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-40 transition-opacity duration-300 md:hidden ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                    className={`fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[90] transition-all duration-500 md:hidden ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                        }`}
                     onClick={closeMenu}
                 ></div>
 
                 {/* Mobile Menu Panel */}
-                <div className={`fixed top-0 right-0 h-full w-[280px] bg-white/80 dark:bg-background-dark/80 backdrop-blur-xl z-40 flex flex-col p-10 transform transition-transform duration-500 ease-in-out md:hidden shadow-2xl ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+                <div className={`fixed top-0 right-0 h-full w-[300px] bg-white/95 dark:bg-background-dark/95 backdrop-blur-xl z-[100] flex flex-col p-10 transform transition-transform duration-500 ease-in-out md:hidden shadow-2xl ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
                     }`}>
                     <div className="flex flex-col gap-8 mt-16 flex-grow">
                         {navItems.map((item) => (
@@ -117,17 +139,17 @@ const Navbar = () => {
                         </Link>
                     </div>
 
-                    <div className="flex items-center gap-6 mt-auto pt-8 border-t border-slate-100 dark:border-slate-800 text-sm tracking-[0.3em] font-bold">
+                    <div className="flex items-center justify-center gap-8 mt-auto pt-8 border-t border-slate-100 dark:border-slate-800 text-sm tracking-[0.3em] font-bold">
                         <button
                             onClick={() => { setLanguage('DE'); closeMenu(); }}
-                            className={`transition-all duration-300 ${language === 'DE' ? 'opacity-100 text-primary' : 'opacity-40'}`}
+                            className={`transition-all duration-300 ${language === 'DE' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
                         >
                             DE
                         </button>
-                        <span className="opacity-20 text-xl">|</span>
+                        <span className="opacity-10 text-xl font-light">|</span>
                         <button
                             onClick={() => { setLanguage('FR'); closeMenu(); }}
-                            className={`transition-all duration-300 ${language === 'FR' ? 'opacity-100 text-primary' : 'opacity-40'}`}
+                            className={`transition-all duration-300 ${language === 'FR' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
                         >
                             FR
                         </button>

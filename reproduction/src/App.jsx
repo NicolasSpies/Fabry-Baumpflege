@@ -23,7 +23,7 @@ function App() {
           <Route path="/referenzen/:id" element={<ReferenceDetail />} />
           <Route path="/kontakt" element={<Contact />} />
           <Route path="/über-mich" element={<AboutMe />} />
-          {/* Fallback to Home or a 404 can be added here if needed */}
+          <Route path="*" element={<Home />} />
         </Routes>
         <Footer />
       </div>

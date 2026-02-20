@@ -69,7 +69,8 @@ const Services = () => {
                 FR: ['Taille de couronne et délestage professionnels', 'Grimpe (SKT) pour les endroits difficiles', 'Préservation de l\'architecture naturelle de l\'arbre']
             },
             image: baumpflegeImg,
-            reverse: false
+            reverse: false,
+            id: 'baumpflege'
         },
         {
             title: { DE: 'Präzise Baumfällung', FR: 'Abattage Précis' },
@@ -83,7 +84,8 @@ const Services = () => {
                 FR: ['Abattage d\'arbres dangereux & dégâts de tempête', 'Démontage par rétention', 'Rognage de souches & assainissement du site']
             },
             image: baumfaellungImg,
-            reverse: true
+            reverse: true,
+            id: 'baumfaellung'
         },
         {
             title: { DE: 'Individuelle Gartenpflege', FR: 'Entretien de jardin individuel' },
@@ -97,7 +99,8 @@ const Services = () => {
                 FR: ['Taille des haies & entretien des arbustes', 'Entretien de la pelouse & préparation des parterres', 'Forfaits d\'entretien saisonniers']
             },
             image: gartenpflegeImg,
-            reverse: false
+            reverse: false,
+            id: 'gartenpflege'
         },
         {
             title: { DE: 'Nachhaltige Bepflanzung', FR: 'Plantation durable' },
@@ -112,7 +115,8 @@ const Services = () => {
             },
             image: wurzelnImg,
             reverse: true,
-            bg: true
+            bg: true,
+            id: 'bepflanzung'
         }
     ];
 
@@ -147,6 +151,7 @@ const Services = () => {
                 {servicesList.map((service, idx) => (
                     <section
                         key={idx}
+                        id={service.id}
                         className={`py-32 px-6 overflow-hidden ${service.bg ? 'bg-surface-light/50 dark:bg-surface-dark/20' : ''}`}
                     >
                         <div className="max-w-7xl mx-auto">

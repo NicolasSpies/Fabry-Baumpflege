@@ -16,7 +16,23 @@ const ReferenceDetail = () => {
     const carouselRef = useRef(null);
 
     // Find project by id
-    const project = references.find(p => p.id === id) || references[0];
+    const project = references.find(p => p.id === id);
+
+    if (!project) {
+        return (
+            <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
+                <h2 className="text-3xl font-display text-primary mb-4">
+                    {language === 'DE' ? 'Referenz nicht gefunden' : 'Référence non trouvée'}
+                </h2>
+                <Link
+                    to="/referenzen"
+                    className="text-primary hover:underline font-medium uppercase tracking-widest text-sm"
+                >
+                    {language === 'DE' ? 'Zurück zur Übersicht' : 'Retour à l\'aperçu'}
+                </Link>
+            </div>
+        );
+    }
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -24,19 +40,19 @@ const ReferenceDetail = () => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            if (project.gallery && !isLightboxOpen) {
-                setCurrentGalleryIndex((prev) => (prev + 1) % project.gallery.length);
+            if (project.galleryImages && !isLightboxOpen) {
+                setCurrentGalleryIndex((prev) => (prev + 1) % project.galleryImages.length);
             }
         }, 5000);
         return () => clearInterval(interval);
-    }, [project.gallery, isLightboxOpen]);
+    }, [project.galleryImages, isLightboxOpen]);
 
     const nextSlide = () => {
-        setCurrentGalleryIndex((prev) => (prev + 1) % project.gallery.length);
+        setCurrentGalleryIndex((prev) => (prev + 1) % project.galleryImages.length);
     };
 
     const prevSlide = () => {
-        setCurrentGalleryIndex((prev) => (prev - 1 + project.gallery.length) % project.gallery.length);
+        setCurrentGalleryIndex((prev) => (prev - 1 + project.galleryImages.length) % project.galleryImages.length);
     };
 
     const openLightbox = (index) => {
@@ -62,11 +78,7 @@ const ReferenceDetail = () => {
                         <img
                             alt={project.title}
                             className="w-full h-full object-cover"
-                            src={project.image}
-                            style={{
-                                transform: `scale(${1.1 + scrollY * 0.0001}) translateY(${scrollY * 0.1}px)`,
-                                transition: 'transform 0.1s ease-out'
-                            }}
+                            src={project.thumbnailImage}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-12">
                             <div className="max-w-3xl">
@@ -132,11 +144,11 @@ const ReferenceDetail = () => {
                             <h2 className="font-display text-3xl text-primary mb-8">
                                 {language === 'DE' ? 'Herausforderung & Umsetzung' : 'Défi & Mise en oeuvre'}
                             </h2>
-                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
-                                Bei diesem Projekt handelte es sich um eine über 80 Jahre alte Buche, die aufgrund von Pilzbefall im Stammfußbereich die Verkehrssicherheit nicht mehr gewährleisten konnte. Die besondere Herausforderung lag in der unmittelbaren Nähe zu einem denkmalgeschützten Gebäude und einer viel befahrenen Straße.
+                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6 whitespace-pre-wrap">
+                                {language === 'DE' ? project.challengeDE : project.challengeFR}
                             </p>
-                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-12">
-                                Unser Expertenteam entschied sich für eine kontrollierte Abtragung mittels Seilklettertechnik (SKT). Dabei wurde jeder Ast einzeln abgeseilt, um Beschädigungen an der umliegenden Architektur und dem wertvollen Unterbewuchs zu vermeiden. Durch präzise Planung konnte die Fällung innerhalb eines Arbeitstages sicher und effizient abgeschlossen werden.
+                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-12 whitespace-pre-wrap">
+                                {language === 'DE' ? project.implementationDE : project.implementationFR}
                             </p>
                         </div>
 
@@ -146,7 +158,7 @@ const ReferenceDetail = () => {
                                 <img
                                     alt="Nachher"
                                     className="absolute inset-0 w-full h-full object-cover"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYxymgFZNohbpj1o9G51GsQASChVCKwn_yMkMAPIWz1MYIDzubInyBregzTzA9LSLrepZV3JIJCoglshtaumZeE8uBoVWdr8DDVm5oggaFKgoJVsIYG73MCxXIxCWJjLd9CI2HabNdokFUo7oQjtvypJ8_Xj61h6m8TZxAiH5e1JnRL9EbUAbXIZzuWQsimZBreFNlYvq128pe4xRALapwv6f62ZplIvnhSCk0NQuBDD7hsh5POFcmlqaUr5M-3Hkqx8l10sKQNMnl"
+                                    src={project.afterImage}
                                 />
                                 <span className="absolute top-6 right-6 font-montserrat text-[10px] text-white/90 uppercase tracking-[0.2em] z-10 bg-black/20 backdrop-blur-sm px-3 py-1 rounded">
                                     {language === 'DE' ? 'NACHHER' : 'APRÈS'}
@@ -159,7 +171,7 @@ const ReferenceDetail = () => {
                                     <img
                                         alt="Vorher"
                                         className="absolute inset-0 w-[800px] md:w-[1200px] lg:w-[1600px] h-full object-cover max-w-none"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLTnK67nYSQJdGBr6olT7noTAdSve1UhHH2PYYkxx7dO-ghy06HeiajLWXoy2N23qAM5NaIpr6CnsOucYXHhOjdloB2QdU-y9yisoFCjQw5EFUkUefylPCBrfdRCNi1Wff9l7gnjXR91wClvXj7e2FOc9qiJaI4zv1nMPng4_3zWE9HTK6b3Zj-5qLvVINpeWQ8u0pZtrtM4NmU3rbPQ4-szc1WgfbQNghsOd9DBo7NzG19m2FWWsKDbBNaPxkiHabdke8oF5jvjb6"
+                                        src={project.beforeImage}
                                     />
                                     <span className="absolute top-6 left-6 font-montserrat text-[10px] text-white/90 uppercase tracking-[0.2em] z-10 bg-black/20 backdrop-blur-sm px-3 py-1 rounded">
                                         {language === 'DE' ? 'VORHER' : 'AVANT'}
@@ -212,7 +224,7 @@ const ReferenceDetail = () => {
                                         className="flex transition-transform duration-700 ease-in-out"
                                         style={{ transform: `translateX(-${currentGalleryIndex * 50}%)` }}
                                     >
-                                        {project.gallery?.map((img, idx) => (
+                                        {project.galleryImages?.map((img, idx) => (
                                             <div
                                                 key={idx}
                                                 className="min-w-[50%] p-2 cursor-zoom-in"
@@ -240,7 +252,7 @@ const ReferenceDetail = () => {
 
             {/* Lightbox */}
             {isLightboxOpen && (
-                <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-6 md:p-12">
+                <div className="fixed inset-0 z-[110] bg-black/95 flex items-center justify-center p-6 md:p-12">
                     <button
                         onClick={() => setIsLightboxOpen(false)}
                         className="absolute top-8 right-8 text-white/60 hover:text-white transition-colors"
@@ -249,7 +261,7 @@ const ReferenceDetail = () => {
                     </button>
 
                     <button
-                        onClick={() => setLightboxIndex((prev) => (prev - 1 + project.gallery.length) % project.gallery.length)}
+                        onClick={() => setLightboxIndex((prev) => (prev - 1 + project.galleryImages.length) % project.galleryImages.length)}
                         className="absolute left-4 md:left-8 text-white/60 hover:text-white transition-colors"
                     >
                         <span className="material-symbols-outlined text-5xl">chevron_left</span>
@@ -257,21 +269,21 @@ const ReferenceDetail = () => {
 
                     <div className="relative w-full max-w-5xl aspect-video">
                         <img
-                            src={project.gallery[lightboxIndex]}
+                            src={project.galleryImages[lightboxIndex]}
                             alt="Project Gallery Large"
                             className="w-full h-full object-contain"
                         />
                     </div>
 
                     <button
-                        onClick={() => setLightboxIndex((prev) => (prev + 1) % project.gallery.length)}
+                        onClick={() => setLightboxIndex((prev) => (prev + 1) % project.galleryImages.length)}
                         className="absolute right-4 md:right-8 text-white/60 hover:text-white transition-colors"
                     >
                         <span className="material-symbols-outlined text-5xl">chevron_right</span>
                     </button>
 
                     <div className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white/40 text-sm tracking-widest uppercase">
-                        {lightboxIndex + 1} / {project.gallery?.length}
+                        {lightboxIndex + 1} / {project.galleryImages?.length}
                     </div>
                 </div>
             )}
