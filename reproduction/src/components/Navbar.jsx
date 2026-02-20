@@ -1,6 +1,5 @@
 import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
-import { useLanguage } from '../context/LanguageContext';
+import logo from '../assets/Baumpflege-Fabry-Logo.svg';
 
 const Navbar = () => {
     const { language, setLanguage } = useLanguage();
@@ -34,7 +33,7 @@ const Navbar = () => {
                     <img
                         alt="Fabry Baumpflege Logo"
                         className="h-14 w-auto object-contain"
-                        src="/src/assets/Baumpflege-Fabry-Logo.svg"
+                        src={logo}
                     />
                 </Link>
                 <div className="hidden md:flex items-center space-x-10 text-sm font-medium uppercase tracking-widest">

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useLanguage } from '../context/LanguageContext';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import servicesHeroImg from '../assets/images/hero/services_hero.png';
 
 const Contact = () => {
     const { language } = useLanguage();
@@ -34,7 +33,7 @@ const Contact = () => {
                 <img
                     alt="Contact"
                     className="absolute inset-0 w-full h-full object-cover"
-                    src="/src/assets/images/hero/services_hero.png"
+                    src={servicesHeroImg}
                     style={{
                         transform: `scale(${1.1 + scrollY * 0.0001}) translateY(${scrollY * 0.1}px)`,
                         transition: 'transform 0.1s ease-out'

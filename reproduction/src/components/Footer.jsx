@@ -1,6 +1,4 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useLanguage } from '../context/LanguageContext';
+import logo from '../assets/Baumpflege-Fabry-Logo.svg';
 
 const Footer = () => {
     const { language } = useLanguage();
@@ -12,7 +10,7 @@ const Footer = () => {
                     <img
                         alt="Fabry Logo White"
                         className="h-10 brightness-0 invert"
-                        src="/src/assets/Baumpflege-Fabry-Logo.svg"
+                        src={logo}
                     />
                     <p className="text-white/70 leading-relaxed text-sm">
                         {language === 'DE'

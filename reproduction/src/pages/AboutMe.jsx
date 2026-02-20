@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useLanguage } from '../context/LanguageContext';
-import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import portrait from '../assets/images/vincent_portrait.png';
+import baumpflegeImg from '../assets/images/services/baumpflege.png';
+import baumfaellungImg from '../assets/images/services/baumfaellung.png';
+import gartenpflegeImg from '../assets/images/services/gartenpflege.png';
 
 const AboutMe = () => {
     const { language } = useLanguage();
@@ -24,7 +25,7 @@ const AboutMe = () => {
                             <img
                                 alt="Vincent Fabry"
                                 className="w-full aspect-[3/4] object-cover"
-                                src="/src/assets/images/vincent_portrait.png"
+                                src={portrait}
                                 style={{
                                     transform: `translateY(${scrollY * -0.05}px)`,
                                     transition: 'transform 0.1s ease-out'
@@ -63,7 +64,7 @@ const AboutMe = () => {
                                 <img
                                     alt="Detail Tree Care"
                                     className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-110"
-                                    src="/src/assets/images/services/baumpflege.png"
+                                    src={baumpflegeImg}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -84,7 +85,7 @@ const AboutMe = () => {
                                 <img
                                     alt="Nature conservation"
                                     className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-110"
-                                    src="/src/assets/images/services/baumfaellung.png"
+                                    src={baumfaellungImg}
                                 />
                             </div>
                             <div className="space-y-2">
@@ -105,7 +106,7 @@ const AboutMe = () => {
                                 <img
                                     alt="Technical expert"
                                     className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-110"
-                                    src="/src/assets/images/services/gartenpflege.png"
+                                    src={gartenpflegeImg}
                                 />
                             </div>
                             <div className="space-y-2">

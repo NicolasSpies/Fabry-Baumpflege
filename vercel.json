@@ -1,8 +1,8 @@
 {
     "rewrites": [
         {
-            "source": "/((?!assets/|.*\\..*).*)",
-            "destination": "/reproduction/index.html"
+            "source": "/(.*)",
+            "destination": "/reproduction/"
         }
     ]
 }

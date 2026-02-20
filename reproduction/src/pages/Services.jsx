@@ -1,6 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useLanguage } from '../context/LanguageContext';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import baumpflegeImg from '../assets/images/services/baumpflege.png';
+import baumfaellungImg from '../assets/images/services/baumfaellung.png';
+import gartenpflegeImg from '../assets/images/services/gartenpflege.png';
+import wurzelnImg from '../assets/images/services/wurzeln.png';
+import servicesHeroImg from '../assets/images/hero/services_hero.png';
 
 const StatCounter = ({ value, label, language }) => {
     const [count, setCount] = useState(0);
@@ -63,7 +66,7 @@ const Services = () => {
                 DE: ['Fachgerechter Kronenschnitt & Entlastung', 'Seilklettertechnik (SKT) für schwierige Lagen', 'Erhalt der natürlichen Baumarchitektur'],
                 FR: ['Taille de couronne et délestage professionnels', 'Grimpe (SKT) pour les endroits difficiles', 'Préservation de l\'architecture naturelle de l\'arbre']
             },
-            image: "/src/assets/images/services/baumpflege.png",
+            image: baumpflegeImg,
             reverse: false
         },
         {
@@ -77,7 +80,7 @@ const Services = () => {
                 DE: ['Gefahrenbaumfällung & Sturmschäden', 'Abtragen mittels Seilablassverfahren', 'Wurzelstockfräsen & Standortsanierung'],
                 FR: ['Abattage d\'arbres dangereux & dégâts de tempête', 'Démontage par rétention', 'Rognage de souches & assainissement du site']
             },
-            image: "/src/assets/images/services/baumfaellung.png",
+            image: baumfaellungImg,
             reverse: true
         },
         {
@@ -91,7 +94,7 @@ const Services = () => {
                 DE: ['Heckenschnitt & Formgehölzpflege', 'Rasenpflege & Beetaufbereitung', 'Jahreszeitliche Gartenpflege-Pakete'],
                 FR: ['Taille des haies & entretien des arbustes', 'Entretien de la pelouse & préparation des parterres', 'Forfaits d\'entretien saisonniers']
             },
-            image: "/src/assets/images/services/gartenpflege.png",
+            image: gartenpflegeImg,
             reverse: false
         },
         {
@@ -105,7 +108,7 @@ const Services = () => {
                 DE: ['Beratung bei der Pflanzenauswahl', 'Fachgerechte Neupflanzung von Bäumen', 'Standortoptimierung & Bodenverbesserung'],
                 FR: ['Conseils pour le choix des plantes', 'Plantation experte d\'arbres', 'Optimisation du site & amélioration du sol']
             },
-            image: "/src/assets/images/services/wurzeln.png",
+            image: wurzelnImg,
             reverse: true,
             bg: true
         }
@@ -124,7 +127,7 @@ const Services = () => {
                 <img
                     alt="Lush green canopy"
                     className="absolute inset-0 w-full h-full object-cover"
-                    src="/src/assets/images/hero/services_hero.png"
+                    src={servicesHeroImg}
                     style={{
                         transform: `scale(${1.1 + scrollY * 0.0001}) translateY(${scrollY * 0.15}px)`,
                         transition: 'transform 0.1s ease-out'

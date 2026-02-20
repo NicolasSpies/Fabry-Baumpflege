@@ -1,7 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { useLanguage } from '../context/LanguageContext';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import baumpflegeImg from '../assets/images/services/baumpflege.png';
 
 const StatCounter = ({ value, label, language }) => {
     const [count, setCount] = useState(0);
@@ -184,7 +182,7 @@ const Home = () => {
                                 <img
                                     alt="Professional Arborist Climbing"
                                     className="w-full h-[650px] object-cover transition-transform duration-700 group-hover:scale-105"
-                                    src="/src/assets/images/services/baumpflege.png"
+                                    src={baumpflegeImg}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent p-10 flex items-end">
                                     <p className="text-white italic font-serif text-2xl border-l-4 border-primary pl-4 drop-shadow-lg">
