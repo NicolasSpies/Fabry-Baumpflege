@@ -106,6 +106,43 @@ const Home = () => {
         }
     ];
 
+    /* ── Marquee (pixel-per-second driven) ── */
+    const marqueeRef = useRef(null);
+    const [marqueePaused, setMarqueePaused] = useState(false);
+    const SPEED_PX_PER_SEC = 40;
+
+    useEffect(() => {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReducedMotion) return;
+
+        let offset = 0;
+        let prevTimestamp = null;
+        let rafId;
+
+        const tick = (timestamp) => {
+            if (prevTimestamp === null) prevTimestamp = timestamp;
+            const delta = (timestamp - prevTimestamp) / 1000; // seconds
+            prevTimestamp = timestamp;
+
+            if (!marqueePaused && marqueeRef.current) {
+                offset += SPEED_PX_PER_SEC * delta;
+
+                // Reset seamlessly at one-third of track width (one full set)
+                const singleSetWidth = marqueeRef.current.scrollWidth / 3;
+                if (singleSetWidth > 0 && offset >= singleSetWidth) {
+                    offset -= singleSetWidth;
+                }
+
+                marqueeRef.current.style.transform = `translate3d(-${offset}px, 0, 0)`;
+            }
+
+            rafId = requestAnimationFrame(tick);
+        };
+
+        rafId = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(rafId);
+    }, [marqueePaused]);
+
     const heroRef = useRef(null);
     const expertiseRef = useRef(null);
     useParallax(heroRef, { speed: 0.08, maxTravel: 40, scale: 1.1 });
@@ -252,7 +289,12 @@ const Home = () => {
 
                 <div className="relative">
                     <div className="overflow-hidden">
-                        <div className="marquee-track gap-8 px-6 py-6">
+                        <div
+                            ref={marqueeRef}
+                            className="marquee-track gap-8 px-6 py-6"
+                            onMouseEnter={() => setMarqueePaused(true)}
+                            onMouseLeave={() => setMarqueePaused(false)}
+                        >
                             {/* Tripled list for infinite loop feel */}
                             {[...testimonials, ...testimonials, ...testimonials].map((t, idx) => (
                                 <div
