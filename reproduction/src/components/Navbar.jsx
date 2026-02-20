@@ -9,14 +9,23 @@ const Navbar = () => {
     const [isScrolled, setIsScrolled] = React.useState(false);
 
     React.useEffect(() => {
-        let lastScrolled = false;
-        const handleScroll = () => {
-            const scrolly = window.scrollY;
-            const shouldBeScrolled = scrolly > 20;
+        let lastKnownScrollY = window.scrollY;
+        let ticking = false;
 
-            if (shouldBeScrolled !== lastScrolled) {
-                lastScrolled = shouldBeScrolled;
-                setIsScrolled(shouldBeScrolled);
+        const handleScroll = () => {
+            lastKnownScrollY = window.scrollY;
+
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    if (lastKnownScrollY > 20) {
+                        setIsScrolled(true);
+                    } else {
+                        setIsScrolled(false);
+                    }
+                    ticking = false;
+                });
+
+                ticking = true;
             }
         };
 

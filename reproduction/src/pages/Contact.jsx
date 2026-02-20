@@ -7,8 +7,15 @@ import servicesHeroImg from '../assets/images/hero/services_hero.png';
 const Contact = () => {
     const { language } = useLanguage();
     useScrollReveal();
-    const heroRef = useParallax(0.0001, 0.1);
+    const heroRef = React.useRef(null);
+    useParallax(heroRef, { speed: 0.1, scaleBase: 1.1, scaleSpeed: 0.0001 });
     const [selectedServices, setSelectedServices] = useState(['Baumpflege']);
+
+    const toggleService = (id) => {
+        setSelectedServices(prev =>
+            prev.includes(id) ? prev.filter(serviceId => serviceId !== id) : [...prev, id]
+        );
+    };
 
     const services = [
         { id: 'Baumpflege', label: { DE: 'Baumpflege', FR: 'Arboriculture' }, sub: { DE: 'Kronenschnitt & Erhalt', FR: 'Taille & Maintien' }, icon: 'park' },
@@ -17,11 +24,6 @@ const Contact = () => {
         { id: 'Bepflanzung', label: { DE: 'Bepflanzung', FR: 'Plantation' }, sub: { DE: 'Nachhaltige Neuanlage', FR: 'Nouvelle Plantation' }, icon: 'potted_plant' },
     ];
 
-    const toggleService = (id) => {
-        setSelectedServices(prev =>
-            prev.includes(id) ? prev.filter(serviceId => serviceId !== id) : [...prev, id]
-        );
-    };
 
     return (
         <main className="bg-[#F9FBF7] dark:bg-background-dark transition-colors duration-300">
@@ -30,10 +32,11 @@ const Contact = () => {
                 <img
                     ref={heroRef}
                     alt="Contact"
-                    className="absolute inset-0 w-full h-full object-cover will-change-transform"
+                    className="absolute inset-0 w-full h-full object-cover"
                     src={servicesHeroImg}
                     style={{
-                        transform: 'scale(1.1) translateY(0px)'
+                        transform: 'translate3d(0, 0, 0) scale(1.1)',
+                        willChange: 'transform'
                     }}
                 />
                 <div className="absolute inset-0 bg-black/40"></div>

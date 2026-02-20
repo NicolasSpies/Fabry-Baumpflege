@@ -90,7 +90,8 @@ const Home = () => {
         },
     ];
 
-    const heroRef = useParallax(0.0002, 0.2);
+    const heroRef = useRef(null);
+    useParallax(heroRef, { speed: 0.2, scaleBase: 1.1, scaleSpeed: 0.0002 });
 
     return (
         <main>
@@ -100,10 +101,11 @@ const Home = () => {
                     <img
                         ref={heroRef}
                         alt="Professional tree work"
-                        className="w-full h-full object-cover will-change-transform"
+                        className="w-full h-full object-cover"
                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKWkuceu9VZWOD9mKiRLyewvI7P3g4WSt4KcxdFVfkfQehbCUL6Uybyf9OClVUkICnp1gw08a07G5aj8gos3IJcp84FdxC50xMYpSd2qVlY3QmubVByqpv7PS53aO44xZ_NwCJNg55mmnndIiMoMO7P3P89_1CQklbcu2kOoolomCv8mJdnG_BJKC_slopZSLtQuKBQbJ0VSeQKPXPpxg0sayypaz-apH-zqTY35IrZaKPB1aPu-y5_P9t7ZrDlZw9ZLbgtxiX4MWM"
                         style={{
-                            transform: 'scale(1.1) translateY(0px)'
+                            transform: 'translate3d(0, 0, 0) scale(1.1)',
+                            willChange: 'transform'
                         }}
                     />
                     {/* Modern cinematic radial/depth overlay */}

@@ -121,16 +121,20 @@ const Services = () => {
         }
     ];
 
+    const heroRef = useRef(null);
+    useParallax(heroRef, { speed: 0.15, scaleBase: 1.1, scaleSpeed: 0.0001 });
+
     return (
         <main>
             <section className="relative h-[60vh] flex items-center justify-center pt-20 overflow-hidden">
                 <img
                     ref={heroRef}
                     alt="Lush green canopy"
-                    className="absolute inset-0 w-full h-full object-cover will-change-transform"
+                    className="absolute inset-0 w-full h-full object-cover"
                     src={servicesHeroImg}
                     style={{
-                        transform: 'scale(1.1) translateY(0px)'
+                        transform: 'translate3d(0, 0, 0) scale(1.1)',
+                        willChange: 'transform'
                     }}
                 />
                 <div className="absolute inset-0 bg-black/30"></div>
