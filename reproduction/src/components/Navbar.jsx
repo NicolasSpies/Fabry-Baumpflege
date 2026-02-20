@@ -13,6 +13,20 @@ const Navbar = () => {
         { name: { DE: 'Referenzen', FR: 'Références' }, path: '/referenzen' },
     ];
 
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+        if (!isMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+    };
+
+    const closeMenu = () => {
+        setIsMenuOpen(false);
+        document.body.style.overflow = 'unset';
+    };
+
     return (
         <nav className="fixed top-0 w-full z-50 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800">
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -63,47 +77,55 @@ const Navbar = () => {
 
                 {/* Mobile Toggle */}
                 <button
-                    className="md:hidden text-primary z-50 relative"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="md:hidden text-primary z-50 relative flex items-center justify-center"
+                    onClick={toggleMenu}
                 >
-                    <span className="material-symbols-outlined text-3xl">
+                    <span className={`material-symbols-outlined text-3xl transition-transform duration-300 ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
                         {isMenuOpen ? 'close' : 'menu'}
                     </span>
                 </button>
 
-                {/* Mobile Menu */}
-                <div className={`fixed inset-0 bg-background-light dark:bg-background-dark z-40 flex flex-col items-center justify-center gap-8 transition-all duration-500 md:hidden ${isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
-                    }`}>
-                    {navItems.map((item) => (
-                        <NavLink
-                            key={item.path}
-                            to={item.path}
-                            onClick={() => setIsMenuOpen(false)}
-                            className={({ isActive }) =>
-                                `text-2xl font-serif uppercase tracking-widest transition-colors ${isActive ? 'text-primary' : 'text-slate-400'}`
-                            }
-                        >
-                            {item.name[language]}
-                        </NavLink>
-                    ))}
-                    <Link
-                        to="/kontakt"
-                        onClick={() => setIsMenuOpen(false)}
-                        className="bg-primary text-white px-10 py-4 rounded-full text-lg uppercase tracking-widest font-bold mt-4"
-                    >
-                        {language === 'DE' ? 'Kontakt' : 'Contact'}
-                    </Link>
+                {/* Mobile Menu Overlay */}
+                <div
+                    className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-40 transition-opacity duration-300 md:hidden ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                    onClick={closeMenu}
+                ></div>
 
-                    <div className="flex items-center gap-4 mt-8 text-sm tracking-[0.3em] font-bold">
+                {/* Mobile Menu Panel */}
+                <div className={`fixed top-0 right-0 h-full w-[280px] bg-white/80 dark:bg-background-dark/80 backdrop-blur-xl z-40 flex flex-col p-10 transform transition-transform duration-500 ease-in-out md:hidden shadow-2xl ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+                    }`}>
+                    <div className="flex flex-col gap-8 mt-16 flex-grow">
+                        {navItems.map((item) => (
+                            <NavLink
+                                key={item.path}
+                                to={item.path}
+                                onClick={closeMenu}
+                                className={({ isActive }) =>
+                                    `text-xl font-serif uppercase tracking-widest transition-colors ${isActive ? 'text-primary' : 'text-slate-500 hover:text-primary'}`
+                                }
+                            >
+                                {item.name[language]}
+                            </NavLink>
+                        ))}
+                        <Link
+                            to="/kontakt"
+                            onClick={closeMenu}
+                            className="bg-primary text-white px-8 py-3 rounded-full text-sm uppercase tracking-widest font-bold mt-4 shadow-lg hover:bg-opacity-90 inline-block text-center"
+                        >
+                            {language === 'DE' ? 'Kontakt' : 'Contact'}
+                        </Link>
+                    </div>
+
+                    <div className="flex items-center gap-6 mt-auto pt-8 border-t border-slate-100 dark:border-slate-800 text-sm tracking-[0.3em] font-bold">
                         <button
-                            onClick={() => { setLanguage('DE'); setIsMenuOpen(false); }}
+                            onClick={() => { setLanguage('DE'); closeMenu(); }}
                             className={`transition-all duration-300 ${language === 'DE' ? 'opacity-100 text-primary' : 'opacity-40'}`}
                         >
                             DE
                         </button>
                         <span className="opacity-20 text-xl">|</span>
                         <button
-                            onClick={() => { setLanguage('FR'); setIsMenuOpen(false); }}
+                            onClick={() => { setLanguage('FR'); closeMenu(); }}
                             className={`transition-all duration-300 ${language === 'FR' ? 'opacity-100 text-primary' : 'opacity-40'}`}
                         >
                             FR

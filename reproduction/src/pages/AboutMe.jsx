@@ -15,34 +15,7 @@ const AboutMe = () => {
     }, []);
 
     return (
-        <main className="pt-20">
-            {/* Cinematic Hero */}
-            <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 z-0">
-                    <img
-                        alt="Arborist working"
-                        className="w-full h-full object-cover"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKWkuceu9VZWOD9mKiRLyewvI7P3g4WSt4KcxdFVfkfQehbCUL6Uybyf9OClVUkICnp1gw08a07G5aj8gos3IJcp84FdxC50xMYpSd2qVlY3QmubVByqpv7PS53aO44xZ_NwCJNg55mmnndIiMoMO7P3P89_1CQklbcu2kOoolomCv8mJdnG_BJKC_slopZSLtQuKBQbJ0VSeQKPXPpxg0sayypaz-apH-zqTY35IrZaKPB1aPu-y5_P9t7ZrDlZw9ZLbgtxiX4MWM"
-                        style={{
-                            transform: `scale(${1.1 + scrollY * 0.0002}) translateY(${scrollY * 0.2}px)`,
-                            transition: 'transform 0.1s ease-out'
-                        }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-transparent"></div>
-                </div>
-                <div className="relative z-10 text-center text-white px-6 reveal">
-                    <h1 className="text-6xl md:text-8xl font-serif mb-6 drop-shadow-2xl">
-                        {language === 'DE' ? 'Leidenschaft in den Wipfeln' : 'La passion dans les cimes'}
-                    </h1>
-                    <p className="text-xl md:text-2xl font-light tracking-[0.4em] uppercase opacity-90 drop-shadow-lg">
-                        Fabry Baumpflege
-                    </p>
-                </div>
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-                    <span className="material-symbols-outlined text-white text-4xl">expand_more</span>
-                </div>
-            </section>
-
+        <main className="pt-32">
             {/* Philosophy Section with Portrait Overlap */}
             <section className="relative py-32 px-6 overflow-hidden" id="about">
                 <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">

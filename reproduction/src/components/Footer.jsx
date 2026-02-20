@@ -7,17 +7,17 @@ const Footer = () => {
 
     return (
         <footer className="bg-primary text-white py-12 px-6">
-            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-                <div className="col-span-1 md:col-span-2 space-y-4">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 text-center md:text-left items-center md:items-start">
+                <div className="space-y-6 flex flex-col items-center md:items-start max-w-sm">
                     <img
                         alt="Fabry Logo White"
                         className="h-10 brightness-0 invert"
                         src="/src/assets/Baumpflege-Fabry-Logo.svg"
                     />
-                    <p className="max-w-md text-white/70 leading-relaxed text-sm">
+                    <p className="text-white/70 leading-relaxed text-sm">
                         {language === 'DE'
-                            ? 'Als zertifizierter Fachbetrieb für Baumpflege und Gartengestaltung stehe ich für höchste Qualität und den nachhaltigen Erhalt deiner Grünanlagen im Raum Ostbelgien.'
-                            : 'En tant qu\'entreprise spécialisée certifiée en arboriculture et aménagement paysager, je m\'engage pour la plus haute qualité et la préservation durable de vos espaces verts dans la région de l\'Est de la Belgique.'}
+                            ? 'Zertifizierter Fachbetrieb für Baumpflege und Gartengestaltung in Ostbelgien. Qualität und Nachhaltigkeit für dein Grün.'
+                            : 'Entreprise spécialisée certifiée en arboriculture et aménagement paysager. Qualité et durabilité pour vos espaces verts.'}
                     </p>
                     <div className="flex gap-4">
                         <a
@@ -32,19 +32,20 @@ const Footer = () => {
                         </a>
                     </div>
                 </div>
-                <div>
+
+                <div className="hidden md:block">
                     <h4 className="font-bold text-xs mb-6 tracking-widest uppercase text-white/90">Navigation</h4>
                     <ul className="space-y-3 text-white/60 text-sm">
                         <li><Link className="hover:text-white transition-colors" to="/">{language === 'DE' ? 'Startseite' : 'Accueil'}</Link></li>
                         <li><Link className="hover:text-white transition-colors" to="/leistungen">{language === 'DE' ? 'Leistungen' : 'Services'}</Link></li>
                         <li><Link className="hover:text-white transition-colors" to="/über-mich">{language === 'DE' ? 'Über Mich' : 'À Propos'}</Link></li>
                         <li><Link className="hover:text-white transition-colors" to="/referenzen">{language === 'DE' ? 'Referenzen' : 'Références'}</Link></li>
-                        <li><Link className="hover:text-white transition-colors" to="/kontakt">{language === 'DE' ? 'Kontakt' : 'Contact'}</Link></li>
                     </ul>
                 </div>
-                <div>
+
+                <div className="space-y-6">
                     <h4 className="font-bold text-xs mb-6 tracking-widest uppercase text-white/90">Kontakt</h4>
-                    <ul className="space-y-4 text-white/60 text-sm">
+                    <ul className="space-y-4 text-white/60 text-sm flex flex-col items-center md:items-start">
                         <li className="flex items-start gap-3">
                             <span className="material-symbols-outlined text-white/80">location_on</span>
                             <a
@@ -53,7 +54,7 @@ const Footer = () => {
                                 rel="noopener noreferrer"
                                 className="hover:text-white transition-colors"
                             >
-                                Halloux 16,<br />4830 Limbourg
+                                Halloux 16, 4830 Limbourg
                             </a>
                         </li>
                         <li className="flex items-center gap-3">
@@ -62,7 +63,7 @@ const Footer = () => {
                         </li>
                         <li className="flex items-center gap-3">
                             <span className="material-symbols-outlined text-white/80">mail</span>
-                            <a href="mailto:info@fabry-baumpflege.be" className="hover:text-white transition-colors">info@fabry-baumpflege.be</a>
+                            <a href="mailto:info@fabry-baumpflege.be" className="hover:text-white transition-colors underline decoration-white/20 underline-offset-4">info@fabry-baumpflege.be</a>
                         </li>
                     </ul>
                 </div>

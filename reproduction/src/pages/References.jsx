@@ -23,25 +23,7 @@ const References = () => {
         : references.filter(p => p.categories?.includes(activeFilter));
 
     return (
-        <main>
-            <section className="relative h-[60vh] flex items-center justify-center pt-20 overflow-hidden">
-                <img
-                    alt="Reference projects"
-                    className="absolute inset-0 w-full h-full object-cover"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLTnK67nYSQJdGBr6olT7noTAdSve1UhHH2PYYkxx7dO-ghy06HeiajLWXoy2N23qAM5NaIpr6CnsOucYXHhOjdloB2QdU-y9yisoFCjQw5EFUkUefylPCBrfdRCNi1Wff9l7gnjXR91wClvXj7e2FOc9qiJaI4zv1nMPng4_3zWE9HTK6b3Zj-5qLvVINpeWQ8u0pZtrtM4NmU3rbPQ4-szc1WgfbQNghsOd9DBo7NzG19m2FWWsCDbBNaPxkiHabdke8oF5jvjb6"
-                    style={{
-                        transform: `scale(${1.1 + scrollY * 0.0001}) translateY(${scrollY * 0.1}px)`,
-                        transition: 'transform 0.1s ease-out'
-                    }}
-                />
-                <div className="absolute inset-0 bg-black/40"></div>
-                <div className="relative z-10 text-center reveal">
-                    <h1 className="text-6xl md:text-7xl font-serif text-white">
-                        {language === 'DE' ? 'Referenzen' : 'Références'}
-                    </h1>
-                </div>
-            </section>
-
+        <main className="pt-28">
             <section className="pt-8 pb-8 px-6 text-center">
                 <div className="max-w-7xl mx-auto text-center space-y-6">
                     <p className="text-lg opacity-90 max-w-2xl mx-auto leading-relaxed">
@@ -86,18 +68,18 @@ const References = () => {
                                         }`}
                                     src={project.image}
                                 />
-                                <div className="absolute inset-0 bg-primary/70 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[1px] flex flex-col justify-end p-8 text-white">
-                                    <span className="text-[10px] uppercase tracking-widest mb-2 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100">
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-primary/70 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[1px] flex flex-col justify-end p-8 text-white">
+                                    <span className="text-[10px] uppercase tracking-widest mb-2 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100">
                                         {project.location}
                                     </span>
-                                    <h3 className="font-serif text-2xl mb-1 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-200">
+                                    <h3 className="font-serif text-2xl mb-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-200">
                                         {project.title}
                                     </h3>
-                                    <p className="text-xs opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-300 line-clamp-2">
+                                    <p className="text-xs opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-300 line-clamp-2">
                                         {project.description}
                                     </p>
 
-                                    <div className="mt-4 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 delay-400">
+                                    <div className="mt-4 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-2 group-hover:translate-y-0 transition-all duration-500 delay-400">
                                         <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest border-b border-white/40 pb-1">
                                             {language === 'DE' ? 'Projekt ansehen' : 'Voir le projet'}
                                             <span className="material-symbols-outlined text-sm">arrow_forward</span>

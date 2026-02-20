@@ -106,13 +106,13 @@ const Contact = () => {
                                     <h2 className="text-2xl font-serif italic text-primary">
                                         {language === 'DE' ? 'Womit kann ich helfen?' : 'Comment puis-je aider ?'}
                                     </h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-2 lg:grid-cols-2 gap-4">
                                         {services.map((s) => (
                                             <div
                                                 key={s.id}
-                                                className={`relative border p-8 transition-all duration-300 cursor-pointer flex flex-col items-center text-center gap-4 rounded-xl ${selectedServices.includes(s.id)
+                                                className={`relative border p-6 md:p-8 transition-all duration-300 cursor-pointer flex flex-col items-center text-center gap-4 rounded-xl ${selectedServices.includes(s.id)
                                                     ? 'border-primary bg-primary/5 dark:bg-primary/10 ring-1 ring-primary'
-                                                    : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-surface-dark hover:border-primary shadow-sm'
+                                                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-surface-dark hover:border-primary shadow-sm'
                                                     }`}
                                                 onClick={() => toggleService(s.id)}
                                             >
@@ -121,12 +121,12 @@ const Contact = () => {
                                                         <span className="material-symbols-outlined text-sm font-bold">check</span>
                                                     </div>
                                                 )}
-                                                <span className={`material-symbols-outlined text-5xl font-light ${selectedServices.includes(s.id) ? 'text-primary' : 'text-slate-400'
+                                                <span className={`material-symbols-outlined text-3xl md:text-5xl font-light ${selectedServices.includes(s.id) ? 'text-primary' : 'text-slate-400'
                                                     }`}>{s.icon}</span>
                                                 <div>
-                                                    <p className={`text-sm font-bold uppercase tracking-widest mb-1 ${selectedServices.includes(s.id) ? 'text-primary' : 'text-slate-700 dark:text-slate-200'
+                                                    <p className={`text-[10px] md:text-sm font-bold uppercase tracking-widest mb-1 ${selectedServices.includes(s.id) ? 'text-primary' : 'text-slate-700 dark:text-slate-200'
                                                         }`}>{s.label[language]}</p>
-                                                    <p className="text-[11px] text-slate-400 uppercase tracking-widest">{s.sub[language]}</p>
+                                                    <p className="text-[9px] md:text-[11px] text-slate-400 uppercase tracking-widest leading-tight">{s.sub[language]}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -135,31 +135,41 @@ const Contact = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                     <div className="relative">
-                                        <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-400 block mb-2">
-                                            {language === 'DE' ? 'Dein Name' : 'Votre Nom'}
+                                        <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 block mb-2">
+                                            {language === 'DE' ? 'Vorname' : 'Prénom'}
                                         </label>
                                         <input
-                                            className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 text-lg dark:text-white"
-                                            placeholder={language === 'DE' ? 'Vor- und Nachname' : 'Prénom et Nom'}
+                                            className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b-2 border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 text-lg dark:text-white placeholder-slate-300"
+                                            placeholder="John"
                                             type="text"
                                         />
                                     </div>
                                     <div className="relative">
-                                        <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-400 block mb-2">
+                                        <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 block mb-2">
+                                            {language === 'DE' ? 'Nachname' : 'Nom'}
+                                        </label>
+                                        <input
+                                            className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b-2 border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 text-lg dark:text-white placeholder-slate-300"
+                                            placeholder="Doe"
+                                            type="text"
+                                        />
+                                    </div>
+                                    <div className="relative">
+                                        <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 block mb-2">
                                             {language === 'DE' ? 'Email-Adresse' : 'Adresse E-Mail'}
                                         </label>
                                         <input
-                                            className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 dark:text-white"
-                                            placeholder="beispiel@mail.be"
+                                            className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b-2 border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 dark:text-white placeholder-slate-300"
+                                            placeholder="john@example.com"
                                             type="email"
                                         />
                                     </div>
                                     <div className="relative">
-                                        <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-400 block mb-2">
+                                        <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 block mb-2">
                                             {language === 'DE' ? 'Telefonnummer' : 'Téléphone'}
                                         </label>
                                         <input
-                                            className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 dark:text-white"
+                                            className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b-2 border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 dark:text-white placeholder-slate-300"
                                             placeholder="+32 ..."
                                             type="tel"
                                         />
@@ -167,18 +177,18 @@ const Contact = () => {
                                 </div>
 
                                 <div className="relative">
-                                    <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-400 block mb-2">
-                                        {language === 'DE' ? 'Deine Nachricht' : 'Votre Message'}
+                                    <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 block mb-2">
+                                        {language === 'DE' ? 'Notiz' : 'Note'}
                                     </label>
                                     <textarea
                                         rows="4"
-                                        className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 text-lg dark:text-white"
+                                        className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b-2 border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 text-lg dark:text-white placeholder-slate-300"
                                         placeholder={language === 'DE' ? 'Wie kann ich dir helfen?' : 'Comment puis-je vous aider ?'}
                                     ></textarea>
                                 </div>
 
                                 <div className="pt-6 flex justify-end">
-                                    <button className="bg-primary text-white px-14 py-5 text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-opacity-90 transition-all flex items-center gap-4 group rounded-full shadow-lg" type="button">
+                                    <button className="bg-primary text-white w-full md:w-auto px-14 py-5 text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-opacity-90 transition-all flex items-center justify-center gap-4 group rounded-full shadow-lg" type="button">
                                         {language === 'DE' ? 'Anfrage senden' : 'Envoyer la demande'}
                                         <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">send</span>
                                     </button>
