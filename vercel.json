@@ -1,8 +1,10 @@
 {
+    "buildCommand": "npm run build --prefix reproduction",
+    "outputDirectory": "reproduction/dist",
     "rewrites": [
         {
-            "source": "/(.*)",
-            "destination": "/reproduction/$1"
+            "source": "/((?!assets/|.*\\..*).*)",
+            "destination": "/index.html"
         }
     ]
 }
