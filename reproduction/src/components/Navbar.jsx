@@ -63,7 +63,16 @@ const Navbar = () => {
             : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-100/50 dark:border-slate-800/50 py-2'
             }`}>
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-                <Link to="/" className="flex items-center gap-2">
+                <Link
+                    to="/"
+                    className="flex items-center gap-2"
+                    onClick={(e) => {
+                        if (window.location.pathname === '/') {
+                            e.preventDefault();
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    }}
+                >
                     <img
                         alt="Fabry Baumpflege Logo"
                         className={`w-auto object-contain transition-all duration-500 ${isScrolled ? 'h-12' : 'h-16'

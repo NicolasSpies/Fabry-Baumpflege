@@ -49,7 +49,7 @@ const AboutMe = () => {
                         ></div>
                     </div>
                     <div className="text-left order-1 lg:order-2">
-                        <span className="text-primary font-semibold tracking-[0.3em] uppercase text-xs mb-8 block reveal">
+                        <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs mb-8 block reveal">
                             {language === 'DE' ? 'Die Philosophie' : 'La Philosophie'}
                         </span>
                         <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-primary mb-12 leading-tight italic reveal stagger-1">

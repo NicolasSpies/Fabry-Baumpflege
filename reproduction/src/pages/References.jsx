@@ -49,9 +49,9 @@ const References = () => {
                 </div>
             </section>
 
-            <section className="sticky top-20 z-40 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-y border-slate-100 dark:border-slate-800 mb-8">
-                <div className="max-w-7xl mx-auto px-6 py-4 overflow-x-auto">
-                    <div className="flex items-center justify-center min-w-max gap-4 md:gap-8">
+            <section className="sticky top-20 z-40 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-y border-slate-100 dark:border-slate-800 mb-8 py-4">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
                         {filters.map((f) => (
                             <button
                                 key={f.DE}

@@ -108,44 +108,63 @@ const Home = () => {
         }
     ];
 
-    /* ── Marquee (pixel-per-second driven + touch drag) ── */
+    /* ── Marquee (Robust Real Scroll + Auto-Loop) ── */
     const marqueeRef = useRef(null);
-    const [marqueePaused, setMarqueePaused] = useState(false);
-    const SPEED_PX_PER_SEC = 40;
-
-    // Touch state refs to avoid re-triggering dependency array 
+    const [isMarqueeHovered, setIsMarqueeHovered] = useState(false);
+    const lastInteractionTime = useRef(0);
     const isDragging = useRef(false);
     const startX = useRef(0);
-    const currentOffset = useRef(0);
+    const startScrollLeft = useRef(0);
+    const SPEED_PX_PER_SEC = 40;
 
     useEffect(() => {
+        const marquee = marqueeRef.current;
+        if (!marquee) return;
+
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (prefersReducedMotion) return;
 
         let prevTimestamp = null;
         let rafId;
 
+        // Initialize to middle set for infinite feel
+        const initMidset = () => {
+            const singleSetWidth = marquee.scrollWidth / 3;
+            if (singleSetWidth > 0) {
+                marquee.scrollLeft = singleSetWidth;
+            } else {
+                // Retry in next frame if scrollWidth isn't ready
+                requestAnimationFrame(initMidset);
+            }
+        };
+        initMidset();
+
         const tick = (timestamp) => {
             if (prevTimestamp === null) prevTimestamp = timestamp;
-            const delta = (timestamp - prevTimestamp) / 1000; // seconds
+            const delta = (timestamp - prevTimestamp) / 1000;
             prevTimestamp = timestamp;
 
-            // Only auto-scroll if not hovered AND not currently dragging
-            if (!marqueePaused && !isDragging.current && marqueeRef.current) {
-                currentOffset.current += SPEED_PX_PER_SEC * delta;
+            const now = Date.now();
+            const timeSinceInteraction = now - lastInteractionTime.current;
 
-                // Reset seamlessly at one-third of track width (one full set)
-                const singleSetWidth = marqueeRef.current.scrollWidth / 3;
-                if (singleSetWidth > 0 && currentOffset.current >= singleSetWidth) {
-                    currentOffset.current -= singleSetWidth;
+            // Auto-scroll logic: only if idle, not dragging, and not hovered
+            const shouldAutoScroll = timeSinceInteraction > 1500 && !isDragging.current && !isMarqueeHovered;
+
+            if (marquee) {
+                const singleSetWidth = marquee.scrollWidth / 3;
+
+                if (shouldAutoScroll) {
+                    marquee.scrollLeft += SPEED_PX_PER_SEC * delta;
                 }
 
-                // Handle reverse drag loops
-                if (singleSetWidth > 0 && currentOffset.current < 0) {
-                    currentOffset.current += singleSetWidth;
+                // Infinite loop jump boundaries
+                if (singleSetWidth > 0) {
+                    if (marquee.scrollLeft >= singleSetWidth * 2) {
+                        marquee.scrollLeft -= singleSetWidth;
+                    } else if (marquee.scrollLeft <= 0) {
+                        marquee.scrollLeft += singleSetWidth;
+                    }
                 }
-
-                marqueeRef.current.style.transform = `translate3d(-${currentOffset.current}px, 0, 0)`;
             }
 
             rafId = requestAnimationFrame(tick);
@@ -153,31 +172,43 @@ const Home = () => {
 
         rafId = requestAnimationFrame(tick);
         return () => cancelAnimationFrame(rafId);
-    }, [marqueePaused]);
+    }, [isMarqueeHovered]);
 
-    // Touch Handlers
-    const handleTouchStart = (e) => {
+    const handlePointerDown = (e) => {
+        if (!marqueeRef.current) return;
         isDragging.current = true;
-        startX.current = e.touches[0].clientX;
+        startX.current = e.clientX;
+        startScrollLeft.current = marqueeRef.current.scrollLeft;
+        lastInteractionTime.current = Date.now();
+        marqueeRef.current.setPointerCapture(e.pointerId);
     };
 
-    const handleTouchMove = (e) => {
+    const handlePointerMove = (e) => {
         if (!isDragging.current || !marqueeRef.current) return;
+        const x = e.clientX;
+        const walk = x - startX.current;
 
-        const currentX = e.touches[0].clientX;
-        const diffX = startX.current - currentX;
-
-        // Update offset immediately for smooth drag
-        currentOffset.current += diffX;
-        marqueeRef.current.style.transform = `translate3d(-${currentOffset.current}px, 0, 0)`;
-
-        // Reset startX for continuous calculation
-        startX.current = currentX;
+        // Threshold to avoid hijacking vertical scroll on slight diagonals
+        if (Math.abs(walk) > 7) {
+            marqueeRef.current.scrollLeft = startScrollLeft.current - walk;
+            lastInteractionTime.current = Date.now();
+        }
     };
 
-    const handleTouchEnd = () => {
+    const handlePointerUp = (e) => {
         isDragging.current = false;
-        // The rAF loop will automatically pick up from the new currentOffset.current
+        if (marqueeRef.current) {
+            marqueeRef.current.releasePointerCapture(e.pointerId);
+        }
+        lastInteractionTime.current = Date.now();
+    };
+
+    const handleWheel = () => {
+        lastInteractionTime.current = Date.now();
+    };
+
+    const handleScroll = () => {
+        lastInteractionTime.current = Date.now();
     };
 
     const heroRef = useRef(null);
@@ -324,16 +355,33 @@ const Home = () => {
                 </div>
 
                 <div className="relative">
-                    <div className="overflow-hidden">
+                    {/* Generous vertical bounds so the shadow doesn't clip */}
+                    <div className="w-full relative -my-10 py-10">
+                        <style>{`
+                            .native-marquee-track::-webkit-scrollbar { display: none; }
+                            .native-marquee-track { 
+                                scrollbar-width: none; 
+                                -ms-overflow-style: none;
+                                -webkit-overflow-scrolling: touch; 
+                                overscroll-behavior-x: contain;
+                            }
+                            @media (hover: hover) {
+                                .native-marquee-track { cursor: grab; }
+                                .native-marquee-track:active { cursor: grabbing; }
+                            }
+                        `}</style>
                         <div
                             ref={marqueeRef}
-                            className="marquee-track gap-8 px-6 py-6"
-                            style={{ touchAction: 'pan-y' }}
-                            onMouseEnter={() => setMarqueePaused(true)}
-                            onMouseLeave={() => setMarqueePaused(false)}
-                            onTouchStart={handleTouchStart}
-                            onTouchMove={handleTouchMove}
-                            onTouchEnd={handleTouchEnd}
+                            className="native-marquee-track flex overflow-x-auto gap-8 px-6 py-6"
+                            style={{ touchAction: 'pan-x pan-y' }}
+                            onPointerDown={handlePointerDown}
+                            onPointerMove={handlePointerMove}
+                            onPointerUp={handlePointerUp}
+                            onPointerCancel={handlePointerUp}
+                            onWheel={handleWheel}
+                            onScroll={handleScroll}
+                            onMouseEnter={() => setIsMarqueeHovered(true)}
+                            onMouseLeave={() => setIsMarqueeHovered(false)}
                         >
                             {/* Tripled list for infinite loop feel */}
                             {[...testimonials, ...testimonials, ...testimonials].map((t, idx) => (
