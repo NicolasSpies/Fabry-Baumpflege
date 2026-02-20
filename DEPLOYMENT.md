@@ -1,12 +1,14 @@
-# Vercel Deployment Guide
+# Vercel Deployment Settings
 
-To deploy this project to Vercel, use the following settings in the Vercel Dashboard:
+To deploy this project successfully, use the following settings in your Vercel Project Dashboard:
 
-- **Framework Preset**: Vite
 - **Root Directory**: `reproduction`
+- **Framework Preset**: `Vite`
 - **Build Command**: `npm run build`
 - **Output Directory**: `dist`
 - **Install Command**: `npm install` (default)
 
-### Alternative (Root Deployment)
-If you deploy from the repository root (`./`), the included `vercel.json` and `package.json` will automatically handle the build delegation to the `reproduction` folder.
+### Instructions
+1. Go to your Project Settings on Vercel.
+2. In the **General** tab, set the **Root Directory** to `reproduction`.
+3. Save and redeploy. Vercel will now automatically install dependencies and build the app correctly.
