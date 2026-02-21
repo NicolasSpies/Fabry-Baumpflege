@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../i18n/useLanguage';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useParallax } from '../hooks/useParallax';
+import { ROUTES } from '../i18n/routes';
 import portrait from '../assets/images/vincent_portrait.png';
 import baumpflegeImg from '../assets/images/services/baumpflege.png';
 import baumfaellungImg from '../assets/images/services/baumfaellung.png';
@@ -22,7 +23,7 @@ const ParallaxImage = ({ src, alt, className = "", speed = 0.04, maxTravel = 24 
 };
 
 const AboutMe = () => {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     useScrollReveal();
 
     const heroPortraitRef = useRef(null);
@@ -50,15 +51,13 @@ const AboutMe = () => {
                     </div>
                     <div className="text-left order-1 lg:order-2">
                         <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs mb-8 block reveal">
-                            {language === 'DE' ? 'Die Philosophie' : 'La Philosophie'}
+                            {t('aboutme.philosophy.label')}
                         </span>
                         <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-primary mb-12 leading-tight italic reveal stagger-1">
-                            {language === 'DE' ? '"Ein Baum ist mehr als nur Holz. Er ist ein Vermächtnis."' : '"Un arbre est plus que du bois. C\'est un héritage."'}
+                            {t('aboutme.philosophy.quote')}
                         </h2>
                         <p className="text-lg md:text-xl leading-relaxed text-slate-600 dark:text-slate-400 font-light reveal stagger-2">
-                            {language === 'DE'
-                                ? 'Mit Leidenschaft und Fachkenntnis klettere ich in die Kronen, um das Gleichgewicht zwischen urbaner Entwicklung und natürlichem Erhalt zu wahren. Meine Arbeit ist geprägt von tiefem Respekt vor der Vitalität jedes einzelnen Baumes.'
-                                : 'C\'est avec passion et expertise que je grimpe dans les cimes pour maintenir l\'équilibre entre le développement urbain et la préservation naturelle. Mon travail est imprégné d\'un profond respect pour la vitalité de chaque arbre.'}
+                            {t('aboutme.philosophy.text')}
                         </p>
                     </div>
                 </div>
@@ -81,12 +80,10 @@ const AboutMe = () => {
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-xl font-serif text-primary">
-                                    {language === 'DE' ? 'Präzision' : 'Précision'}
+                                    {t('aboutme.values.precision.title')}
                                 </h3>
                                 <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                                    {language === 'DE'
-                                        ? 'Jeder Schnitt folgt einer biologischen Notwendigkeit. Seilklettertechnik erlaubt uns, auch die sensibelsten Bereiche sicher zu erreichen.'
-                                        : 'Chaque coupe suit une nécessité biologique. Les techniques de grimpe nous permettent d\'atteindre en toute sécurité même les zones les plus sensibles.'}
+                                    {t('aboutme.values.precision.text')}
                                 </p>
                             </div>
                         </div>
@@ -104,12 +101,10 @@ const AboutMe = () => {
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-xl font-serif text-primary">
-                                    {language === 'DE' ? 'Nachhaltigkeit' : 'Durabilité'}
+                                    {t('aboutme.values.sustainability.title')}
                                 </h3>
                                 <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                                    {language === 'DE'
-                                        ? 'Wir pflegen nicht nur für heute, sondern für die Generationen von morgen. Nachhaltiger Erhalt steht vor radikaler Fällung.'
-                                        : 'Nous entretenons non seulement pour aujourd\'hui, mais pour les générations de demain. La préservation durable prime sur l\'abattage radical.'}
+                                    {t('aboutme.values.sustainability.text')}
                                 </p>
                             </div>
                         </div>
@@ -127,12 +122,10 @@ const AboutMe = () => {
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-xl font-serif text-primary">
-                                    {language === 'DE' ? 'Expertise' : 'Expertise'}
+                                    {t('aboutme.values.expertise.title')}
                                 </h3>
                                 <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                                    {language === 'DE'
-                                        ? 'Zertifiziertes Fachwissen und modernste Ausrüstung garantieren höchste Sicherheit für Mensch und Baumumfeld.'
-                                        : 'Une expertise certifiée et un équipement de pointe garantissent une sécurité maximale pour l\'homme et l\'environnement des arbres.'}
+                                    {t('aboutme.values.expertise.text')}
                                 </p>
                             </div>
                         </div>
@@ -144,19 +137,19 @@ const AboutMe = () => {
             <section className="py-32 bg-surface-light dark:bg-surface-dark/30 border-t border-slate-100 dark:border-slate-800" id="contact">
                 <div className="max-w-4xl mx-auto px-6 text-center reveal">
                     <h2 className="text-4xl md:text-5xl font-serif text-primary mb-12">
-                        {language === 'DE' ? 'Lass uns gemeinsam für deine Bäume sorgen.' : 'Prenons soin de vos arbres ensemble.'}
+                        {t('aboutme.signature.title')}
                     </h2>
                     <div className="mb-16 reveal stagger-1">
                         <p className="text-primary font-signature text-5xl md:text-8xl select-none leading-none whitespace-nowrap">Vincent Fabry</p>
                         <p className="text-[10px] tracking-[0.4em] uppercase text-slate-400 mt-6 font-bold">
-                            {language === 'DE' ? 'Inhaber & Baumpfleger' : 'Propriétaire & Arboriculteur'}
+                            {t('aboutme.signature.label')}
                         </p>
                     </div>
                     <Link
-                        to="/kontakt"
+                        to={ROUTES[language].contact}
                         className="inline-flex items-center gap-4 bg-primary text-white px-12 py-5 rounded-full text-lg font-bold uppercase tracking-widest hover:bg-opacity-90 transition-all group shadow-xl reveal stagger-2"
                     >
-                        {language === 'DE' ? 'Kontakt aufnehmen' : 'Prendre contact'}
+                        {t('aboutme.signature.cta')}
                         <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
                     </Link>
                 </div>

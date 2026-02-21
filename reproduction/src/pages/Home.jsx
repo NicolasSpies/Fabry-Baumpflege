@@ -1,19 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../i18n/useLanguage';
+import { getLocalizedPath } from '../i18n/routes';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useSoftEntrance } from '../hooks/useSoftEntrance';
 import { useServiceCardsEntrance } from '../hooks/useServiceCardsEntrance';
 import { useParallax } from '../hooks/useParallax';
-import { getLatestReferences, getCategoryMap, mapReferenceCard } from '../lib/cms';
+import { getLatestReferences, getCategoryMap, mapReferenceCard, PLLCode } from '../lib/cms';
 import ReferenceCard from '../components/ReferenceCard';
 import BaumpflegeIcon from '../components/BaumpflegeIcon';
 import BaumfaellungIcon from '../components/BaumfaellungIcon';
 import GartenpflegeIcon from '../components/GartenpflegeIcon';
 import BepflanzungIcon from '../components/BepflanzungIcon';
 import baumpflegeImg from '../assets/images/hero/expertise_new.jpg';
+import homeHeroImg from '../assets/images/hero/vincent-fabry-header3.jpg';
 
-const StatCounter = ({ value, label, language }) => {
+const StatCounter = ({ value, labelKey, t }) => {
     const [count, setCount] = useState(0);
     const countRef = useRef(null);
     const hasAnimated = useRef(false);
@@ -52,67 +54,73 @@ const StatCounter = ({ value, label, language }) => {
                 {count}{value.includes('+') ? '+' : value.includes('%') ? '%' : ''}
             </div>
             <div className="text-xs md:text-sm text-slate-500 uppercase tracking-widest font-medium">
-                {label[language]}
+                {t(labelKey)}
             </div>
         </div>
     );
 };
 
-import homeHeroImg from '../assets/images/hero/vincent-fabry-header3.jpg';
-
 const Home = () => {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     useScrollReveal();
 
-    // ── Latest references from CMS ───────────────────────────────────────────
     const [latestRefs, setLatestRefs] = useState([]);
     const [refsLoading, setRefsLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
         async function loadLatest() {
+            setRefsLoading(true);
             try {
                 const [raw, catMap] = await Promise.all([
-                    getLatestReferences(3),
-                    getCategoryMap(),
+                    getLatestReferences(6, language), // fetch extra to ensure 3 after filter
+                    getCategoryMap(language),
                 ]);
-                setLatestRefs(raw.map(item => mapReferenceCard(item, catMap)));
+                if (cancelled) return;
+                // Filter strictly by pll_lang to prevent cross-locale bleed
+                const pllLang = PLLCode[language];
+                const filtered = Array.isArray(raw)
+                    ? raw.filter(item => !item.pll_lang || item.pll_lang === pllLang)
+                    : [];
+                setLatestRefs(filtered.slice(0, 3).map(item => mapReferenceCard(item, catMap)));
             } catch (err) {
+                if (cancelled) return;
                 console.error('[Home] Failed to load latest references:', err);
-                // Fail gracefully — show empty grid, not a crash
                 setLatestRefs([]);
             } finally {
-                setRefsLoading(false);
+                if (!cancelled) setRefsLoading(false);
             }
         }
         loadLatest();
-    }, []);
+        return () => { cancelled = true; };
+    }, [language]);
 
     const stats = [
-        { value: '35+', label: { DE: 'Zufriedene Kunden', FR: 'Clients satisfaits' } },
-        { value: '125+', label: { DE: 'Gepflegte Bäume', FR: 'Arbres entretenus' } },
-        { value: '5+', label: { DE: 'Jahre Erfahrung', FR: 'Années d’expérience' } },
-        { value: '0', label: { DE: 'Arbeitsunfälle', FR: 'Accidents signalés' } },
+        { value: '35+', labelKey: 'stats.clients' },
+        { value: '125+', labelKey: 'stats.trees' },
+        { value: '5+', labelKey: 'stats.experience' },
+        { value: '0', labelKey: 'stats.accidents' },
     ];
 
     const services = [
         {
-            title: { DE: 'Baumpflege', FR: 'Taille raisonnée' },
-            desc: { DE: 'Kronenpflege, Totholzentfernung und Lichtraumprofilschnitt für die Gesundheit deiner Bäume.', FR: 'Taille de la couronne, enlèvement du bois mort et taille de profil pour la santé de vos arbres.' },
+            titleKey: 'services.baumpflege.title',
+            descKey: 'services.baumpflege.desc',
             id: 'baumpflege'
         },
         {
-            title: { DE: 'Baumfällung', FR: 'Abattage' },
-            desc: { DE: 'Sichere Fällungen auch an schwierigen Standorten mittels Seilklettertechnik oder Hubsteiger.', FR: 'Abattage sécurisé même dans des endroits difficiles grâce à la grimpe ou à la nacelle.' },
+            titleKey: 'services.baumfaellung.title',
+            descKey: 'services.baumfaellung.desc',
             id: 'baumfaellung'
         },
         {
-            title: { DE: 'Gartenpflege', FR: 'Entretien de jardin' },
-            desc: { DE: 'Ganzheitliche Pflege für deinen Garten, von Hecke schneiden bis zur Rasenpflege.', FR: 'Entretien complet de votre jardin, de la taille des haies à la tonte de la pelouse.' },
+            titleKey: 'services.gartenpflege.title',
+            descKey: 'services.gartenpflege.desc',
             id: 'gartenpflege'
         },
         {
-            title: { DE: 'Bepflanzung', FR: 'Plantation' },
-            desc: { DE: 'Fachgerechte Neupflanzungen von Bäumen, Sträuchern und Stauden für nachhaltiges Grün.', FR: 'Plantations expertes d\'arbres, d\'arbustes et de vivaces pour une verdure durable.' },
+            titleKey: 'services.bepflanzung.title',
+            descKey: 'services.bepflanzung.desc',
             id: 'bepflanzung'
         },
     ];
@@ -121,24 +129,18 @@ const Home = () => {
         {
             author: 'William Wehr',
             rating: 5,
-            time: 'il y a 2 semaines',
             text: 'Travail effectué avec professionnalisme dans le respect des délais et du budget. A recommander à 100%.'
         },
         {
             author: 'Natascha Hilbrink',
-            label: 'Local Guide',
             rating: 5,
-            time: 'il y a 2 semaines',
             text: 'Nos travaux d’abattage d’arbres ont été réalisés avec le plus grand soin. Nous sommes pleinement satisfaits et recommandons Fabry Tree Care sans hésitation. Merci pour l’excellent travail !'
         }
     ];
 
-    /* ── Safari-Safe Marquee (Transform based with Drag) ── */
     const marqueeContainerRef = useRef(null);
     const marqueeTrackRef = useRef(null);
     const SPEED_PX_PER_SEC = 40;
-
-    // Animation state kept in refs to avoid rerenders
     const offsetRef = useRef(0);
     const isHoveringRef = useRef(false);
     const isDraggingRef = useRef(false);
@@ -162,30 +164,23 @@ const Home = () => {
 
             if (!isHoveringRef.current && !isDraggingRef.current && !isPausedRef.current) {
                 const singleSetWidth = track.scrollWidth / 2;
-
                 if (singleSetWidth > 0) {
                     offsetRef.current += SPEED_PX_PER_SEC * deltaTime;
-
-                    // Seamless midpoint reset for 2 sets
                     if (offsetRef.current >= singleSetWidth) {
                         offsetRef.current -= singleSetWidth;
                     } else if (offsetRef.current < 0) {
                         offsetRef.current += singleSetWidth;
                     }
-
                     track.style.transform = `translate3d(-${offsetRef.current}px, 0, 0)`;
                 }
             }
-
             rafId = requestAnimationFrame(tick);
         };
 
         rafId = requestAnimationFrame(tick);
-
-        // Visibility API to pause when off-screen/background tab
         const handleVisibilityChange = () => {
             isPausedRef.current = document.hidden;
-            if (!document.hidden) prevTimestamp = null; // Reset delta on resume
+            if (!document.hidden) prevTimestamp = null;
         };
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
@@ -196,16 +191,13 @@ const Home = () => {
     }, []);
 
     useEffect(() => {
-        // Intersection Observer to pause when section is out of view
         const observer = new IntersectionObserver((entries) => {
             isPausedRef.current = !entries[0].isIntersecting;
         }, { threshold: 0 });
-
         if (marqueeContainerRef.current) observer.observe(marqueeContainerRef.current);
         return () => observer.disconnect();
     }, []);
 
-    // Pointer events for manual drag/swipe override
     const handlePointerDown = (e) => {
         isDraggingRef.current = true;
         startXRef.current = e.clientX;
@@ -215,27 +207,19 @@ const Home = () => {
         if (!isDraggingRef.current) return;
         const track = marqueeTrackRef.current;
         if (!track) return;
-
         const deltaX = e.clientX - startXRef.current;
         startXRef.current = e.clientX;
-
         const singleSetWidth = track.scrollWidth / 2;
         offsetRef.current -= deltaX;
-
-        // Boundary wrapping during drag
         if (offsetRef.current >= singleSetWidth) {
             offsetRef.current -= singleSetWidth;
         } else if (offsetRef.current < 0) {
             offsetRef.current += singleSetWidth;
         }
-
         track.style.transform = `translate3d(-${offsetRef.current}px, 0, 0)`;
     };
 
-    const handlePointerUp = () => {
-        isDraggingRef.current = false;
-    };
-
+    const handlePointerUp = () => { isDraggingRef.current = false; };
 
     const heroRef = useRef(null);
     const expertiseRef = useRef(null);
@@ -257,40 +241,31 @@ const Home = () => {
                 <div className="absolute inset-0 z-0">
                     <img
                         ref={heroRef}
-                        alt="Baumpfleger Vincent Fabry working in a tree"
+                        alt="Baumpfleger Vincent Fabry"
                         className="w-full h-[120%] object-cover object-top filter brightness-[0.80] contrast-[1.05]"
                         src={homeHeroImg}
                     />
-                    {/* Subtle gradient — reduced to let more image through */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"></div>
                 </div>
-                {/* Desktop: asymmetric left-shifted, Mobile: vertically centered */}
                 <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-center h-full">
                     <div className="w-full md:max-w-2xl space-y-6 md:space-y-7 text-left flex flex-col items-start">
                         <h1 className="font-serif text-white leading-[0.95] md:leading-[0.95] reveal">
-                            {language === 'DE' ? (
-                                <>
-                                    <span className="text-[1.5rem] md:text-[2.25rem] lg:text-[2.5rem] block mb-[0.125rem] md:mb-1 text-white/75 font-light tracking-wide">Präzision</span>
-                                    <span className="text-[2.75rem] md:text-[5rem] lg:text-[6.5rem] font-bold block tracking-tight">trifft Natur</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span className="text-[1.5rem] md:text-[2.25rem] lg:text-[2.5rem] block mb-[0.125rem] md:mb-1 text-white/75 font-light tracking-wide">Précision rencontre</span>
-                                    <span className="text-[2.75rem] md:text-[5rem] lg:text-[6.5rem] font-bold block tracking-tight">Nature</span>
-                                </>
-                            )}
+                            <span className="text-[1.5rem] md:text-[2.25rem] lg:text-[2.5rem] block mb-[0.125rem] md:mb-1 text-white/75 font-light tracking-wide">
+                                {t('hero.precision')}
+                            </span>
+                            <span className="text-[2.75rem] md:text-[5rem] lg:text-[6.5rem] font-bold block tracking-tight">
+                                {t('hero.meets')}
+                            </span>
                         </h1>
                         <p className="text-[0.9375rem] md:text-base text-white/70 font-sans font-normal max-w-[250px] md:max-w-md leading-snug md:leading-relaxed reveal stagger-1">
-                            {language === 'DE'
-                                ? 'Nachhaltige Baumpflege und Fällarbeiten mit höchster Sorgfalt und Expertise. Für gesunde Bäume und sichere Gärten.'
-                                : 'Entretien durable des arbres et abattages effectués avec le plus grand soin et expertise. Pour des arbres sains et des jardins sécurisés.'}
+                            {t('hero.description')}
                         </p>
                         <div className="pt-2 md:pt-4 reveal stagger-2">
                             <Link
-                                to="/kontakt"
+                                to={getLocalizedPath('contact', language)}
                                 className="inline-block bg-[#3E5F25] text-white px-8 py-3.5 rounded-full font-semibold tracking-widest uppercase text-xs hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
                             >
-                                {language === 'DE' ? 'Jetzt Kontakt aufnehmen' : 'Nous contacter'}
+                                {t('hero.cta')}
                             </Link>
                         </div>
                     </div>
@@ -303,7 +278,7 @@ const Home = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8">
                         {stats.map((stat, idx) => (
                             <div key={idx} className="soft-entrance-item">
-                                <StatCounter value={stat.value} label={stat.label} language={language} />
+                                <StatCounter value={stat.value} labelKey={stat.labelKey} t={t} />
                             </div>
                         ))}
                     </div>
@@ -316,18 +291,17 @@ const Home = () => {
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16 md:mb-24 space-y-4 soft-entrance-item">
                         <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">
-                            {language === 'DE' ? 'Meine Expertise' : 'Mon Expertise'}
+                            {t('expertise.title')}
                         </span>
                         <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight">
-                            {language === 'DE' ? 'Professionelle Baumpflege' : 'Taille raisonnée professionnelle'} <br className="hidden md:block" />
-                            {language === 'DE' ? 'auf höchstem Niveau' : 'au plus haut niveau'}
+                            {t('expertise.subtitle')}
                         </h2>
                     </div>
                     <div ref={expertCardsGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-6">
                         {services.map((service, idx) => (
                             <div key={idx} className="expert-card-anim h-full">
                                 <Link
-                                    to={`/leistungen#${service.id}`}
+                                    to={`${getLocalizedPath('services', language)}#${service.id}`}
                                     className="group relative bg-white dark:bg-surface-dark rounded-[2rem] p-8 md:p-10 hover:-translate-y-2 transition-transform duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full"
                                 >
                                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors duration-500"></div>
@@ -338,13 +312,13 @@ const Home = () => {
                                             {idx === 2 && <GartenpflegeIcon className="w-6 h-6 fill-current" />}
                                             {idx === 3 && <BepflanzungIcon className="w-6 h-6 fill-current" />}
                                         </div>
-                                        <h3 className="text-2xl font-serif text-primary mb-4 group-hover:text-[#3E5F25] dark:group-hover:text-primary transition-colors">{service.title[language]}</h3>
+                                        <h3 className="text-2xl font-serif text-primary mb-4 group-hover:text-[#3E5F25] dark:group-hover:text-primary transition-colors">{t(service.titleKey)}</h3>
                                         <p className="text-slate-600 dark:text-slate-400 text-[0.9375rem] leading-relaxed font-sans mb-8 flex-grow">
-                                            {service.desc[language]}
+                                            {t(service.descKey)}
                                         </p>
                                         <div className="flex items-center text-primary font-bold text-xs tracking-[0.15em] uppercase mt-auto">
                                             <span className="mr-2 group-hover:mr-4 transition-all duration-300">
-                                                {language === 'DE' ? 'Mehr erfahren' : 'En savoir plus'}
+                                                {t('expertise.learn_more')}
                                             </span>
                                             <span className="material-symbols-outlined text-base">arrow_forward</span>
                                         </div>
@@ -361,10 +335,10 @@ const Home = () => {
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-20 space-y-4">
                         <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">
-                            {language === 'DE' ? 'Ausgewählte Projekte' : 'Projets Sélectionnés'}
+                            {t('refs.preview_title')}
                         </span>
                         <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">
-                            {language === 'DE' ? 'Neueste Referenzen' : 'Dernières Références'}
+                            {t('refs.preview_subtitle')}
                         </h2>
                     </div>
 
@@ -375,7 +349,7 @@ const Home = () => {
                             </div>
                         ) : latestRefs.length === 0 ? (
                             <p className="col-span-3 text-center text-slate-400 py-12">
-                                {language === 'DE' ? 'Keine Referenzen gefunden.' : 'Aucune référence trouvée.'}
+                                {t('refs.none_found')}
                             </p>
                         ) : (
                             latestRefs.map((project) => (
@@ -386,10 +360,10 @@ const Home = () => {
 
                     <div className="mt-16 text-center reveal">
                         <Link
-                            to="/referenzen"
+                            to={getLocalizedPath('references', language)}
                             className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 uppercase tracking-widest text-xs"
                         >
-                            {language === 'DE' ? 'Alle Referenzen ansehen' : 'Voir toutes les références'}
+                            {t('refs.view_all')}
                             <span className="material-symbols-outlined">arrow_forward</span>
                         </Link>
                     </div>
@@ -401,16 +375,15 @@ const Home = () => {
                 <div className="max-w-7xl mx-auto px-6 mb-16">
                     <div className="text-center space-y-4">
                         <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">
-                            {language === 'DE' ? 'Kundenstimmen' : 'Témoignages'}
+                            {t('testimonials.title')}
                         </span>
                         <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">
-                            {language === 'DE' ? 'Was meine Kunden sagen' : 'Ce que disent nos clients'}
+                            {t('testimonials.subtitle')}
                         </h2>
                     </div>
                 </div>
 
                 <div ref={marqueeContainerRef} className="relative">
-                    {/* Generous vertical bounds so the shadow doesn't clip */}
                     <div
                         className="w-full relative -my-10 py-10 overflow-hidden cursor-grab active:cursor-grabbing"
                         onMouseEnter={() => isHoveringRef.current = true}
@@ -425,7 +398,6 @@ const Home = () => {
                             ref={marqueeTrackRef}
                             className="flex flex-nowrap gap-8 px-6 w-max will-change-transform"
                         >
-                            {/* Doubled list for infinite loop feel */}
                             {[...testimonials, ...testimonials].map((t, idx) => (
                                 <div
                                     key={idx}
@@ -460,13 +432,13 @@ const Home = () => {
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
                                 <img
                                     ref={expertiseRef}
-                                    alt="Professional Arborist Climbing"
+                                    alt="Expertise"
                                     className="w-full h-[650px] object-cover"
                                     src={baumpflegeImg}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent p-10 flex items-end">
                                     <p className="text-white italic font-serif text-2xl border-l-4 border-primary pl-4 drop-shadow-lg">
-                                        {language === 'DE' ? '"Sorgfalt bis ins Detail"' : '"La qualité qui grandit au fil des générations."'}
+                                        {t('about.quote')}
                                     </p>
                                 </div>
                             </div>
@@ -474,23 +446,21 @@ const Home = () => {
                         <div className="w-full lg:w-1/2 space-y-10">
                             <div className="space-y-4">
                                 <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs block">
-                                    {language === 'DE' ? 'Tradition trifft Präzision' : 'Tradition rencontre Précision'}
+                                    {t('about.teaser_label')}
                                 </span>
                                 <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight reveal">
-                                    {language === 'DE' ? 'Expertise in jedem Astschlag' : 'Expertise dans chaque coupe d\'onglet'}
+                                    {t('about.teaser_title')}
                                 </h2>
                             </div>
                             <p className="text-lg leading-[1.8] text-slate-700 dark:text-slate-300 font-sans">
-                                {language === 'DE'
-                                    ? 'Mit Leidenschaft und Fachkenntnis widmet sich Vincent Fabry dem Erhalt und der Pflege urbaner Naturräume. Ich verstehe Bäume nicht nur als Gestaltungselemente, sondern als wertvolle Lebewesen.'
-                                    : 'Avec passion et expertise, Vincent Fabry se consacre à la préservation et à l\'entretien des espaces naturels urbains. Je considère les arbres non seulement comme des éléments de conception, mais comme des êtres vivants précieux.'}
+                                {t('about.teaser_text')}
                             </p>
                             <div className="pt-4">
                                 <Link
-                                    to="/über-mich"
+                                    to={getLocalizedPath('about', language)}
                                     className="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all group border-b border-primary/30 pb-1 hover:border-primary"
                                 >
-                                    {language === 'DE' ? 'Erfahre mehr über mich' : 'En savoir plus sur moi'}
+                                    {t('about.teaser_cta')}
                                     <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
                                 </Link>
                             </div>

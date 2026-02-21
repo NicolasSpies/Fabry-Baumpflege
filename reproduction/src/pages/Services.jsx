@@ -12,7 +12,7 @@ import gartenpflegeImg from '../assets/images/services/gartenpflege.png';
 import wurzelnImg from '../assets/images/services/wurzeln.png';
 import servicesHeroImg from '../assets/images/hero/services_hero.png';
 
-const StatCounter = ({ value, label, language }) => {
+const StatCounter = ({ value, labelKey, t }) => {
     const [count, setCount] = useState(0);
     const countRef = useRef(null);
     const hasAnimated = useRef(false);
@@ -51,7 +51,7 @@ const StatCounter = ({ value, label, language }) => {
                 {count}{value.includes('+') ? '+' : value.includes('%') ? '%' : ''}
             </div>
             <div className="text-xs md:text-sm text-[#9bb221] uppercase tracking-widest font-medium">
-                {label[language]}
+                {t(labelKey)}
             </div>
         </div>
     );
@@ -71,63 +71,39 @@ const ServiceImage = ({ src, alt }) => {
 };
 
 const Services = () => {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     useScrollReveal();
 
     const servicesList = [
         {
-            title: { DE: 'Professionelle Baumpflege', FR: 'Taille raisonnée Professionnelle' },
+            titleKey: 'services.baumpflege.title',
             id: 'baumpflege',
-            desc: {
-                DE: 'Eine fachgerechte Baumpflege ist essenziell für die Vitalität und Verkehrssicherheit deiner Bäume. Ich führe Kronenpflege, Totholzbeseitigung und Lichtraumprofilschnitte nach ZTV-Baumpflege Richtlinien durch.',
-                FR: 'Un entretien professionnel des arbres est essentiel pour la vitalité et la sécurité de vos arbres. Nous effectuons la taille de la couronne, l\'élimination du bois mort et la taille de profil selon les directives ZTV-Baumpflege.'
-            },
-            features: {
-                DE: ['Fachgerechter Kronenschnitt & Entlastung', 'Seilklettertechnik (SKT) für schwierige Lagen', 'Erhalt der natürlichen Baumarchitektur'],
-                FR: ['Taille de couronne et délestage professionnels', 'Grimpe (SKT) pour les endroits difficiles', 'Préservation de l\'architecture naturelle de l\'arbre']
-            },
+            descKey: 'services.baumpflege.desc',
+            featuresKey: 'services.baumpflege.features',
             image: baumpflegeImg,
             reverse: false
         },
         {
-            title: { DE: 'Präzise Baumfällung', FR: 'Abattage Précis' },
-            desc: {
-                DE: 'Wenn Bäume zur Gefahr werden oder Platz für Neues weichen müssen, bin ich dein Partner für sichere Fällungen. Ich arbeite präzise, auch auf engstem Raum, und kümmere mich um die Entsorgung.',
-                FR: 'Lorsque les arbres deviennent un danger ou doivent laisser place à la nouveauté, nous sommes votre partenaire pour des abattages sûrs. Nous travaillons avec précision, même dans des espaces restreints, et nous occupons de l\'évacuation.'
-            },
-            features: {
-                DE: ['Gefahrenbaumfällung & Sturmschäden', 'Abtragen mittels Seilablassverfahren', 'Wurzelstockfräsen & Standortsanierung'],
-                FR: ['Abattage d\'arbres dangereux & dégâts de tempête', 'Démontage par rétention', 'Rognage de souches & assainissement du site']
-            },
+            titleKey: 'services.baumfaellung.title',
+            descKey: 'services.baumfaellung.desc',
+            featuresKey: 'services.baumfaellung.features',
             image: baumfaellungImg,
             reverse: true,
             id: 'baumfaellung'
         },
         {
-            title: { DE: 'Individuelle Gartenpflege', FR: 'Entretien de jardin individuel' },
+            titleKey: 'services.gartenpflege.title',
             id: 'gartenpflege',
-            desc: {
-                DE: 'Ein schöner Garten braucht regelmäßige Zuwendung. Ich übernehme die Pflege deiner Grünanlagen, damit du deine freie Zeit in deiner persönlichen Oase genießen kannst.',
-                FR: 'Un beau jardin nécessite une attention régulière. Nous nous occupons de l\'entretien de vos espaces verts afin que vous puissiez profiter de votre temps libre dans votre oasis personnelle.'
-            },
-            features: {
-                DE: ['Heckenschnitt & Formgehölzpflege', 'Rasenpflege & Beetaufbereitung', 'Jahreszeitliche Gartenpflege-Pakete'],
-                FR: ['Taille des haies & entretien des arbustes', 'Entretien de la pelouse & préparation des parterres', 'Forfaits d\'entretien saisonniers']
-            },
+            descKey: 'services.gartenpflege.desc',
+            featuresKey: 'services.gartenpflege.features',
             image: gartenpflegeImg,
             reverse: false
         },
         {
-            title: { DE: 'Nachhaltige Bepflanzung', FR: 'Plantation durable' },
+            titleKey: 'services.bepflanzung.title',
             id: 'bepflanzung',
-            desc: {
-                DE: 'Wir schaffen Lebensräume. Durch die Auswahl standortgerechter Gehölze und Stauden sorgen wir für ein gesundes Wachstum und eine ästhetische Gestaltung deines Außenbereichs.',
-                FR: 'Nous créons des habitats. En choisissant des arbustes et des vivaces adaptés au site, nous assurons une croissance saine et un aménagement esthétique de votre espace extérieur.'
-            },
-            features: {
-                DE: ['Beratung bei der Pflanzenauswahl', 'Fachgerechte Neupflanzung von Bäumen', 'Standortoptimierung & Bodenverbesserung'],
-                FR: ['Conseils pour le choix des plantes', 'Plantation experte d\'arbres', 'Optimisation du site & amélioration du sol']
-            },
+            descKey: 'services.bepflanzung.desc',
+            featuresKey: 'services.bepflanzung.features',
             image: wurzelnImg,
             reverse: true,
             bg: true
@@ -142,14 +118,14 @@ const Services = () => {
             <section className="relative h-[60vh] flex items-center justify-center pt-20 overflow-hidden">
                 <img
                     ref={heroRef}
-                    alt="Lush green canopy"
+                    alt="Services Hero"
                     className="absolute inset-0 w-full h-full object-cover"
                     src={servicesHeroImg}
                 />
                 <div className="absolute inset-0 bg-black/30"></div>
                 <div className="relative z-10 text-center reveal">
                     <h1 className="text-6xl md:text-7xl font-serif text-white">
-                        {language === 'DE' ? 'Leistungen' : 'Services'}
+                        {t('nav.services')}
                     </h1>
                 </div>
             </section>
@@ -165,7 +141,7 @@ const Services = () => {
                             <div className={`flex flex-col lg:flex-row items-center gap-16 ${service.reverse ? 'lg:flex-row-reverse' : ''}`}>
                                 <div className="w-full lg:w-1/2">
                                     <div className="relative rounded-xl overflow-hidden shadow-2xl reveal h-[500px]">
-                                        <ServiceImage src={service.image} alt={service.title[language]} />
+                                        <ServiceImage src={service.image} alt={t(service.titleKey)} />
                                     </div>
                                 </div>
                                 <div className="w-full lg:w-1/2 space-y-8 reveal stagger-1">
@@ -181,13 +157,13 @@ const Services = () => {
                                         ) : (
                                             <span className="material-symbols-outlined text-primary text-6xl font-light">{service.icon}</span>
                                         )}
-                                        <h2 className="text-4xl font-serif text-primary leading-tight font-medium">{service.title[language]}</h2>
+                                        <h2 className="text-4xl font-serif text-primary leading-tight font-medium">{t(service.titleKey)}</h2>
                                     </div>
                                     <p className="text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                                        {service.desc[language]}
+                                        {t(service.descKey)}
                                     </p>
                                     <ul className="space-y-3">
-                                        {service.features[language].map((feature, fIdx) => (
+                                        {(t(service.featuresKey) || []).map((feature, fIdx) => (
                                             <li key={fIdx} className="flex items-center gap-3">
                                                 <span className="material-symbols-outlined text-[#9bb221]">check_circle</span>
                                                 <span>{feature}</span>
@@ -204,12 +180,12 @@ const Services = () => {
             <section className="py-16 border-y border-slate-100 dark:border-slate-800">
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
                     {[
-                        { v: '500+', l: { DE: 'Zufriedene Kunden', FR: 'Clients satisfaits' } },
-                        { v: '2500+', l: { DE: 'Gepflegte Bäume', FR: 'Arbres entretenus' } },
-                        { v: '100%', l: { DE: 'Fundiertes Fachwissen', FR: 'Expertise approfondie' } },
-                        { v: '100%', l: { DE: 'Einsatz & Sicherheit', FR: 'Engagement & Sécurité' } },
+                        { v: '500+', k: 'stats.clients' },
+                        { v: '2500+', k: 'stats.trees' },
+                        { v: '100%', k: 'stats.expertise' },
+                        { v: '100%', k: 'stats.safety' },
                     ].map((stat, idx) => (
-                        <StatCounter key={idx} value={stat.v} label={stat.l} language={language} />
+                        <StatCounter key={idx} value={stat.v} labelKey={stat.k} t={t} />
                     ))}
                 </div>
             </section>

@@ -1,29 +1,48 @@
-const DEFAULT_BASE_URL = 'https://cms.fabry-baumpflege.be/wp-json/wp/v2';
-export const CMS_BASE_URL =
-    import.meta.env.VITE_CMS_BASE_URL ||
-    import.meta.env.NEXT_PUBLIC_WP_API_BASE ||
-    DEFAULT_BASE_URL;
+// ─── Single CMS Base ──────────────────────────────────────────────────────────
+//
+// All REST calls go through the /cms proxy path.
+//   Dev  → Vite proxies /cms/* to https://cms.fabry-baumpflege.be/*
+//   Prod → Vercel rewrite /cms/* → https://cms.fabry-baumpflege.be/*
+//
+// This single relative base works identically in both environments and
+// eliminates CORS issues without any hostname-sniffing logic.
+//
+// Language selection is done entirely via the Polylang ?lang= query parameter
+// on every request. Do NOT change the path prefix for French — Polylang does
+// not map /fr/wp-json to this REST API.
+//
+const CMS_BASE = '/cms/wp/v2';
 
-// ─── Core fetch helper ───────────────────────────────────────────────────────
+// ─── Language helpers ─────────────────────────────────────────────────────────
 
-export async function fetchFromCMS(endpoint) {
-    const url = `${CMS_BASE_URL}${endpoint}`;
-    const response = await fetch(url);
+/** Polylang locale codes used in ?lang= query params and pll_lang fields. */
+export const PLLCode = { DE: 'de', FR: 'fr' };
+
+// ─── Core fetch helper ────────────────────────────────────────────────────────
+
+/**
+ * Fetch from the CMS REST API.
+ * @param {string} endpoint  - path starting with /  e.g. '/references?_embed=1'
+ * @param {string} language  - 'DE' | 'FR'  — appended as ?lang=de/fr
+ * @param {AbortSignal} [signal]
+ */
+export async function fetchFromCMS(endpoint, language = 'DE', signal = null) {
+    const langCode = PLLCode[language] ?? 'de';
+    const separator = endpoint.includes('?') ? '&' : '?';
+    const url = `${CMS_BASE}${endpoint}${separator}lang=${langCode}`;
+    const response = await fetch(url, signal ? { signal } : undefined);
     if (!response.ok) {
         throw new Error(`CMS fetch failed: ${response.status} ${response.statusText} — ${url}`);
     }
     return response.json();
 }
 
-// ─── Categories ──────────────────────────────────────────────────────────────
+// ─── Categories ───────────────────────────────────────────────────────────────
 
-/**
- * Fetch all reference_category terms from WordPress.
- * Returns an array of { id, name, slug } objects, alphabetically sorted by name.
- */
-export async function getReferenceCategories() {
+/** Fetch all reference_category terms for the given language. */
+export async function getReferenceCategories(language = 'DE') {
     try {
-        const terms = await fetchFromCMS('/reference_category?per_page=100');
+        const terms = await fetchFromCMS('/reference_category?per_page=100', language);
         return Array.isArray(terms) ? terms : [];
     } catch (error) {
         console.error('[CMS] Failed to load reference categories:', error);
@@ -31,60 +50,71 @@ export async function getReferenceCategories() {
     }
 }
 
-/**
- * Returns a Map<id, name> for quick lookup by term id.
- * Built from the same category endpoint as above.
- */
-export async function getCategoryMap() {
-    const terms = await getReferenceCategories();
+/** Returns an id→name map built from getReferenceCategories. */
+export async function getCategoryMap(language = 'DE') {
+    const terms = await getReferenceCategories(language);
     return terms.reduce((acc, term) => {
         acc[term.id] = term.name;
         return acc;
     }, {});
 }
 
-// ─── References ──────────────────────────────────────────────────────────────
+// ─── References ───────────────────────────────────────────────────────────────
 
-/**
- * Fetch ALL references, newest first.
- * WordPress default is date DESC, but we pass orderby/order explicitly to be safe.
- */
-export async function getReferences() {
-    return fetchFromCMS('/references?_embed=1&per_page=100&orderby=date&order=desc');
+/** Fetch ALL references for the given language, newest first. */
+export async function getReferences(language = 'DE') {
+    return fetchFromCMS('/references?_embed=1&per_page=100&orderby=date&order=desc', language);
 }
 
-/**
- * Fetch only the newest `limit` references, newest first.
- * Used by the homepage preview section.
- */
-export async function getLatestReferences(limit = 3) {
-    return fetchFromCMS(`/references?_embed=1&per_page=${limit}&orderby=date&order=desc`);
-}
-
-/**
- * Fetch references filtered to a single category term id, newest first.
- */
-export async function getReferencesByCategory(categoryId) {
+/** Fetch the newest `limit` references for the given language (homepage preview). */
+export async function getLatestReferences(limit = 3, language = 'DE') {
     return fetchFromCMS(
-        `/references?_embed=1&per_page=100&orderby=date&order=desc&reference_category=${encodeURIComponent(categoryId)}`
+        `/references?_embed=1&per_page=${limit}&orderby=date&order=desc`,
+        language
+    );
+}
+
+/** Fetch references filtered to a single category term id, newest first. */
+export async function getReferencesByCategory(categoryId, language = 'DE') {
+    return fetchFromCMS(
+        `/references?_embed=1&per_page=100&orderby=date&order=desc&reference_category=${encodeURIComponent(categoryId)}`,
+        language
     );
 }
 
 /**
- * Fetch a single reference by slug for the detail page.
+ * Fetch a single reference by slug.
  * Returns the first item from the array, or null if not found.
  */
-export async function getReferenceBySlug(slug) {
-    const arr = await fetchFromCMS(`/references?slug=${encodeURIComponent(slug)}&_embed=1`);
+export async function getReferenceBySlug(slug, language = 'DE', signal = null) {
+    const arr = await fetchFromCMS(
+        `/references?slug=${encodeURIComponent(slug)}&_embed=1`,
+        language,
+        signal
+    );
     if (!Array.isArray(arr) || arr.length === 0) return null;
     return arr[0];
 }
 
-// ─── Media ───────────────────────────────────────────────────────────────────
+/**
+ * Fetch a single reference by numeric WordPress post ID.
+ * Used to resolve translated slugs from pll_translations on language switch.
+ */
+export async function getReferenceById(id, language = 'DE', signal = null) {
+    try {
+        return await fetchFromCMS(`/references/${id}?_embed=1`, language, signal);
+    } catch (error) {
+        if (error.name === 'AbortError') throw error;
+        console.error(`[CMS] Failed to fetch reference by ID ${id}:`, error);
+        return null;
+    }
+}
+
+// ─── Media ────────────────────────────────────────────────────────────────────
 
 /**
- * Resolve a media ID (integer) or URL (string) to the full source_url.
- * Returns null if the value is missing or the fetch fails.
+ * Resolve a media ID (integer) or URL (string) to a source_url.
+ * Media is not language-specific — always fetches without a lang param.
  */
 export async function resolveMedia(idOrUrl) {
     if (!idOrUrl) return null;
@@ -92,7 +122,9 @@ export async function resolveMedia(idOrUrl) {
         return idOrUrl;
     }
     try {
-        const media = await fetchFromCMS(`/media/${idOrUrl}`);
+        const res = await fetch(`${CMS_BASE}/media/${idOrUrl}`);
+        if (!res.ok) return null;
+        const media = await res.json();
         return media?.source_url || null;
     } catch (error) {
         console.error(`[CMS] Failed to resolve media ID ${idOrUrl}:`, error);
@@ -100,17 +132,16 @@ export async function resolveMedia(idOrUrl) {
     }
 }
 
-// ─── Shared data mapper ───────────────────────────────────────────────────────
+// ─── Data mapper ──────────────────────────────────────────────────────────────
 
 /**
- * Convert a raw WordPress reference item to the shape expected by ReferenceCard.
- * Pass the category map (id → name) produced by getCategoryMap().
+ * Map a raw WordPress reference item to the shape expected by ReferenceCard.
+ * Preserves pll_lang and pll_translations for language filtering and switching.
  */
 export function mapReferenceCard(item, catMap = {}) {
     const thumbnail =
         item._embedded?.['wp:featuredmedia']?.[0]?.source_url || '';
 
-    // Prefer embedded wp:term[0], fall back to id→name map
     let catNames = [];
     const embeddedTerms = item._embedded?.['wp:term']?.[0];
     if (Array.isArray(embeddedTerms) && embeddedTerms.length > 0) {
@@ -123,10 +154,13 @@ export function mapReferenceCard(item, catMap = {}) {
         id: item.slug,
         slug: item.slug,
         title: item.title?.rendered || '',
+        description: item.acf?.short_description || '',
         location: item.acf?.location || '',
         thumbnailImage: thumbnail,
         categories: catNames,
-        // Raw term ids kept for client-side filtering by id
         categoryIds: Array.isArray(item.reference_category) ? item.reference_category : [],
+        // Polylang fields — used for language enforcement and slug resolution
+        pll_lang: item.pll_lang || null,
+        pll_translations: item.pll_translations || null,
     };
 }

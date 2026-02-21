@@ -1,6 +1,10 @@
 {
     "rewrites": [
         {
+            "source": "/cms/:path*",
+            "destination": "https://cms.fabry-baumpflege.be/wp-json/:path*"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }

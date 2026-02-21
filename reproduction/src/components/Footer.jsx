@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../i18n/useLanguage';
+import { getLocalizedPath } from '../i18n/routes';
 import logo from '../assets/Baumpflege-Fabry-Logo.svg';
 
 const Footer = () => {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
 
     return (
         <footer className="bg-primary text-white py-8 px-6">
@@ -16,9 +17,7 @@ const Footer = () => {
                         src={logo}
                     />
                     <p className="text-white/70 leading-relaxed text-xs">
-                        {language === 'DE'
-                            ? 'Zertifizierter Fachbetrieb für Baumpflege und Gartengestaltung in Ostbelgien. Qualität und Nachhaltigkeit für dein Grün.'
-                            : 'Entreprise spécialisée certifiée en arboriculture et aménagement paysager. Qualité et durabilité pour vos espaces verts.'}
+                        {t('footer.description')}
                     </p>
                     <div className="flex gap-4">
                         <a
@@ -35,19 +34,19 @@ const Footer = () => {
                 </div>
 
                 <div className="hidden md:block">
-                    <h4 className="font-bold text-[10px] mb-4 tracking-widest uppercase text-white/90">Navigation</h4>
-                    <ul className="space-y-2 text-white/60 text-xs">
-                        <li><Link className="hover:text-white transition-colors" to="/">{language === 'DE' ? 'Startseite' : 'Accueil'}</Link></li>
-                        <li><Link className="hover:text-white transition-colors" to="/leistungen">{language === 'DE' ? 'Leistungen' : 'Services'}</Link></li>
-                        <li><Link className="hover:text-white transition-colors" to="/über-mich">{language === 'DE' ? 'Über Mich' : 'À Propos'}</Link></li>
-                        <li><Link className="hover:text-white transition-colors" to="/referenzen">{language === 'DE' ? 'Referenzen' : 'Références'}</Link></li>
+                    <h4 className="font-bold text-[10px] mb-4 tracking-widest uppercase text-white/90">{t('footer.nav')}</h4>
+                    <ul className="space-y-2 text-white/60 text-xs text-center md:text-left">
+                        <li><Link className="hover:text-white transition-colors" to={getLocalizedPath('home', language)}>{t('nav.home')}</Link></li>
+                        <li><Link className="hover:text-white transition-colors" to={getLocalizedPath('services', language)}>{t('nav.services')}</Link></li>
+                        <li><Link className="hover:text-white transition-colors" to={getLocalizedPath('about', language)}>{t('nav.about')}</Link></li>
+                        <li><Link className="hover:text-white transition-colors" to={getLocalizedPath('references', language)}>{t('nav.references')}</Link></li>
                     </ul>
                 </div>
 
                 <div className="space-y-4">
-                    <h4 className="font-bold text-[10px] mb-4 tracking-widest uppercase text-white/90">Kontakt</h4>
-                    <ul className="space-y-2 text-white/60 text-xs flex flex-col items-center md:items-start">
-                        <li className="flex items-start gap-3">
+                    <h4 className="font-bold text-[10px] mb-4 tracking-widest uppercase text-white/90">{t('footer.contact')}</h4>
+                    <ul className="space-y-2 text-white/60 text-xs flex flex-col items-center md:items-start text-center md:text-left">
+                        <li className="flex items-start gap-3 justify-center md:justify-start">
                             <span className="material-symbols-outlined text-white/80 text-sm">location_on</span>
                             <a
                                 href="https://www.google.com/maps/dir/?api=1&destination=Halloux+16,+4830+Limbourg"
@@ -58,11 +57,11 @@ const Footer = () => {
                                 Halloux 16, 4830 Limbourg
                             </a>
                         </li>
-                        <li className="flex items-center gap-3">
+                        <li className="flex items-center gap-3 justify-center md:justify-start">
                             <span className="material-symbols-outlined text-white/80 text-sm">phone</span>
                             <a href="tel:+32476320969" className="hover:text-white transition-colors">+32 476 32 09 69</a>
                         </li>
-                        <li className="flex items-center gap-3">
+                        <li className="flex items-center gap-3 justify-center md:justify-start">
                             <span className="material-symbols-outlined text-white/80 text-sm">mail</span>
                             <a href="mailto:info@fabry-baumpflege.be" className="hover:text-white transition-colors underline decoration-white/20 underline-offset-4">info@fabry-baumpflege.be</a>
                         </li>
@@ -70,10 +69,10 @@ const Footer = () => {
                 </div>
             </div>
             <div className="max-w-7xl mx-auto mt-10 pt-4 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] text-white/30 uppercase tracking-[0.3em]">
-                <p>© {new Date().getFullYear()} Fabry Baumpflege. {language === 'DE' ? 'Alle Rechte vorbehalten.' : 'Tous droits réservés.'}</p>
+                <p>© {new Date().getFullYear()} Fabry Baumpflege. {t('footer.rights')}</p>
                 <div className="flex gap-8">
-                    <Link className="hover:text-white transition-colors" to="/impressum">Impressum</Link>
-                    <Link className="hover:text-white transition-colors" to="/datenschutz">Datenschutz</Link>
+                    <Link className="hover:text-white transition-colors" to="/impressum">{t('footer.imprint')}</Link>
+                    <Link className="hover:text-white transition-colors" to="/datenschutz">{t('footer.privacy')}</Link>
                 </div>
             </div>
         </footer>

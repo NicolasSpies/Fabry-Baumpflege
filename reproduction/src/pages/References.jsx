@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../i18n/useLanguage';
-import { getReferences, getReferenceCategories, mapReferenceCard } from '../lib/cms';
+import { PLLCode, getReferences, getReferenceCategories, mapReferenceCard } from '../lib/cms';
 import ReferenceCard from '../components/ReferenceCard';
 
 const References = () => {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
+    const pllLang = PLLCode[language]; // 'de' | 'fr'
 
     // ── Data state ───────────────────────────────────────────────────────────
-    const [allRefs, setAllRefs] = useState([]);          // all formatted references
-    const [categories, setCategories] = useState([]);    // [{id, name}]
-    const [activeCatId, setActiveCatId] = useState(null); // null = "Alle"
+    const [allRefs, setAllRefs] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [activeCatId, setActiveCatId] = useState(null); // null = "All"
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -17,47 +18,65 @@ const References = () => {
     const [isInitialRender, setIsInitialRender] = useState(true);
 
     useEffect(() => {
-        const t = setTimeout(() => setIsInitialRender(false), 1500);
-        return () => clearTimeout(t);
+        const timer = setTimeout(() => setIsInitialRender(false), 1500);
+        return () => clearTimeout(timer);
     }, []);
 
-    // ── Fetch data on mount ──────────────────────────────────────────────────
+    // Reset category filter when language changes so stale category IDs don't bleed across
     useEffect(() => {
+        setActiveCatId(null);
+    }, [language]);
+
+    // ── Fetch data whenever language changes ─────────────────────────────────
+    useEffect(() => {
+        let cancelled = false;
+
         async function loadData() {
             try {
                 setIsLoading(true);
+                setError(null);
 
-                // Fetch refs (date DESC) and taxonomy terms in parallel
-                const [rawRefs, cats] = await Promise.all([
-                    getReferences(),
-                    getReferenceCategories(),
+                const [rawRefs, rawCats] = await Promise.all([
+                    getReferences(language),
+                    getReferenceCategories(language),
                 ]);
 
-                // Build id→name map for the fallback path in mapReferenceCard
-                const catMap = cats.reduce((acc, c) => { acc[c.id] = c.name; return acc; }, {});
+                if (cancelled) return;
 
-                // Sort by date descending as a stable client-side guarantee
-                const sorted = [...rawRefs].sort(
+                // ── Strict pll_lang filter ────────────────────────────────────
+                // The CMS base URL already targets the correct language, but
+                // Polylang may still return posts from both locales (e.g. when a
+                // translation is missing). Enforce the active locale here.
+                const refsForLang = Array.isArray(rawRefs)
+                    ? rawRefs.filter(item => !item.pll_lang || item.pll_lang === pllLang)
+                    : [];
+
+                const catsForLang = Array.isArray(rawCats)
+                    ? rawCats.filter(item => !item.pll_lang || item.pll_lang === pllLang)
+                    : [];
+
+                // Build id→name map for category resolution in mapReferenceCard
+                const catMap = catsForLang.reduce((acc, c) => { acc[c.id] = c.name; return acc; }, {});
+
+                // Sort newest-first (stable client-side guarantee)
+                const sorted = [...refsForLang].sort(
                     (a, b) => new Date(b.date) - new Date(a.date)
                 );
 
                 setAllRefs(sorted.map(item => mapReferenceCard(item, catMap)));
 
                 // ── Fixed display order for the four core categories ──────────
-                // Priority slugs define the required left-to-right tab order.
-                // Fallback matches on German name if slug is absent.
                 const PRIORITY_SLUGS = ['baumpflege', 'baumfaellung', 'gartenpflege', 'bepflanzung'];
                 const PRIORITY_NAMES = ['Baumpflege', 'Baumfällung', 'Gartenpflege', 'Bepflanzung'];
 
                 const prioritized = [];
                 const rest = [];
 
-                for (const cat of cats) {
+                for (const cat of catsForLang) {
                     const idx = PRIORITY_SLUGS.indexOf(cat.slug);
                     if (idx !== -1) {
-                        prioritized[idx] = cat; // slot into exact position
+                        prioritized[idx] = cat;
                     } else {
-                        // Slug didn't match — try name fallback
                         const nameIdx = PRIORITY_NAMES.indexOf(cat.name);
                         if (nameIdx !== -1) {
                             prioritized[nameIdx] = cat;
@@ -67,8 +86,6 @@ const References = () => {
                     }
                 }
 
-                // Compact sparse array (some priority slots may be unfilled), then
-                // append any future categories sorted alphabetically by name.
                 const orderedCats = [
                     ...prioritized.filter(Boolean),
                     ...rest.sort((a, b) => a.name.localeCompare(b.name, 'de')),
@@ -76,17 +93,19 @@ const References = () => {
 
                 setCategories(orderedCats);
             } catch (err) {
+                if (cancelled) return;
                 console.error('[References] Failed to load CMS data:', err);
                 setError(true);
             } finally {
-                setIsLoading(false);
+                if (!cancelled) setIsLoading(false);
             }
         }
+
         loadData();
-    }, []);
+        return () => { cancelled = true; };
+    }, [language, pllLang]);
 
     // ── Client-side filter by term id ────────────────────────────────────────
-    // categoryIds is kept on the mapped object for this exact purpose
     const filteredRefs = activeCatId === null
         ? allRefs
         : allRefs.filter(ref => ref.categoryIds.includes(activeCatId));
@@ -96,20 +115,16 @@ const References = () => {
         return (
             <main className="pt-28 min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
                 <h2 className="text-3xl font-display text-primary mb-4 p-8">
-                    {language === 'DE'
-                        ? 'Fehler beim Laden der Referenzen.'
-                        : 'Erreur lors du chargement des références.'}
+                    {t('refs.error_loading')}
                 </h2>
                 <p className="text-slate-500 mb-8 max-w-md mx-auto">
-                    {language === 'DE'
-                        ? 'Bitte versuchen Sie es später noch einmal.'
-                        : 'Veuillez réessayer plus tard.'}
+                    {t('refs.error_retry')}
                 </p>
                 <button
                     onClick={() => window.location.reload()}
                     className="inline-flex items-center gap-3 px-8 py-3 bg-primary text-white font-bold rounded-full hover:bg-primary-dark transition-all duration-300"
                 >
-                    {language === 'DE' ? 'Neu laden' : 'Recharger'}
+                    {t('refs.reload')}
                 </button>
             </main>
         );
@@ -121,19 +136,17 @@ const References = () => {
             <section className="pt-8 pb-8 px-6 text-center">
                 <div className="max-w-7xl mx-auto text-center space-y-6">
                     <p className="text-lg opacity-90 max-w-2xl mx-auto leading-relaxed">
-                        {language === 'DE'
-                            ? 'Entdecke eine Auswahl meiner Arbeiten. Von präziser Baumpflege bis hin zu komplexen Fällungen und hochwertiger Gartengestaltung.'
-                            : "Découvrez une sélection de nos travaux. De l'Taille raisonnée précise aux abattages complexes et à l'aménagement paysager de haute qualité."}
+                        {t('refs.intro')}
                     </p>
                 </div>
             </section>
 
-            {/* Sticky filter bar — categories come from WordPress, never hardcoded */}
+            {/* Sticky filter bar */}
             <section className="sticky top-20 z-40 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-y border-slate-100 dark:border-slate-800 mb-4 md:mb-8 py-3 md:py-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-nowrap md:flex-wrap items-center justify-start md:justify-center gap-3 md:gap-8 overflow-x-auto snap-x snap-mandatory px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
 
-                        {/* "All" tab — always present */}
+                        {/* "All" tab */}
                         <button
                             key="all"
                             onClick={() => setActiveCatId(null)}
@@ -142,10 +155,10 @@ const References = () => {
                                 : 'text-slate-500 hover:text-primary border border-transparent hover:border-primary/20'
                                 }`}
                         >
-                            {language === 'DE' ? 'Alle' : 'Tous'}
+                            {t('refs.all')}
                         </button>
 
-                        {/* Dynamic tabs — names from WordPress, no hardcoding */}
+                        {/* Dynamic tabs — names come from the CMS in the active language */}
                         {categories.map(cat => (
                             <button
                                 key={cat.id}
@@ -185,7 +198,7 @@ const References = () => {
 
                     <div className="mt-20 text-center">
                         <button className="inline-flex items-center gap-3 px-12 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300">
-                            {language === 'DE' ? 'Mehr Projekte laden' : 'Charger plus de projets'}
+                            {t('refs.load_more')}
                             <span className="material-symbols-outlined">refresh</span>
                         </button>
                     </div>

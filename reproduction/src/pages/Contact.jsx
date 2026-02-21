@@ -9,7 +9,7 @@ import { useParallax } from '../hooks/useParallax';
 import servicesHeroImg from '../assets/images/hero/services_hero.png';
 
 const Contact = () => {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     useScrollReveal();
     const heroRef = React.useRef(null);
     useParallax(heroRef, { speed: 0.1, scaleBase: 1.1, scaleSpeed: 0.0001 });
@@ -22,10 +22,10 @@ const Contact = () => {
     };
 
     const services = [
-        { id: 'Baumpflege', label: { DE: 'Baumpflege', FR: 'Taille raisonnée' }, sub: { DE: 'Kronenschnitt & Erhalt', FR: 'Taille & Maintien' } },
-        { id: 'Baumfällung', label: { DE: 'Baumfällung', FR: 'Abattage' }, sub: { DE: 'Sichere Abtragung', FR: 'Évacuation Sûre' } },
-        { id: 'Gartenpflege', label: { DE: 'Gartenpflege', FR: 'Entretien' }, sub: { DE: 'Gesamtkonzepte', FR: 'Concepts Globaux' } },
-        { id: 'Bepflanzung', label: { DE: 'Bepflanzung', FR: 'Plantation' }, sub: { DE: 'Nachhaltige Neuanlage', FR: 'Nouvelle Plantation' } },
+        { id: 'Baumpflege', labelKey: 'contact.form.baumpflege.label', subKey: 'contact.form.baumpflege.sub' },
+        { id: 'Baumfällung', labelKey: 'contact.form.baumfaellung.label', subKey: 'contact.form.baumfaellung.sub' },
+        { id: 'Gartenpflege', labelKey: 'contact.form.gartenpflege.label', subKey: 'contact.form.gartenpflege.sub' },
+        { id: 'Bepflanzung', labelKey: 'contact.form.bepflanzung.label', subKey: 'contact.form.bepflanzung.sub' },
     ];
 
 
@@ -46,7 +46,7 @@ const Contact = () => {
                 <div className="absolute inset-0 bg-black/40"></div>
                 <div className="relative z-10 text-center reveal">
                     <h1 className="text-5xl md:text-7xl font-serif text-white drop-shadow-xl mb-4">
-                        {language === 'DE' ? 'Kontakt' : 'Contact'}
+                        {t('contact.title')}
                     </h1>
                     <div className="w-16 h-1 bg-white mx-auto rounded-full opacity-60"></div>
                 </div>
@@ -59,22 +59,22 @@ const Contact = () => {
                         <div className="bg-white dark:bg-surface-dark p-10 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-12">
                             <section>
                                 <h3 className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-bold mb-8">
-                                    {language === 'DE' ? 'Details' : 'Détails'}
+                                    {t('contact.details')}
                                 </h3>
                                 <ul className="space-y-10">
                                     <li className="group">
                                         <p className="text-[9px] uppercase tracking-widest text-slate-400/70 mb-2 font-medium">
-                                            {language === 'DE' ? 'Telefon' : 'Téléphone'}
+                                            {t('contact.phone')}
                                         </p>
                                         <a className="text-xl font-sans text-slate-700 dark:text-slate-200 hover:text-primary transition-colors duration-300" href="tel:+32476320969">+32 476 32 09 69</a>
                                     </li>
                                     <li className="group">
-                                        <p className="text-[9px] uppercase tracking-widest text-slate-400/70 mb-2 font-medium">Email</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-400/70 mb-2 font-medium">{t('contact.email')}</p>
                                         <a className="text-xl font-sans text-slate-700 dark:text-slate-200 hover:text-primary transition-colors duration-300" href="mailto:info@fabry-baumpflege.be">info@fabry-baumpflege.be</a>
                                     </li>
                                     <li className="group">
                                         <p className="text-[9px] uppercase tracking-widest text-slate-400/70 mb-2 font-medium">
-                                            {language === 'DE' ? 'Büro' : 'Bureau'}
+                                            {t('contact.office')}
                                         </p>
                                         <a
                                             href="https://www.google.com/maps/dir/?api=1&destination=Halloux+16,+4830+Limbourg"
@@ -90,12 +90,10 @@ const Contact = () => {
 
                             <section className="bg-primary/5 dark:bg-primary/10 p-8 rounded-xl border border-primary/10 transition-colors duration-300">
                                 <h3 className="text-[10px] uppercase tracking-[0.3em] text-[#9bb221] font-bold mb-4">
-                                    {language === 'DE' ? 'Einsatzgebiet' : 'Zone d\'Intervention'}
+                                    {t('contact.area')}
                                 </h3>
                                 <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">
-                                    {language === 'DE'
-                                        ? 'Ich bin in der gesamten Region Ostbelgien und Umgebung für dich im Einsatz und berate dich fachgerecht direkt vor Ort.'
-                                        : 'Je suis à votre service dans toute la région d’Ostbelgie et ses environs, et je vous conseille professionnellement directement sur place.'}
+                                    {t('contact.area_text')}
                                 </p>
                             </section>
                         </div>
@@ -107,7 +105,7 @@ const Contact = () => {
                             <form className="space-y-12">
                                 <div className="space-y-8">
                                     <h2 className="text-2xl font-serif italic text-primary">
-                                        {language === 'DE' ? 'Womit kann ich helfen?' : 'Comment puis-je aider ?'}
+                                        {t('contact.help_heading')}
                                     </h2>
                                     <div className="grid grid-cols-2 lg:grid-cols-2 gap-4">
                                         {services.map((s) => (
@@ -133,8 +131,8 @@ const Contact = () => {
                                                 )}
                                                 <div>
                                                     <p className={`text-[10px] md:text-sm font-bold uppercase tracking-widest mb-1 ${selectedServices.includes(s.id) ? 'text-primary' : 'text-slate-700 dark:text-slate-200'
-                                                        }`}>{s.label[language]}</p>
-                                                    <p className="text-[9px] md:text-[11px] text-slate-400 uppercase tracking-widest leading-tight">{s.sub[language]}</p>
+                                                        }`}>{t(s.labelKey)}</p>
+                                                    <p className="text-[9px] md:text-[11px] text-slate-400 uppercase tracking-widest leading-tight">{t(s.subKey)}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -144,7 +142,7 @@ const Contact = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                     <div className="relative">
                                         <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 block mb-2">
-                                            {language === 'DE' ? 'Vorname' : 'Prénom'}
+                                            {t('contact.first_name')}
                                         </label>
                                         <input
                                             className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b-2 border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 text-lg dark:text-white placeholder-slate-300"
@@ -154,7 +152,7 @@ const Contact = () => {
                                     </div>
                                     <div className="relative">
                                         <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 block mb-2">
-                                            {language === 'DE' ? 'Nachname' : 'Nom'}
+                                            {t('contact.last_name')}
                                         </label>
                                         <input
                                             className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b-2 border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 text-lg dark:text-white placeholder-slate-300"
@@ -164,7 +162,7 @@ const Contact = () => {
                                     </div>
                                     <div className="relative">
                                         <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 block mb-2">
-                                            {language === 'DE' ? 'Email-Adresse' : 'Adresse E-Mail'}
+                                            {t('contact.email')}
                                         </label>
                                         <input
                                             className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b-2 border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 dark:text-white placeholder-slate-300"
@@ -174,7 +172,7 @@ const Contact = () => {
                                     </div>
                                     <div className="relative">
                                         <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 block mb-2">
-                                            {language === 'DE' ? 'Telefonnummer' : 'Téléphone'}
+                                            {t('contact.phone_field')}
                                         </label>
                                         <input
                                             className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b-2 border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 dark:text-white placeholder-slate-300"
@@ -186,18 +184,18 @@ const Contact = () => {
 
                                 <div className="relative">
                                     <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 dark:text-slate-400 block mb-2">
-                                        {language === 'DE' ? 'Notiz' : 'Note'}
+                                        {t('contact.note')}
                                     </label>
                                     <textarea
                                         rows="4"
                                         className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b-2 border-slate-200 dark:border-slate-700 focus:ring-0 focus:border-primary px-0 py-3 transition-colors duration-300 text-lg dark:text-white placeholder-slate-300"
-                                        placeholder={language === 'DE' ? 'Wie kann ich dir helfen?' : 'Comment puis-je vous aider ?'}
+                                        placeholder={t('contact.placeholder')}
                                     ></textarea>
                                 </div>
 
                                 <div className="pt-6 flex justify-end">
                                     <button className="bg-primary text-white w-full md:w-auto px-14 py-5 text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-opacity-90 transition-all flex items-center justify-center gap-4 group rounded-full shadow-lg" type="button">
-                                        {language === 'DE' ? 'Anfrage senden' : 'Envoyer la demande'}
+                                        {t('contact.send')}
                                         <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">send</span>
                                     </button>
                                 </div>

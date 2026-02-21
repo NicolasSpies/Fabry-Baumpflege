@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useLanguage } from '../i18n/useLanguage';
+import { getLocalizedPath } from '../i18n/routes';
 import logo from '../assets/Baumpflege-Fabry-Logo.svg';
 
 const Navbar = () => {
-    const { language, setLanguage } = useLanguage();
+    const { language, setLanguage, t } = useLanguage();
+    const location = useLocation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMode, setIsMobileMode] = useState(false);
@@ -17,59 +19,36 @@ const Navbar = () => {
     useLayoutEffect(() => {
         const checkCollision = () => {
             if (!containerRef.current || !logoRef.current || !desktopNavRef.current) return;
-
-            // Container width minus padding (px-6 is 24px per side = 48px)
             const availableWidth = containerRef.current.clientWidth - 48;
             const logoWidth = logoRef.current.getBoundingClientRect().width;
             const navWidth = desktopNavRef.current.scrollWidth;
-
-            // Safety gap of 24px between logo and nav
             const requiredWidth = logoWidth + navWidth + 24;
-
-            // Enable mobile mode if the required width exceeds available space
             setIsMobileMode(requiredWidth >= availableWidth);
         };
 
-        // Initial check
         checkCollision();
-
         const resizeObserver = new ResizeObserver(() => checkCollision());
-
         if (containerRef.current) resizeObserver.observe(containerRef.current);
         if (logoRef.current) resizeObserver.observe(logoRef.current);
         if (desktopNavRef.current) resizeObserver.observe(desktopNavRef.current);
 
         return () => resizeObserver.disconnect();
-    }, [language, isScrolled]); // Re-measure if language or scroll state (logo size) changes
+    }, [language, isScrolled]);
 
     useEffect(() => {
-        let lastKnownScrollY = window.scrollY;
-        let ticking = false;
-
         const handleScroll = () => {
-            lastKnownScrollY = window.scrollY;
-
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    setIsScrolled(lastKnownScrollY > 20);
-                    ticking = false;
-                });
-
-                ticking = true;
-            }
+            setIsScrolled(window.scrollY > 20);
         };
-
         window.addEventListener('scroll', handleScroll, { passive: true });
         handleScroll();
-
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     const navItems = [
-        { name: { DE: 'Startseite', FR: 'Accueil' }, path: '/' },
-        { name: { DE: 'Leistungen', FR: 'Services' }, path: '/leistungen' },
-        { name: { DE: 'Über Mich', FR: 'À Propos' }, path: '/über-mich' },
-        { name: { DE: 'Referenzen', FR: 'Références' }, path: '/referenzen' },
+        { nameKey: 'nav.home', routeKey: 'home' },
+        { nameKey: 'nav.services', routeKey: 'services' },
+        { nameKey: 'nav.about', routeKey: 'about' },
+        { nameKey: 'nav.references', routeKey: 'references' },
     ];
 
     const toggleMenu = () => {
@@ -82,7 +61,6 @@ const Navbar = () => {
         document.body.style.overflow = 'unset';
     };
 
-    // Close mobile menu automatically if expanding window safely
     useEffect(() => {
         if (!isMobileMode && isMenuOpen) {
             closeMenu();
@@ -96,10 +74,11 @@ const Navbar = () => {
             }`}>
             <div ref={containerRef} className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 <Link
-                    to="/"
+                    to={getLocalizedPath('home', language)}
                     className="flex items-center gap-2"
                     onClick={(e) => {
-                        if (window.location.pathname === '/') {
+                        const homePath = getLocalizedPath('home', language);
+                        if (location.pathname === homePath) {
                             e.preventDefault();
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
@@ -113,7 +92,6 @@ const Navbar = () => {
                     />
                 </Link>
 
-                {/* Desktop Navigation - Kept in DOM for measurement but visually hidden when in mobile mode */}
                 <div
                     ref={desktopNavRef}
                     className={`flex items-center space-x-10 text-sm font-medium uppercase tracking-widest ${isMobileMode ? 'absolute opacity-0 pointer-events-none invisible' : 'relative opacity-100 visible'
@@ -121,13 +99,13 @@ const Navbar = () => {
                 >
                     {navItems.map((item) => (
                         <NavLink
-                            key={item.path}
-                            to={item.path}
+                            key={item.routeKey}
+                            to={getLocalizedPath(item.routeKey, language)}
                             className={({ isActive }) =>
                                 `hover:text-primary transition-colors whitespace-nowrap ${isActive ? 'text-primary border-b-2 border-primary pb-1' : ''}`
                             }
                         >
-                            {item.name[language]}
+                            {t(item.nameKey)}
                         </NavLink>
                     ))}
 
@@ -148,15 +126,14 @@ const Navbar = () => {
                             </button>
                         </div>
                         <Link
-                            to="/kontakt"
+                            to={getLocalizedPath('contact', language)}
                             className="bg-primary text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all text-xs font-bold uppercase tracking-widest whitespace-nowrap"
                         >
-                            {language === 'DE' ? 'Kontakt' : 'Contact'}
+                            {t('nav.contact')}
                         </Link>
                     </div>
                 </div>
 
-                {/* Mobile Toggle Component */}
                 {isMobileMode && (
                     <button
                         className="text-primary z-50 relative flex items-center justify-center animate-in fade-in duration-300"
@@ -168,34 +145,32 @@ const Navbar = () => {
                         </span>
                     </button>
                 )}
-
             </div>
 
-            {/* Mobile Menu Dropdown */}
             {(isMenuOpen && isMobileMode) && (
                 <div className="absolute top-full left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl border-b border-slate-100 dark:border-slate-800 flex flex-col items-center py-8 gap-8 z-[100] animate-in slide-in-from-top duration-300">
                     <div className="flex flex-col items-center gap-6 w-full px-6">
                         {navItems.map((item) => (
                             <NavLink
-                                key={item.path}
-                                to={item.path}
+                                key={item.routeKey}
+                                to={getLocalizedPath(item.routeKey, language)}
                                 onClick={closeMenu}
                                 className={({ isActive }) =>
                                     `text-lg font-serif uppercase tracking-widest transition-colors ${isActive ? 'text-primary' : 'text-slate-500 hover:text-primary'}`
                                 }
                             >
-                                {item.name[language]}
+                                {t(item.nameKey)}
                             </NavLink>
                         ))}
                     </div>
 
                     <div className="w-full px-6 flex justify-center mt-2">
                         <Link
-                            to="/kontakt"
+                            to={getLocalizedPath('contact', language)}
                             onClick={closeMenu}
                             className="bg-primary text-white px-8 py-3 rounded-full text-sm uppercase tracking-widest font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all text-center w-full max-w-[200px]"
                         >
-                            {language === 'DE' ? 'Kontakt' : 'Contact'}
+                            {t('nav.contact')}
                         </Link>
                     </div>
 
