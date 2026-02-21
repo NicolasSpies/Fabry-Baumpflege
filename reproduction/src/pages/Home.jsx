@@ -65,15 +65,15 @@ const Home = () => {
     useScrollReveal();
 
     const stats = [
-        { value: '500+', label: { DE: 'Zufriedene Kunden', FR: 'Clients satisfaits' } },
-        { value: '2500+', label: { DE: 'Gepflegte Bäume', FR: 'Arbres entretenus' } },
-        { value: '100%', label: { DE: 'Fundiertes Fachwissen', FR: 'Expertise approfondie' } },
-        { value: '100%', label: { DE: 'Einsatz & Sicherheit', FR: 'Engagement & Sécurité' } },
+        { value: '35+', label: { DE: 'Zufriedene Kunden', FR: 'Clients satisfaits' } },
+        { value: '125+', label: { DE: 'Gepflegte Bäume', FR: 'Arbres entretenus' } },
+        { value: '5+', label: { DE: 'Jahre Erfahrung', FR: 'Années d’expérience' } },
+        { value: '0', label: { DE: 'Arbeitsunfälle', FR: 'Accidents signalés' } },
     ];
 
     const services = [
         {
-            title: { DE: 'Baumpflege', FR: 'Arboriculture' },
+            title: { DE: 'Baumpflege', FR: 'Taille raisonnée' },
             desc: { DE: 'Kronenpflege, Totholzentfernung und Lichtraumprofilschnitt für die Gesundheit deiner Bäume.', FR: 'Taille de la couronne, enlèvement du bois mort et taille de profil pour la santé de vos arbres.' },
             id: 'baumpflege'
         },
@@ -252,8 +252,8 @@ const Home = () => {
                                 </>
                             ) : (
                                 <>
-                                    <span className="text-[1.5rem] md:text-[2.25rem] lg:text-[2.5rem] block mb-[0.125rem] md:mb-1 text-white/75 font-light tracking-wide">Précision</span>
-                                    <span className="text-[2.75rem] md:text-[5rem] lg:text-[6.5rem] font-bold block tracking-tight">rencontre Nature</span>
+                                    <span className="text-[1.5rem] md:text-[2.25rem] lg:text-[2.5rem] block mb-[0.125rem] md:mb-1 text-white/75 font-light tracking-wide">Précision rencontre</span>
+                                    <span className="text-[2.75rem] md:text-[5rem] lg:text-[6.5rem] font-bold block tracking-tight">Nature</span>
                                 </>
                             )}
                         </h1>
@@ -267,7 +267,7 @@ const Home = () => {
                                 to="/kontakt"
                                 className="inline-block bg-[#3E5F25] text-white px-8 py-3.5 rounded-full font-semibold tracking-widest uppercase text-xs hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
                             >
-                                {language === 'DE' ? 'Jetzt Kontakt aufnehmen' : 'Devis Gratuit'}
+                                {language === 'DE' ? 'Jetzt Kontakt aufnehmen' : 'Nous contacter'}
                             </Link>
                         </div>
                     </div>
@@ -296,7 +296,7 @@ const Home = () => {
                             {language === 'DE' ? 'Meine Expertise' : 'Mon Expertise'}
                         </span>
                         <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight">
-                            {language === 'DE' ? 'Professionelle Baumpflege' : 'Arboriculture professionnelle'} <br className="hidden md:block" />
+                            {language === 'DE' ? 'Professionelle Baumpflege' : 'Taille raisonnée professionnelle'} <br className="hidden md:block" />
                             {language === 'DE' ? 'auf höchstem Niveau' : 'au plus haut niveau'}
                         </h2>
                     </div>
@@ -449,8 +449,8 @@ const Home = () => {
                             </div>
                             <p className="text-lg leading-[1.8] text-slate-700 dark:text-slate-300 font-sans">
                                 {language === 'DE'
-                                    ? 'Mit Leidenschaft und Fachkenntnis widmet sich Fabry Baumpflege dem Erhalt und der Pflege urbaner Naturräume. Ich verstehe Bäume nicht nur als Gestaltungselemente, sondern als wertvolle Lebewesen.'
-                                    : 'Avec passion et expertise, Fabry Baumpflege se consacre à la préservation et à l\'entretien des espaces naturels urbains. Je considère les arbres non seulement comme des éléments de conception, mais comme des êtres vivants précieux.'}
+                                    ? 'Mit Leidenschaft und Fachkenntnis widmet sich Vincent Fabry dem Erhalt und der Pflege urbaner Naturräume. Ich verstehe Bäume nicht nur als Gestaltungselemente, sondern als wertvolle Lebewesen.'
+                                    : 'Avec passion et expertise, Vincent Fabry se consacre à la préservation et à l\'entretien des espaces naturels urbains. Je considère les arbres non seulement comme des éléments de conception, mais comme des êtres vivants précieux.'}
                             </p>
                             <div className="pt-4">
                                 <Link

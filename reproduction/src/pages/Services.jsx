@@ -76,7 +76,7 @@ const Services = () => {
 
     const servicesList = [
         {
-            title: { DE: 'Professionelle Baumpflege', FR: 'Arboriculture Professionnelle' },
+            title: { DE: 'Professionelle Baumpflege', FR: 'Taille raisonnée Professionnelle' },
             id: 'baumpflege',
             desc: {
                 DE: 'Eine fachgerechte Baumpflege ist essenziell für die Vitalität und Verkehrssicherheit deiner Bäume. Ich führe Kronenpflege, Totholzbeseitigung und Lichtraumprofilschnitte nach ZTV-Baumpflege Richtlinien durch.',

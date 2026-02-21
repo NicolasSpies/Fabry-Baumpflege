@@ -12,7 +12,7 @@ const References = () => {
 
     const filters = [
         { DE: 'Alle', FR: 'Tous' },
-        { DE: 'Baumpflege', FR: 'Arboriculture' },
+        { DE: 'Baumpflege', FR: 'Taille raisonnée' },
         { DE: 'Baumfällung', FR: 'Abattage' },
         { DE: 'Gartenbau', FR: 'Horticulture' },
         { DE: 'Pflanzung', FR: 'Plantation' }
@@ -44,7 +44,7 @@ const References = () => {
                     <p className="text-lg opacity-90 max-w-2xl mx-auto leading-relaxed">
                         {language === 'DE'
                             ? 'Entdecke eine Auswahl meiner Arbeiten. Von präziser Baumpflege bis hin zu komplexen Fällungen und hochwertiger Gartengestaltung.'
-                            : 'Découvrez une sélection de nos travaux. De l\'arboriculture précise aux abattages complexes et à l\'aménagement paysager de haute qualité.'}
+                            : 'Découvrez une sélection de nos travaux. De l\'Taille raisonnée précise aux abattages complexes et à l\'aménagement paysager de haute qualité.'}
                     </p>
                 </div>
             </section>

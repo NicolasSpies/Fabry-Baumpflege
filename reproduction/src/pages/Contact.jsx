@@ -22,7 +22,7 @@ const Contact = () => {
     };
 
     const services = [
-        { id: 'Baumpflege', label: { DE: 'Baumpflege', FR: 'Arboriculture' }, sub: { DE: 'Kronenschnitt & Erhalt', FR: 'Taille & Maintien' } },
+        { id: 'Baumpflege', label: { DE: 'Baumpflege', FR: 'Taille raisonnée' }, sub: { DE: 'Kronenschnitt & Erhalt', FR: 'Taille & Maintien' } },
         { id: 'Baumfällung', label: { DE: 'Baumfällung', FR: 'Abattage' }, sub: { DE: 'Sichere Abtragung', FR: 'Évacuation Sûre' } },
         { id: 'Gartenpflege', label: { DE: 'Gartenpflege', FR: 'Entretien' }, sub: { DE: 'Gesamtkonzepte', FR: 'Concepts Globaux' } },
         { id: 'Bepflanzung', label: { DE: 'Bepflanzung', FR: 'Plantation' }, sub: { DE: 'Nachhaltige Neuanlage', FR: 'Nouvelle Plantation' } },
