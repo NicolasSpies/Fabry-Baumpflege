@@ -9,7 +9,7 @@ import BaumpflegeIcon from '../components/BaumpflegeIcon';
 import BaumfaellungIcon from '../components/BaumfaellungIcon';
 import GartenpflegeIcon from '../components/GartenpflegeIcon';
 import BepflanzungIcon from '../components/BepflanzungIcon';
-import baumpflegeImg from '../assets/images/services/baumpflege.png';
+import baumpflegeImg from '../assets/images/hero/expertise_new.jpg';
 
 const StatCounter = ({ value, label, language }) => {
     const [count, setCount] = useState(0);
@@ -56,7 +56,7 @@ const StatCounter = ({ value, label, language }) => {
     );
 };
 
-import homeHeroImg from '../assets/images/hero/home_hero_highres.png';
+import homeHeroImg from '../assets/images/hero/vincent-fabry-header3.jpg';
 
 const Home = () => {
     const { language } = useLanguage();
@@ -108,13 +108,8 @@ const Home = () => {
         }
     ];
 
-    /* ── Marquee (Robust Real Scroll + Auto-Loop) ── */
+    /* ── Marquee (Pure Infinite Auto-Loop) ── */
     const marqueeRef = useRef(null);
-    const [isMarqueeHovered, setIsMarqueeHovered] = useState(false);
-    const lastInteractionTime = useRef(0);
-    const isDragging = useRef(false);
-    const startX = useRef(0);
-    const startScrollLeft = useRef(0);
     const SPEED_PX_PER_SEC = 40;
 
     useEffect(() => {
@@ -127,43 +122,19 @@ const Home = () => {
         let prevTimestamp = null;
         let rafId;
 
-        // Initialize to middle set for infinite feel
-        const initMidset = () => {
-            const singleSetWidth = marquee.scrollWidth / 3;
-            if (singleSetWidth > 0) {
-                marquee.scrollLeft = singleSetWidth;
-            } else {
-                // Retry in next frame if scrollWidth isn't ready
-                requestAnimationFrame(initMidset);
-            }
-        };
-        initMidset();
-
         const tick = (timestamp) => {
             if (prevTimestamp === null) prevTimestamp = timestamp;
-            const delta = (timestamp - prevTimestamp) / 1000;
+            const deltaTime = (timestamp - prevTimestamp) / 1000;
             prevTimestamp = timestamp;
 
-            const now = Date.now();
-            const timeSinceInteraction = now - lastInteractionTime.current;
+            const singleSetWidth = marquee.scrollWidth / 2;
 
-            // Auto-scroll logic: only if idle, not dragging, and not hovered
-            const shouldAutoScroll = timeSinceInteraction > 1500 && !isDragging.current && !isMarqueeHovered;
+            if (singleSetWidth > 0) {
+                marquee.scrollLeft += SPEED_PX_PER_SEC * deltaTime;
 
-            if (marquee) {
-                const singleSetWidth = marquee.scrollWidth / 3;
-
-                if (shouldAutoScroll) {
-                    marquee.scrollLeft += SPEED_PX_PER_SEC * delta;
-                }
-
-                // Infinite loop jump boundaries
-                if (singleSetWidth > 0) {
-                    if (marquee.scrollLeft >= singleSetWidth * 2) {
-                        marquee.scrollLeft -= singleSetWidth;
-                    } else if (marquee.scrollLeft <= 0) {
-                        marquee.scrollLeft += singleSetWidth;
-                    }
+                // Seamless midpoint reset for 2 sets
+                if (marquee.scrollLeft >= singleSetWidth) {
+                    marquee.scrollLeft -= singleSetWidth;
                 }
             }
 
@@ -172,44 +143,8 @@ const Home = () => {
 
         rafId = requestAnimationFrame(tick);
         return () => cancelAnimationFrame(rafId);
-    }, [isMarqueeHovered]);
+    }, []);
 
-    const handlePointerDown = (e) => {
-        if (!marqueeRef.current) return;
-        isDragging.current = true;
-        startX.current = e.clientX;
-        startScrollLeft.current = marqueeRef.current.scrollLeft;
-        lastInteractionTime.current = Date.now();
-        marqueeRef.current.setPointerCapture(e.pointerId);
-    };
-
-    const handlePointerMove = (e) => {
-        if (!isDragging.current || !marqueeRef.current) return;
-        const x = e.clientX;
-        const walk = x - startX.current;
-
-        // Threshold to avoid hijacking vertical scroll on slight diagonals
-        if (Math.abs(walk) > 7) {
-            marqueeRef.current.scrollLeft = startScrollLeft.current - walk;
-            lastInteractionTime.current = Date.now();
-        }
-    };
-
-    const handlePointerUp = (e) => {
-        isDragging.current = false;
-        if (marqueeRef.current) {
-            marqueeRef.current.releasePointerCapture(e.pointerId);
-        }
-        lastInteractionTime.current = Date.now();
-    };
-
-    const handleWheel = () => {
-        lastInteractionTime.current = Date.now();
-    };
-
-    const handleScroll = () => {
-        lastInteractionTime.current = Date.now();
-    };
 
     const heroRef = useRef(null);
     const expertiseRef = useRef(null);
@@ -231,23 +166,34 @@ const Home = () => {
                             willChange: 'transform'
                         }}
                     />
-                    {/* Refined subtle vertical gradient — lets more image through */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10"></div>
+                    {/* Subtle gradient — reduced to let more image through */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"></div>
                 </div>
-                <div className="relative z-10 max-w-7xl mx-auto px-6 w-full pt-32">
-                    <div className="max-w-3xl space-y-5">
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white leading-[1.1] reveal">
-                            {language === 'DE' ? <>Präzision <br /><span className="text-white/90">trifft Natur</span></> : <>Précision <br /><span className="text-white/90">rencontre Nature</span></>}
+                {/* Desktop: asymmetric left-shifted, Mobile: vertically centered */}
+                <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-center h-full">
+                    <div className="w-full md:max-w-2xl space-y-6 md:space-y-7 text-left flex flex-col items-start">
+                        <h1 className="font-serif text-white leading-[0.95] md:leading-[0.95] reveal">
+                            {language === 'DE' ? (
+                                <>
+                                    <span className="text-[1.5rem] md:text-[2.25rem] lg:text-[2.5rem] block mb-[0.125rem] md:mb-1 text-white/75 font-light tracking-wide">Präzision</span>
+                                    <span className="text-[2.75rem] md:text-[5rem] lg:text-[6.5rem] font-bold block tracking-tight">trifft Natur</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="text-[1.5rem] md:text-[2.25rem] lg:text-[2.5rem] block mb-[0.125rem] md:mb-1 text-white/75 font-light tracking-wide">Précision</span>
+                                    <span className="text-[2.75rem] md:text-[5rem] lg:text-[6.5rem] font-bold block tracking-tight">rencontre Nature</span>
+                                </>
+                            )}
                         </h1>
-                        <p className="text-lg text-white/80 font-sans font-normal max-w-xl leading-relaxed reveal stagger-1">
+                        <p className="text-[0.9375rem] md:text-base text-white/70 font-sans font-normal max-w-[250px] md:max-w-md leading-snug md:leading-relaxed reveal stagger-1">
                             {language === 'DE'
                                 ? 'Nachhaltige Baumpflege und Fällarbeiten mit höchster Sorgfalt und Expertise. Für gesunde Bäume und sichere Gärten.'
                                 : 'Entretien durable des arbres et abattages effectués avec le plus grand soin et expertise. Pour des arbres sains et des jardins sécurisés.'}
                         </p>
-                        <div className="pt-6 reveal stagger-2">
+                        <div className="pt-2 md:pt-4 reveal stagger-2">
                             <Link
                                 to="/kontakt"
-                                className="inline-block bg-[#3E5F25] text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase text-sm hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
+                                className="inline-block bg-[#3E5F25] text-white px-8 py-3.5 rounded-full font-semibold tracking-widest uppercase text-xs hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
                             >
                                 {language === 'DE' ? 'Kostenloses Angebot' : 'Devis Gratuit'}
                             </Link>
@@ -362,29 +308,15 @@ const Home = () => {
                             .native-marquee-track { 
                                 scrollbar-width: none; 
                                 -ms-overflow-style: none;
-                                -webkit-overflow-scrolling: touch; 
-                                overscroll-behavior-x: contain;
-                            }
-                            @media (hover: hover) {
-                                .native-marquee-track { cursor: grab; }
-                                .native-marquee-track:active { cursor: grabbing; }
                             }
                         `}</style>
                         <div
                             ref={marqueeRef}
-                            className="native-marquee-track flex overflow-x-auto gap-8 px-6 py-6"
-                            style={{ touchAction: 'pan-x pan-y' }}
-                            onPointerDown={handlePointerDown}
-                            onPointerMove={handlePointerMove}
-                            onPointerUp={handlePointerUp}
-                            onPointerCancel={handlePointerUp}
-                            onWheel={handleWheel}
-                            onScroll={handleScroll}
-                            onMouseEnter={() => setIsMarqueeHovered(true)}
-                            onMouseLeave={() => setIsMarqueeHovered(false)}
+                            className="native-marquee-track flex overflow-hidden gap-8 px-6 py-6"
+                            style={{ touchAction: 'none' }}
                         >
-                            {/* Tripled list for infinite loop feel */}
-                            {[...testimonials, ...testimonials, ...testimonials].map((t, idx) => (
+                            {/* Doubled list for infinite loop feel */}
+                            {[...testimonials, ...testimonials].map((t, idx) => (
                                 <div
                                     key={idx}
                                     className="flex-shrink-0 w-[90vw] md:w-[450px] bg-white dark:bg-surface-dark p-8 md:p-10 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-shadow"
