@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../i18n/useLanguage';
 import { ROUTES } from '../i18n/routes';
-import { PLLCode, getReferenceBySlug, getCategoryMap, resolveMedia, getReferenceById } from '../lib/cms';
+import { PLLCode, getReferenceBySlug, getTermsByIds, resolveMedia, getReferenceById } from '../lib/cms';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
 const ReferenceDetail = () => {
@@ -46,11 +46,8 @@ const ReferenceDetail = () => {
                 setStatus('loading');
                 setProject(null);
 
-                const [ref, catMap] = await Promise.all([
-                    getReferenceBySlug(slug, language, controller.signal),
-                    getCategoryMap(language),
-                ]);
-
+                // ── 1. Fetch by slug in the active language ───────────────────
+                let ref = await getReferenceBySlug(slug, language, controller.signal);
                 if (controller.signal.aborted) return;
 
                 if (!ref) {
@@ -58,10 +55,41 @@ const ReferenceDetail = () => {
                     return;
                 }
 
-                // Store pll_translations so the language-switch handler can use them
+                // ── 2. pll_lang validation ────────────────────────────────────
+                // The CMS returns ?lang=X filtered posts, but if the slug only
+                // exists in one language the other language's result may be the
+                // same untranslated post. Re-fetch the translation when needed.
+                const expectedLang = PLLCode[language]; // 'de' | 'fr'
+                if (ref.pll_lang && ref.pll_lang !== expectedLang) {
+                    const translationId = ref.pll_translations?.[expectedLang];
+                    if (import.meta.env.DEV) {
+                        console.log(
+                            `[Detail] slug="${slug}" fetched id=${ref.id} pll_lang=${ref.pll_lang}` +
+                            ` — mismatch, re-fetching translation id=${translationId} for lang=${expectedLang}`
+                        );
+                    }
+                    if (translationId) {
+                        const translated = await getReferenceById(translationId, language, controller.signal);
+                        if (controller.signal.aborted) return;
+                        if (translated) ref = translated;
+                    } else {
+                        // No translation exists — show not found for this language
+                        setStatus('notfound');
+                        return;
+                    }
+                }
+
+                // ── 3. Store pll_translations for language-switch handler ─────
                 pllTranslationsRef.current = ref.pll_translations ?? null;
 
-                // ── Media ────────────────────────────────────────────────────
+                if (import.meta.env.DEV) {
+                    console.log(
+                        `[Detail] Rendering id=${ref.id} pll_lang=${ref.pll_lang}` +
+                        ` translations=${JSON.stringify(ref.pll_translations)}`
+                    );
+                }
+
+                // ── 4. Media ─────────────────────────────────────────────────
                 const [thumbnail, beforeUrl, afterUrl] = await Promise.all([
                     resolveMedia(ref._embedded?.['wp:featuredmedia']?.[0]?.source_url ?? null),
                     resolveMedia(ref.acf?.before_image),
@@ -70,14 +98,23 @@ const ReferenceDetail = () => {
 
                 if (controller.signal.aborted) return;
 
-                // ── Categories ───────────────────────────────────────────────
+                // ── 5. Categories — prefer embedded terms ─────────────────────
+                // The reference was fetched with _embed=1, so wp:term should be
+                // present. If it is empty (e.g. taxonomy not embedded), fall back
+                // to fetching the needed terms by include list in the active
+                // language context so names are always locale-correct.
                 let catNames = [];
                 const embeddedTerms = ref._embedded?.['wp:term']?.[0];
-                if (Array.isArray(embeddedTerms)) {
-                    catNames = embeddedTerms.map(t => t.name).filter(Boolean);
+                if (Array.isArray(embeddedTerms) && embeddedTerms.length > 0) {
+                    catNames = embeddedTerms.map(term => term.name).filter(Boolean);
+                } else if (Array.isArray(ref.reference_category) && ref.reference_category.length > 0) {
+                    // Fallback: fetch only the terms we need, language-scoped
+                    const termMap = await getTermsByIds(ref.reference_category, language, controller.signal);
+                    if (controller.signal.aborted) return;
+                    catNames = ref.reference_category.map(id => termMap[id]).filter(Boolean);
                 }
 
-                // ── Date ─────────────────────────────────────────────────────
+                // ── 6. Date ──────────────────────────────────────────────────
                 let formattedDate = '';
                 if (ref.date) {
                     formattedDate = new Date(ref.date).toLocaleDateString(
@@ -123,6 +160,13 @@ const ReferenceDetail = () => {
                 const translations = pllTranslationsRef.current;
                 const targetLangCode = PLLCode[targetLang]; // 'de' | 'fr'
                 const targetId = translations?.[targetLangCode];
+
+                if (import.meta.env.DEV) {
+                    console.log(
+                        `[Detail] Language switch → ${targetLang} (${targetLangCode})` +
+                        ` translation_id=${targetId ?? 'none'}`
+                    );
+                }
 
                 if (!targetId) {
                     // No translation — fall back to target language overview

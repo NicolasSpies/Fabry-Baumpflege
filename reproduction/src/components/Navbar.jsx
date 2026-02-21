@@ -101,6 +101,7 @@ const Navbar = () => {
                         <NavLink
                             key={item.routeKey}
                             to={getLocalizedPath(item.routeKey, language)}
+                            end={item.routeKey === 'home'}
                             className={({ isActive }) =>
                                 `hover:text-primary transition-colors whitespace-nowrap ${isActive ? 'text-primary border-b-2 border-primary pb-1' : ''}`
                             }
@@ -154,6 +155,7 @@ const Navbar = () => {
                             <NavLink
                                 key={item.routeKey}
                                 to={getLocalizedPath(item.routeKey, language)}
+                                end={item.routeKey === 'home'}
                                 onClick={closeMenu}
                                 className={({ isActive }) =>
                                     `text-lg font-serif uppercase tracking-widest transition-colors ${isActive ? 'text-primary' : 'text-slate-500 hover:text-primary'}`

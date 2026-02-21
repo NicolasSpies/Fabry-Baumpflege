@@ -19,29 +19,29 @@ export const translations = {
         'expertise.learn_more': 'Mehr erfahren',
 
         // Detailed Services
-        'services.baumpflege.title': 'Professionelle Baumpflege',
-        'services.baumpflege.desc': 'Eine fachgerechte Baumpflege ist essenziell für die Vitalität und Verkehrssicherheit deiner Bäume. Ich führe Kronenpflege, Totholzbeseitigung und Lichtraumprofilschnitte nach ZTV-Baumpflege Richtlinien durch.',
+        'services.baumpflege.title': 'Baumpflege',
+        'services.baumpflege.desc': 'Kronenpflege, Totholzentfernung und Lichtraumprofilschnitt für die Gesundheit deiner Bäume.',
         'services.baumpflege.features': [
             'Fachgerechter Kronenschnitt & Entlastung',
             'Seilklettertechnik (SKT) für schwierige Lagen',
             'Erhalt der natürlichen Baumarchitektur'
         ],
-        'services.baumfaellung.title': 'Präzise Baumfällung',
-        'services.baumfaellung.desc': 'Wenn Bäume zur Gefahr werden oder Platz für Neues weichen müssen, bin ich dein Partner für sichere Fällungen. Ich arbeite präzise, auch auf engstem Raum, und kümmere mich um die Entsorgung.',
+        'services.baumfaellung.title': 'Baumfällung',
+        'services.baumfaellung.desc': 'Sichere Fällungen auch an schwierigen Standorten mittels Seilklettertechnik oder Hubsteiger.',
         'services.baumfaellung.features': [
             'Gefahrenbaumfällung & Sturmschäden',
             'Abtragen mittels Seilablassverfahren',
             'Wurzelstockfräsen & Standortsanierung'
         ],
-        'services.gartenpflege.title': 'Individuelle Gartenpflege',
-        'services.gartenpflege.desc': 'Ein schöner Garten braucht regelmäßige Zuwendung. Ich übernehme die Pflege deiner Grünanlagen, damit du deine freie Zeit in deiner persönlichen Oase genießen kannst.',
+        'services.gartenpflege.title': 'Gartenpflege',
+        'services.gartenpflege.desc': 'Ganzheitliche Pflege für deinen Garten, von Hecke schneiden bis zur Rasenpflege.',
         'services.gartenpflege.features': [
             'Heckenschnitt & Formgehölzpflege',
             'Rasenpflege & Beetaufbereitung',
             'Jahreszeitliche Gartenpflege-Pakete'
         ],
-        'services.bepflanzung.title': 'Nachhaltige Bepflanzung',
-        'services.bepflanzung.desc': 'Wir schaffen Lebensräume. Durch die Auswahl standortgerechter Gehölze und Stauden sorgen wir für ein gesundes Wachstum und eine ästhetische Gestaltung deines Außenbereichs.',
+        'services.bepflanzung.title': 'Bepflanzung',
+        'services.bepflanzung.desc': 'Fachgerechte Neupflanzungen von Bäumen, Sträuchern und Stauden für nachhaltiges Grün.',
         'services.bepflanzung.features': [
             'Beratung bei der Pflanzenauswahl',
             'Fachgerechte Neupflanzung von Bäumen',
@@ -183,29 +183,29 @@ export const translations = {
         'expertise.learn_more': 'En savoir plus',
 
         // Detailed Services
-        'services.baumpflege.title': 'Taille raisonnée Professionnelle',
-        'services.baumpflege.desc': "Un entretien professionnel des arbres est essentiel pour la vitalité et la sécurité de vos arbres. Nous effectuons la taille de la couronne, l'élimination du bois mort et la taille de profil selon les directives ZTV-Baumpflege.",
+        'services.baumpflege.title': 'Entretien des arbres',
+        'services.baumpflege.desc': "Taille de couronne, suppression du bois mort et élagage du gabarit pour la santé de vos arbres.",
         'services.baumpflege.features': [
             'Taille de couronne et délestage professionnels',
             'Grimpe (SKT) pour les endroits difficiles',
             "Préservation de l'architecture naturelle de l'arbre"
         ],
-        'services.baumfaellung.title': 'Abattage Précis',
-        'services.baumfaellung.desc': "Lorsque les arbres deviennent un danger ou doivent laisser place à la nouveauté, nous sommes votre partenaire pour des abattages sûrs. Nous travaillons avec précision, même dans des espaces restreints, et nous occupons de l'évacuation.",
+        'services.baumfaellung.title': 'Abattage',
+        'services.baumfaellung.desc': "Abattages sécurisés, même dans des endroits difficiles, grâce à la technique de grimpe encordée ou à la nacelle élévatrice.",
         'services.baumfaellung.features': [
             "Abattage d'arbres dangereux & dégâts de tempête",
             'Démontage par rétention',
             'Rognage de souches & assainissement du site'
         ],
-        'services.gartenpflege.title': 'Entretien de jardin individuel',
-        'services.gartenpflege.desc': "Un beau jardin nécessite une attention régulière. Nous nous occupons de l'entretien de vos espaces verts afin que vous puissiez profiter de votre temps libre dans votre oasis personnelle.",
+        'services.gartenpflege.title': 'Entretien de jardin',
+        'services.gartenpflege.desc': "Entretien complet de votre jardin, de la taille des haies à l'entretien de la pelouse.",
         'services.gartenpflege.features': [
             'Taille des haies & entretien des arbustes',
             'Entretien de la pelouse & préparation des parterres',
             "Forfaits d'entretien saisonniers"
         ],
-        'services.bepflanzung.title': 'Plantation durable',
-        'services.bepflanzung.desc': 'Nous créons des habitats. En choisissant des arbustes et des vivaces adaptés au site, nous assurons une croissance saine et un aménagement esthétique de votre espace extérieur.',
+        'services.bepflanzung.title': 'Plantation',
+        'services.bepflanzung.desc': "Nouvelles plantations professionnelles d'arbres, d'arbustes et de vivaces pour un espace vert durable.",
         'services.bepflanzung.features': [
             'Conseils pour le choix des plantes',
             "Plantation experte d'arbres",

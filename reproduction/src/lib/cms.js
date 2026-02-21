@@ -59,6 +59,29 @@ export async function getCategoryMap(language = 'DE') {
     }, {});
 }
 
+/**
+ * Fetch only the term names for a specific set of term IDs (include list).
+ * Used as a fallback in ReferenceDetail when _embedded terms are missing.
+ * Language-scoped so French terms return French names.
+ */
+export async function getTermsByIds(ids, language = 'DE', signal = null) {
+    if (!ids || ids.length === 0) return {};
+    try {
+        const include = ids.map(Number).filter(Boolean).join(',');
+        const terms = await fetchFromCMS(
+            `/reference_category?include=${include}&per_page=${ids.length}`,
+            language,
+            signal
+        );
+        if (!Array.isArray(terms)) return {};
+        return terms.reduce((acc, term) => { acc[term.id] = term.name; return acc; }, {});
+    } catch (err) {
+        if (err.name === 'AbortError') throw err;
+        console.error('[CMS] getTermsByIds failed:', err);
+        return {};
+    }
+}
+
 // ─── References ───────────────────────────────────────────────────────────────
 
 /** Fetch ALL references for the given language, newest first. */

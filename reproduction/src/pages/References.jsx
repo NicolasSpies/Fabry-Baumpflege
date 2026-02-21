@@ -66,8 +66,9 @@ const References = () => {
                 setAllRefs(sorted.map(item => mapReferenceCard(item, catMap)));
 
                 // ── Fixed display order for the four core categories ──────────
+                // Slugs are language-neutral in WordPress — the same slug is
+                // shared between DE and FR translations of the same term.
                 const PRIORITY_SLUGS = ['baumpflege', 'baumfaellung', 'gartenpflege', 'bepflanzung'];
-                const PRIORITY_NAMES = ['Baumpflege', 'Baumfällung', 'Gartenpflege', 'Bepflanzung'];
 
                 const prioritized = [];
                 const rest = [];
@@ -77,18 +78,13 @@ const References = () => {
                     if (idx !== -1) {
                         prioritized[idx] = cat;
                     } else {
-                        const nameIdx = PRIORITY_NAMES.indexOf(cat.name);
-                        if (nameIdx !== -1) {
-                            prioritized[nameIdx] = cat;
-                        } else {
-                            rest.push(cat);
-                        }
+                        rest.push(cat);
                     }
                 }
 
                 const orderedCats = [
                     ...prioritized.filter(Boolean),
-                    ...rest.sort((a, b) => a.name.localeCompare(b.name, 'de')),
+                    ...rest.sort((a, b) => a.name.localeCompare(b.name)),
                 ];
 
                 setCategories(orderedCats);
