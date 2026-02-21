@@ -267,7 +267,7 @@ const Home = () => {
                                 to="/kontakt"
                                 className="inline-block bg-[#3E5F25] text-white px-8 py-3.5 rounded-full font-semibold tracking-widest uppercase text-xs hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
                             >
-                                {language === 'DE' ? 'Kostenloses Angebot' : 'Devis Gratuit'}
+                                {language === 'DE' ? 'Jetzt Kontakt aufnehmen' : 'Devis Gratuit'}
                             </Link>
                         </div>
                     </div>
@@ -433,7 +433,7 @@ const Home = () => {
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent p-10 flex items-end">
                                     <p className="text-white italic font-serif text-2xl border-l-4 border-primary pl-4 drop-shadow-lg">
-                                        {language === 'DE' ? '"Qualität, die über Generationen wächst."' : '"La qualité qui grandit au fil des générations."'}
+                                        {language === 'DE' ? '"Sorgfalt bis ins Detail"' : '"La qualité qui grandit au fil des générations."'}
                                     </p>
                                 </div>
                             </div>
