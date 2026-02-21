@@ -1,14 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useLanguage } from '../i18n/useLanguage';
 import logo from '../assets/Baumpflege-Fabry-Logo.svg';
 
 const Navbar = () => {
     const { language, setLanguage } = useLanguage();
-    const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-    const [isScrolled, setIsScrolled] = React.useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isMobileMode, setIsMobileMode] = useState(false);
 
-    React.useEffect(() => {
+    const containerRef = useRef(null);
+    const logoRef = useRef(null);
+    const desktopNavRef = useRef(null);
+
+    // Dynamic collision detection
+    useLayoutEffect(() => {
+        const checkCollision = () => {
+            if (!containerRef.current || !logoRef.current || !desktopNavRef.current) return;
+
+            // Container width minus padding (px-6 is 24px per side = 48px)
+            const availableWidth = containerRef.current.clientWidth - 48;
+            const logoWidth = logoRef.current.getBoundingClientRect().width;
+            const navWidth = desktopNavRef.current.scrollWidth;
+
+            // Safety gap of 24px between logo and nav
+            const requiredWidth = logoWidth + navWidth + 24;
+
+            // Enable mobile mode if the required width exceeds available space
+            setIsMobileMode(requiredWidth >= availableWidth);
+        };
+
+        // Initial check
+        checkCollision();
+
+        const resizeObserver = new ResizeObserver(() => checkCollision());
+
+        if (containerRef.current) resizeObserver.observe(containerRef.current);
+        if (logoRef.current) resizeObserver.observe(logoRef.current);
+        if (desktopNavRef.current) resizeObserver.observe(desktopNavRef.current);
+
+        return () => resizeObserver.disconnect();
+    }, [language, isScrolled]); // Re-measure if language or scroll state (logo size) changes
+
+    useEffect(() => {
         let lastKnownScrollY = window.scrollY;
         let ticking = false;
 
@@ -17,11 +51,7 @@ const Navbar = () => {
 
             if (!ticking) {
                 window.requestAnimationFrame(() => {
-                    if (lastKnownScrollY > 20) {
-                        setIsScrolled(true);
-                    } else {
-                        setIsScrolled(false);
-                    }
+                    setIsScrolled(lastKnownScrollY > 20);
                     ticking = false;
                 });
 
@@ -30,7 +60,6 @@ const Navbar = () => {
         };
 
         window.addEventListener('scroll', handleScroll, { passive: true });
-        // Initial check
         handleScroll();
 
         return () => window.removeEventListener('scroll', handleScroll);
@@ -45,11 +74,7 @@ const Navbar = () => {
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
-        if (!isMenuOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
+        document.body.style.overflow = !isMenuOpen ? 'hidden' : 'unset';
     };
 
     const closeMenu = () => {
@@ -57,12 +82,19 @@ const Navbar = () => {
         document.body.style.overflow = 'unset';
     };
 
+    // Close mobile menu automatically if expanding window safely
+    useEffect(() => {
+        if (!isMobileMode && isMenuOpen) {
+            closeMenu();
+        }
+    }, [isMobileMode, isMenuOpen]);
+
     return (
         <nav className={`fixed top-0 w-full z-[100] transition-all duration-500 ease-in-out ${isScrolled || isMenuOpen
             ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 py-0 shadow-sm'
             : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-100/50 dark:border-slate-800/50 py-2'
             }`}>
-            <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div ref={containerRef} className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 <Link
                     to="/"
                     className="flex items-center gap-2"
@@ -74,19 +106,25 @@ const Navbar = () => {
                     }}
                 >
                     <img
+                        ref={logoRef}
                         alt="Fabry Baumpflege Logo"
-                        className={`w-auto object-contain transition-all duration-500 ${isScrolled ? 'h-12' : 'h-16'
-                            }`}
+                        className={`w-auto object-contain transition-all duration-500 ${isScrolled ? 'h-12' : 'h-16'}`}
                         src={logo}
                     />
                 </Link>
-                <div className="hidden md:flex items-center space-x-10 text-sm font-medium uppercase tracking-widest">
+
+                {/* Desktop Navigation - Kept in DOM for measurement but visually hidden when in mobile mode */}
+                <div
+                    ref={desktopNavRef}
+                    className={`flex items-center space-x-10 text-sm font-medium uppercase tracking-widest ${isMobileMode ? 'absolute opacity-0 pointer-events-none invisible' : 'relative opacity-100 visible'
+                        }`}
+                >
                     {navItems.map((item) => (
                         <NavLink
                             key={item.path}
                             to={item.path}
                             className={({ isActive }) =>
-                                `hover:text-primary transition-colors ${isActive ? 'text-primary border-b-2 border-primary pb-1' : ''}`
+                                `hover:text-primary transition-colors whitespace-nowrap ${isActive ? 'text-primary border-b-2 border-primary pb-1' : ''}`
                             }
                         >
                             {item.name[language]}
@@ -111,27 +149,31 @@ const Navbar = () => {
                         </div>
                         <Link
                             to="/kontakt"
-                            className="bg-primary text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all text-xs font-bold uppercase tracking-widest"
+                            className="bg-primary text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all text-xs font-bold uppercase tracking-widest whitespace-nowrap"
                         >
                             {language === 'DE' ? 'Kontakt' : 'Contact'}
                         </Link>
                     </div>
                 </div>
 
-                {/* Mobile Toggle */}
-                <button
-                    className="md:hidden text-primary z-50 relative flex items-center justify-center"
-                    onClick={toggleMenu}
-                >
-                    <span className={`material-symbols-outlined text-3xl transition-transform duration-300 ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
-                        {isMenuOpen ? 'close' : 'menu'}
-                    </span>
-                </button>
+                {/* Mobile Toggle Component */}
+                {isMobileMode && (
+                    <button
+                        className="text-primary z-50 relative flex items-center justify-center animate-in fade-in duration-300"
+                        onClick={toggleMenu}
+                        aria-label="Toggle Menu"
+                    >
+                        <span className={`material-symbols-outlined text-3xl transition-transform duration-300 ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
+                            {isMenuOpen ? 'close' : 'menu'}
+                        </span>
+                    </button>
+                )}
 
             </div>
+
             {/* Mobile Menu Dropdown */}
-            {isMenuOpen && (
-                <div className="absolute top-full left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl border-b border-slate-100 dark:border-slate-800 md:hidden flex flex-col items-center py-8 gap-8 z-[100] animate-in slide-in-from-top duration-300">
+            {(isMenuOpen && isMobileMode) && (
+                <div className="absolute top-full left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl border-b border-slate-100 dark:border-slate-800 flex flex-col items-center py-8 gap-8 z-[100] animate-in slide-in-from-top duration-300">
                     <div className="flex flex-col items-center gap-6 w-full px-6">
                         {navItems.map((item) => (
                             <NavLink

@@ -49,14 +49,14 @@ const References = () => {
                 </div>
             </section>
 
-            <section className="sticky top-20 z-40 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-y border-slate-100 dark:border-slate-800 mb-8 py-4">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
+            <section className="sticky top-20 z-40 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-y border-slate-100 dark:border-slate-800 mb-4 md:mb-8 py-3 md:py-4">
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-nowrap md:flex-wrap items-center justify-start md:justify-center gap-3 md:gap-8 overflow-x-auto snap-x snap-mandatory px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                         {filters.map((f) => (
                             <button
                                 key={f.DE}
                                 onClick={() => setActiveFilter(f.DE)}
-                                className={`px-6 py-2 rounded-full text-sm font-medium uppercase tracking-widest transition-all ${activeFilter === f.DE
+                                className={`flex-shrink-0 snap-start whitespace-nowrap px-6 py-2 rounded-full text-sm font-medium uppercase tracking-widest transition-all ${activeFilter === f.DE
                                     ? 'bg-[#2a411a] text-white shadow-lg'
                                     : 'text-slate-500 hover:text-primary border border-transparent hover:border-primary/20'
                                     }`}

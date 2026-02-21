@@ -108,13 +108,21 @@ const Home = () => {
         }
     ];
 
-    /* ── Marquee (Pure Infinite Auto-Loop) ── */
-    const marqueeRef = useRef(null);
+    /* ── Safari-Safe Marquee (Transform based with Drag) ── */
+    const marqueeContainerRef = useRef(null);
+    const marqueeTrackRef = useRef(null);
     const SPEED_PX_PER_SEC = 40;
 
+    // Animation state kept in refs to avoid rerenders
+    const offsetRef = useRef(0);
+    const isHoveringRef = useRef(false);
+    const isDraggingRef = useRef(false);
+    const startXRef = useRef(0);
+    const isPausedRef = useRef(false);
+
     useEffect(() => {
-        const marquee = marqueeRef.current;
-        if (!marquee) return;
+        const track = marqueeTrackRef.current;
+        if (!track) return;
 
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (prefersReducedMotion) return;
@@ -127,14 +135,20 @@ const Home = () => {
             const deltaTime = (timestamp - prevTimestamp) / 1000;
             prevTimestamp = timestamp;
 
-            const singleSetWidth = marquee.scrollWidth / 2;
+            if (!isHoveringRef.current && !isDraggingRef.current && !isPausedRef.current) {
+                const singleSetWidth = track.scrollWidth / 2;
 
-            if (singleSetWidth > 0) {
-                marquee.scrollLeft += SPEED_PX_PER_SEC * deltaTime;
+                if (singleSetWidth > 0) {
+                    offsetRef.current += SPEED_PX_PER_SEC * deltaTime;
 
-                // Seamless midpoint reset for 2 sets
-                if (marquee.scrollLeft >= singleSetWidth) {
-                    marquee.scrollLeft -= singleSetWidth;
+                    // Seamless midpoint reset for 2 sets
+                    if (offsetRef.current >= singleSetWidth) {
+                        offsetRef.current -= singleSetWidth;
+                    } else if (offsetRef.current < 0) {
+                        offsetRef.current += singleSetWidth;
+                    }
+
+                    track.style.transform = `translate3d(-${offsetRef.current}px, 0, 0)`;
                 }
             }
 
@@ -142,8 +156,60 @@ const Home = () => {
         };
 
         rafId = requestAnimationFrame(tick);
-        return () => cancelAnimationFrame(rafId);
+
+        // Visibility API to pause when off-screen/background tab
+        const handleVisibilityChange = () => {
+            isPausedRef.current = document.hidden;
+            if (!document.hidden) prevTimestamp = null; // Reset delta on resume
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            cancelAnimationFrame(rafId);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, []);
+
+    useEffect(() => {
+        // Intersection Observer to pause when section is out of view
+        const observer = new IntersectionObserver((entries) => {
+            isPausedRef.current = !entries[0].isIntersecting;
+        }, { threshold: 0 });
+
+        if (marqueeContainerRef.current) observer.observe(marqueeContainerRef.current);
+        return () => observer.disconnect();
+    }, []);
+
+    // Pointer events for manual drag/swipe override
+    const handlePointerDown = (e) => {
+        isDraggingRef.current = true;
+        startXRef.current = e.clientX;
+    };
+
+    const handlePointerMove = (e) => {
+        if (!isDraggingRef.current) return;
+        const track = marqueeTrackRef.current;
+        if (!track) return;
+
+        const deltaX = e.clientX - startXRef.current;
+        startXRef.current = e.clientX;
+
+        const singleSetWidth = track.scrollWidth / 2;
+        offsetRef.current -= deltaX;
+
+        // Boundary wrapping during drag
+        if (offsetRef.current >= singleSetWidth) {
+            offsetRef.current -= singleSetWidth;
+        } else if (offsetRef.current < 0) {
+            offsetRef.current += singleSetWidth;
+        }
+
+        track.style.transform = `translate3d(-${offsetRef.current}px, 0, 0)`;
+    };
+
+    const handlePointerUp = () => {
+        isDraggingRef.current = false;
+    };
 
 
     const heroRef = useRef(null);
@@ -158,13 +224,9 @@ const Home = () => {
                 <div className="absolute inset-0 z-0">
                     <img
                         ref={heroRef}
-                        alt="Professional tree work"
-                        className="w-full h-full object-cover"
+                        alt="Baumpfleger Vincent Fabry working in a tree"
+                        className="w-full h-[120%] object-cover object-top filter brightness-[0.80] contrast-[1.05]"
                         src={homeHeroImg}
-                        style={{
-                            transform: 'translate3d(0, 0, 0) scale(1.1)',
-                            willChange: 'transform'
-                        }}
                     />
                     {/* Subtle gradient — reduced to let more image through */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"></div>
@@ -203,55 +265,57 @@ const Home = () => {
             </section>
 
             {/* Stats Section */}
-            <section className="py-16 bg-surface-light dark:bg-surface-dark border-b border-slate-100 dark:border-slate-800">
-                <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-slate-200 dark:divide-slate-700/50">
-                    {stats.map((stat, idx) => (
-                        <StatCounter key={idx} value={stat.value} label={stat.label} language={language} />
-                    ))}
+            <section className="bg-white dark:bg-slate-900 py-16 md:py-20 border-b border-slate-100 dark:border-slate-800">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8">
+                        {stats.map((stat, idx) => (
+                            <StatCounter key={idx} value={stat.value} label={stat.label} language={language} />
+                        ))}
+                    </div>
                 </div>
             </section>
 
             {/* Services Section */}
-            <section className="py-24 px-6 bg-background-light dark:bg-background-dark" id="services">
+            <section className="py-24 md:py-32 px-6 bg-surface-light dark:bg-background-dark relative overflow-hidden" id="services">
+                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
                 <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-20 space-y-4">
-                        <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">
-                            {language === 'DE' ? 'Unsere Expertise' : 'Notre Expertise'}
+                    <div className="text-center mb-16 md:mb-24 space-y-4">
+                        <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs reveal">
+                            {language === 'DE' ? 'Meine Expertise' : 'Mon Expertise'}
                         </span>
-                        <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">
-                            {language === 'DE' ? 'Leistungen im Überblick' : 'Aperçu de nos Services'}
+                        <h2 className="text-4xl md:text-5xl font-serif text-primary reveal stagger-1 leading-tight">
+                            {language === 'DE' ? 'Professionelle Baumpflege' : 'Arboriculture professionnelle'} <br className="hidden md:block" />
+                            {language === 'DE' ? 'auf höchstem Niveau' : 'au plus haut niveau'}
                         </h2>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
                         {services.map((service, idx) => (
-                            <div key={idx} className={`group p-8 rounded-2xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left reveal stagger-${(idx % 4) + 1}`}>
-                                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
-                                    {service.id === 'baumpflege' ? (
-                                        <BaumpflegeIcon className="w-7 h-7 flex items-center justify-center text-3xl text-primary group-hover:text-white transition-colors" />
-                                    ) : service.id === 'baumfaellung' ? (
-                                        <BaumfaellungIcon className="w-7 h-7 text-primary group-hover:text-white transition-colors" />
-                                    ) : service.id === 'gartenpflege' ? (
-                                        <GartenpflegeIcon className="w-7 h-7 flex items-center justify-center text-3xl text-primary group-hover:text-white transition-colors" />
-                                    ) : service.id === 'bepflanzung' ? (
-                                        <BepflanzungIcon className="w-7 h-7 flex items-center justify-center text-3xl text-primary group-hover:text-white transition-colors" />
-                                    ) : (
-                                        <span className="material-symbols-outlined text-3xl text-primary group-hover:text-white transition-colors">{service.icon}</span>
-                                    )}
+                            <Link
+                                to={`/leistungen#${service.id}`}
+                                key={idx}
+                                className="group relative bg-white dark:bg-surface-dark rounded-[2rem] p-10 md:p-12 hover:-translate-y-2 transition-all duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden reveal"
+                                style={{ animationDelay: `${idx * 150}ms` }}
+                            >
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors duration-500"></div>
+                                <div className="relative z-10 flex flex-col h-full">
+                                    <div className="w-16 h-16 bg-primary/10 dark:bg-primary/20 rounded-2xl flex items-center justify-center mb-8 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
+                                        {idx === 0 && <BaumpflegeIcon className="w-8 h-8 fill-current" />}
+                                        {idx === 1 && <BaumfaellungIcon className="w-8 h-8 fill-current" />}
+                                        {idx === 2 && <GartenpflegeIcon className="w-8 h-8 fill-current" />}
+                                        {idx === 3 && <BepflanzungIcon className="w-8 h-8 fill-current" />}
+                                    </div>
+                                    <h3 className="text-2xl font-serif text-primary mb-4 group-hover:text-[#3E5F25] dark:group-hover:text-primary transition-colors">{service.title[language]}</h3>
+                                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-sans mb-8 flex-grow">
+                                        {service.desc[language]}
+                                    </p>
+                                    <div className="flex items-center text-primary font-bold text-sm tracking-widest uppercase">
+                                        <span className="mr-2 group-hover:mr-4 transition-all duration-300">
+                                            {language === 'DE' ? 'Mehr erfahren' : 'En savoir plus'}
+                                        </span>
+                                        <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                                    </div>
                                 </div>
-                                <h3 className="text-xl font-serif text-primary mb-3">{service.title[language]}</h3>
-                                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
-                                    {service.desc[language]}
-                                </p>
-                                <Link
-                                    to={`/leistungen#${service.id}`}
-                                    className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-primary hover:text-primary-dark"
-                                >
-                                    <span className="underline-anim">
-                                        {language === 'DE' ? 'Mehr erfahren' : 'En savoir plus'}
-                                    </span>
-                                    <span className="material-symbols-outlined text-sm ml-1">arrow_forward</span>
-                                </Link>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </div>
@@ -300,26 +364,27 @@ const Home = () => {
                     </div>
                 </div>
 
-                <div className="relative">
+                <div ref={marqueeContainerRef} className="relative">
                     {/* Generous vertical bounds so the shadow doesn't clip */}
-                    <div className="w-full relative -my-10 py-10">
-                        <style>{`
-                            .native-marquee-track::-webkit-scrollbar { display: none; }
-                            .native-marquee-track { 
-                                scrollbar-width: none; 
-                                -ms-overflow-style: none;
-                            }
-                        `}</style>
+                    <div
+                        className="w-full relative -my-10 py-10 overflow-hidden cursor-grab active:cursor-grabbing"
+                        onMouseEnter={() => isHoveringRef.current = true}
+                        onMouseLeave={() => { isHoveringRef.current = false; isDraggingRef.current = false; }}
+                        onPointerDown={handlePointerDown}
+                        onPointerMove={handlePointerMove}
+                        onPointerUp={handlePointerUp}
+                        onPointerCancel={handlePointerUp}
+                        style={{ touchAction: 'pan-y' }}
+                    >
                         <div
-                            ref={marqueeRef}
-                            className="native-marquee-track flex overflow-hidden gap-8 px-6 py-6"
-                            style={{ touchAction: 'none' }}
+                            ref={marqueeTrackRef}
+                            className="flex flex-nowrap gap-8 px-6 w-max will-change-transform"
                         >
                             {/* Doubled list for infinite loop feel */}
                             {[...testimonials, ...testimonials].map((t, idx) => (
                                 <div
                                     key={idx}
-                                    className="flex-shrink-0 w-[90vw] md:w-[450px] bg-white dark:bg-surface-dark p-8 md:p-10 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-shadow"
+                                    className="flex-shrink-0 w-[90vw] md:w-[450px] bg-white dark:bg-surface-dark p-8 md:p-10 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-lg hover:shadow-xl transition-shadow pointer-events-none"
                                 >
                                     <div className="flex items-center gap-1 text-amber-400 mb-4">
                                         {[...Array(t.rating)].map((_, i) => (
