@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../i18n/useLanguage';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useSoftEntrance } from '../hooks/useSoftEntrance';
+import { useServiceCardsEntrance } from '../hooks/useServiceCardsEntrance';
 import { useParallax } from '../hooks/useParallax';
 import { references } from '../data/references';
 import ReferenceCard from '../components/ReferenceCard';
@@ -217,6 +219,14 @@ const Home = () => {
     useParallax(heroRef, { speed: 0.08, maxTravel: 40, scale: 1.1 });
     useParallax(expertiseRef, { speed: 0.04, maxTravel: 20, scale: 1.1 });
 
+    const statsRef = useRef(null);
+    const servicesRef = useRef(null);
+    const expertCardsGridRef = useRef(null);
+
+    useSoftEntrance(statsRef);
+    useSoftEntrance(servicesRef);
+    useServiceCardsEntrance(expertCardsGridRef);
+
     return (
         <main>
             {/* Hero Section */}
@@ -265,57 +275,59 @@ const Home = () => {
             </section>
 
             {/* Stats Section */}
-            <section className="bg-white dark:bg-slate-900 py-16 md:py-20 border-b border-slate-100 dark:border-slate-800">
+            <section ref={statsRef} className="bg-white dark:bg-slate-900 py-16 md:py-20 border-b border-slate-100 dark:border-slate-800">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8">
                         {stats.map((stat, idx) => (
-                            <StatCounter key={idx} value={stat.value} label={stat.label} language={language} />
+                            <div key={idx} className="soft-entrance-item">
+                                <StatCounter value={stat.value} label={stat.label} language={language} />
+                            </div>
                         ))}
                     </div>
                 </div>
             </section>
 
             {/* Services Section */}
-            <section className="py-24 md:py-32 px-6 bg-surface-light dark:bg-background-dark relative overflow-hidden" id="services">
+            <section ref={servicesRef} className="py-24 md:py-32 px-6 bg-surface-light dark:bg-background-dark relative overflow-hidden" id="services">
                 <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
                 <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16 md:mb-24 space-y-4">
-                        <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs reveal">
+                    <div className="text-center mb-16 md:mb-24 space-y-4 soft-entrance-item">
+                        <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">
                             {language === 'DE' ? 'Meine Expertise' : 'Mon Expertise'}
                         </span>
-                        <h2 className="text-4xl md:text-5xl font-serif text-primary reveal stagger-1 leading-tight">
+                        <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight">
                             {language === 'DE' ? 'Professionelle Baumpflege' : 'Arboriculture professionnelle'} <br className="hidden md:block" />
                             {language === 'DE' ? 'auf höchstem Niveau' : 'au plus haut niveau'}
                         </h2>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-6">
+                    <div ref={expertCardsGridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-6">
                         {services.map((service, idx) => (
-                            <Link
-                                to={`/leistungen#${service.id}`}
-                                key={idx}
-                                className="group relative bg-white dark:bg-surface-dark rounded-[2rem] p-8 md:p-10 hover:-translate-y-2 transition-all duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden reveal flex flex-col h-full"
-                                style={{ animationDelay: `${idx * 150}ms` }}
-                            >
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors duration-500"></div>
-                                <div className="relative z-10 flex flex-col flex-grow">
-                                    <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center mb-6 text-[#3E5F25] group-hover:bg-[#3E5F25] group-hover:text-white transition-all duration-300">
-                                        {idx === 0 && <BaumpflegeIcon className="w-6 h-6 fill-current" />}
-                                        {idx === 1 && <BaumfaellungIcon className="w-6 h-6 fill-current" />}
-                                        {idx === 2 && <GartenpflegeIcon className="w-6 h-6 fill-current" />}
-                                        {idx === 3 && <BepflanzungIcon className="w-6 h-6 fill-current" />}
+                            <div key={idx} className="expert-card-anim h-full">
+                                <Link
+                                    to={`/leistungen#${service.id}`}
+                                    className="group relative bg-white dark:bg-surface-dark rounded-[2rem] p-8 md:p-10 hover:-translate-y-2 transition-transform duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full"
+                                >
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors duration-500"></div>
+                                    <div className="relative z-10 flex flex-col flex-grow">
+                                        <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center mb-6 text-[#3E5F25] group-hover:bg-[#3E5F25] group-hover:text-white transition-all duration-300">
+                                            {idx === 0 && <BaumpflegeIcon className="w-6 h-6 fill-current" />}
+                                            {idx === 1 && <BaumfaellungIcon className="w-6 h-6 fill-current" />}
+                                            {idx === 2 && <GartenpflegeIcon className="w-6 h-6 fill-current" />}
+                                            {idx === 3 && <BepflanzungIcon className="w-6 h-6 fill-current" />}
+                                        </div>
+                                        <h3 className="text-2xl font-serif text-primary mb-4 group-hover:text-[#3E5F25] dark:group-hover:text-primary transition-colors">{service.title[language]}</h3>
+                                        <p className="text-slate-600 dark:text-slate-400 text-[0.9375rem] leading-relaxed font-sans mb-8 flex-grow">
+                                            {service.desc[language]}
+                                        </p>
+                                        <div className="flex items-center text-primary font-bold text-xs tracking-[0.15em] uppercase mt-auto">
+                                            <span className="mr-2 group-hover:mr-4 transition-all duration-300">
+                                                {language === 'DE' ? 'Mehr erfahren' : 'En savoir plus'}
+                                            </span>
+                                            <span className="material-symbols-outlined text-base">arrow_forward</span>
+                                        </div>
                                     </div>
-                                    <h3 className="text-2xl font-serif text-primary mb-4 group-hover:text-[#3E5F25] dark:group-hover:text-primary transition-colors">{service.title[language]}</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 text-[0.9375rem] leading-relaxed font-sans mb-8 flex-grow">
-                                        {service.desc[language]}
-                                    </p>
-                                    <div className="flex items-center text-primary font-bold text-xs tracking-[0.15em] uppercase mt-auto">
-                                        <span className="mr-2 group-hover:mr-4 transition-all duration-300">
-                                            {language === 'DE' ? 'Mehr erfahren' : 'En savoir plus'}
-                                        </span>
-                                        <span className="material-symbols-outlined text-base">arrow_forward</span>
-                                    </div>
-                                </div>
-                            </Link>
+                                </Link>
+                            </div>
                         ))}
                     </div>
                 </div>
