@@ -288,31 +288,31 @@ const Home = () => {
                             {language === 'DE' ? 'auf höchstem Niveau' : 'au plus haut niveau'}
                         </h2>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-6">
                         {services.map((service, idx) => (
                             <Link
                                 to={`/leistungen#${service.id}`}
                                 key={idx}
-                                className="group relative bg-white dark:bg-surface-dark rounded-[2rem] p-10 md:p-12 hover:-translate-y-2 transition-all duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden reveal"
+                                className="group relative bg-white dark:bg-surface-dark rounded-[2rem] p-8 md:p-10 hover:-translate-y-2 transition-all duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden reveal flex flex-col h-full"
                                 style={{ animationDelay: `${idx * 150}ms` }}
                             >
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors duration-500"></div>
-                                <div className="relative z-10 flex flex-col h-full">
-                                    <div className="w-16 h-16 bg-primary/10 dark:bg-primary/20 rounded-2xl flex items-center justify-center mb-8 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
-                                        {idx === 0 && <BaumpflegeIcon className="w-8 h-8 fill-current" />}
-                                        {idx === 1 && <BaumfaellungIcon className="w-8 h-8 fill-current" />}
-                                        {idx === 2 && <GartenpflegeIcon className="w-8 h-8 fill-current" />}
-                                        {idx === 3 && <BepflanzungIcon className="w-8 h-8 fill-current" />}
+                                <div className="relative z-10 flex flex-col flex-grow">
+                                    <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center mb-6 text-[#3E5F25] group-hover:bg-[#3E5F25] group-hover:text-white transition-all duration-300">
+                                        {idx === 0 && <BaumpflegeIcon className="w-6 h-6 fill-current" />}
+                                        {idx === 1 && <BaumfaellungIcon className="w-6 h-6 fill-current" />}
+                                        {idx === 2 && <GartenpflegeIcon className="w-6 h-6 fill-current" />}
+                                        {idx === 3 && <BepflanzungIcon className="w-6 h-6 fill-current" />}
                                     </div>
                                     <h3 className="text-2xl font-serif text-primary mb-4 group-hover:text-[#3E5F25] dark:group-hover:text-primary transition-colors">{service.title[language]}</h3>
-                                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-sans mb-8 flex-grow">
+                                    <p className="text-slate-600 dark:text-slate-400 text-[0.9375rem] leading-relaxed font-sans mb-8 flex-grow">
                                         {service.desc[language]}
                                     </p>
-                                    <div className="flex items-center text-primary font-bold text-sm tracking-widest uppercase">
+                                    <div className="flex items-center text-primary font-bold text-xs tracking-[0.15em] uppercase mt-auto">
                                         <span className="mr-2 group-hover:mr-4 transition-all duration-300">
                                             {language === 'DE' ? 'Mehr erfahren' : 'En savoir plus'}
                                         </span>
-                                        <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                                        <span className="material-symbols-outlined text-base">arrow_forward</span>
                                     </div>
                                 </div>
                             </Link>
