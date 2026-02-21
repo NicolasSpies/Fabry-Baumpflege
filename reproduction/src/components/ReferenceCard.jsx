@@ -36,6 +36,7 @@ const ReferenceCard = ({ project, language, forceSquare = false, animateEntry = 
                     </div>
                 </div>
             </div>
+
         </Link>
     );
 };

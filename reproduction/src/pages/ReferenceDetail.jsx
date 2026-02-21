@@ -1,24 +1,129 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '../i18n/useLanguage';
-import { references } from '../data/references';
-
+import { getReferenceBySlug, getCategoryMap, resolveMedia } from '../lib/cms';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
 const ReferenceDetail = () => {
-    const { id } = useParams();
+    const { id } = useParams(); // param name matches App.jsx route "/referenzen/:id" — used as slug
     const { language } = useLanguage();
-    useScrollReveal();
+    // ── All state must be declared unconditionally (Rules of Hooks) ──────────
     const [sliderValue, setSliderValue] = useState(50);
-    const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
-    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-    const [lightboxIndex, setLightboxIndex] = useState(0);
-    const carouselRef = useRef(null);
+    const [project, setProject] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Find project by id
-    const project = references.find(p => p.id === id);
+    // Re-run reveal observer after data loads so .reveal elements in the content are observed.
+    // On mount the DOM only has the loading spinner; reveal elements appear after setProject.
+    useScrollReveal([project]);
 
-    if (!project) {
+    // ── Scroll to top whenever slug changes ──────────────────────────────────
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [id]);
+
+    // ── Primary data fetch ───────────────────────────────────────────────────
+    useEffect(() => {
+        if (!id) {
+            setError('No slug');
+            setIsLoading(false);
+            return;
+        }
+
+        let cancelled = false;
+
+        async function loadData() {
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                // Fetch reference by slug AND category map concurrently
+                const [ref, catMap] = await Promise.all([
+                    getReferenceBySlug(id),
+                    getCategoryMap()
+                ]);
+
+                if (cancelled) return;
+
+                if (!ref) {
+                    setError('Not Found');
+                    setIsLoading(false);
+                    return;
+                }
+
+                // ── Featured image ──────────────────────────────────────────
+                const thumbnail =
+                    ref._embedded?.['wp:featuredmedia']?.[0]?.source_url || null;
+
+                // ── Categories ─────────────────────────────────────────────
+                // Prefer embedded wp:term (first group = primary taxonomy)
+                let catNames = [];
+                const embeddedTerms = ref._embedded?.['wp:term']?.[0];
+                if (Array.isArray(embeddedTerms) && embeddedTerms.length > 0) {
+                    catNames = embeddedTerms.map(t => t.name).filter(Boolean);
+                } else if (Array.isArray(ref.reference_category) && ref.reference_category.length > 0) {
+                    // Fall back to resolving IDs via the category map
+                    catNames = ref.reference_category.map(catId => catMap[catId]).filter(Boolean);
+                }
+
+                // ── Publish date ────────────────────────────────────────────
+                let formattedDate = '';
+                if (ref.date) {
+                    try {
+                        formattedDate = new Date(ref.date).toLocaleDateString(
+                            language === 'DE' ? 'de-DE' : 'fr-FR',
+                            { year: 'numeric', month: 'long' }
+                        );
+                    } catch {
+                        formattedDate = ref.date;
+                    }
+                }
+
+                // ── Resolve before / after images (may be numeric IDs) ──────
+                const beforeUrl = await resolveMedia(ref.acf?.before_image);
+                if (cancelled) return;
+                const afterUrl = await resolveMedia(ref.acf?.after_image);
+                if (cancelled) return;
+
+                setProject({
+                    id: ref.slug || id,
+                    title: ref.title?.rendered || '',
+                    dateFormatted: formattedDate,
+                    categories: catNames,
+                    location: ref.acf?.location || '',
+                    description: ref.acf?.short_description || '',
+                    thumbnailImage: thumbnail,
+                    beforeImage: beforeUrl,
+                    afterImage: afterUrl,
+                });
+
+            } catch (err) {
+                if (cancelled) return;
+                if (import.meta.env.DEV) {
+                    console.error('[ReferenceDetail] Failed to load CMS data:', err);
+                }
+                setError('Error');
+            } finally {
+                if (!cancelled) setIsLoading(false);
+            }
+        }
+
+        loadData();
+
+        return () => { cancelled = true; };
+    }, [id, language]);
+
+    // ── Loading state ────────────────────────────────────────────────────────
+    if (isLoading) {
+        return (
+            <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
+                <div className="w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin mx-auto mb-4" />
+            </div>
+        );
+    }
+
+    // ── Not found / error state ──────────────────────────────────────────────
+    if (error || !project) {
         return (
             <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
                 <h2 className="text-3xl font-display text-primary mb-4">
@@ -28,72 +133,58 @@ const ReferenceDetail = () => {
                     to="/referenzen"
                     className="text-primary hover:underline font-medium uppercase tracking-widest text-sm"
                 >
-                    {language === 'DE' ? 'Zurück zur Übersicht' : 'Retour à l\'aperçu'}
+                    {language === 'DE' ? 'Zurück zur Übersicht' : "Retour à l'aperçu"}
                 </Link>
             </div>
         );
     }
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [id]);
+    // ── Derived booleans used in JSX ─────────────────────────────────────────
+    const hasBeforeAfter = project.beforeImage || project.afterImage;
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (project.galleryImages && !isLightboxOpen) {
-                setCurrentGalleryIndex((prev) => (prev + 1) % project.galleryImages.length);
-            }
-        }, 5000);
-        return () => clearInterval(interval);
-    }, [project.galleryImages, isLightboxOpen]);
-
-    const nextSlide = () => {
-        setCurrentGalleryIndex((prev) => (prev + 1) % project.galleryImages.length);
-    };
-
-    const prevSlide = () => {
-        setCurrentGalleryIndex((prev) => (prev - 1 + project.galleryImages.length) % project.galleryImages.length);
-    };
-
-    const openLightbox = (index) => {
-        setLightboxIndex(index);
-        setIsLightboxOpen(true);
-    };
-
+    // ── Full detail layout ───────────────────────────────────────────────────
     return (
         <>
+            {/* ── Back link ── */}
             <section className="max-w-7xl mx-auto px-6 pt-12 pb-8 mt-20">
                 <Link
                     to="/referenzen"
                     className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-slate-400 hover:text-primary transition-colors"
                 >
                     <span className="material-symbols-outlined text-sm">arrow_back</span>
-                    {language === 'DE' ? 'Zurück zur Übersicht' : 'Retour à l\'aperçu'}
+                    {language === 'DE' ? 'Zurück zur Übersicht' : "Retour à l'aperçu"}
                 </Link>
             </section>
 
+            {/* ── Hero image + title overlay ── */}
             <section className="px-6 mb-24">
                 <div className="max-w-7xl mx-auto">
                     <div className="relative h-[70vh] w-full rounded-3xl overflow-hidden shadow-2xl reveal">
-                        <img
-                            alt={project.title}
-                            className="w-full h-full object-cover"
-                            src={project.thumbnailImage}
-                        />
+                        {project.thumbnailImage && (
+                            <img
+                                alt={project.title}
+                                className="w-full h-full object-cover"
+                                src={project.thumbnailImage}
+                            />
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-12">
                             <div className="max-w-3xl">
                                 <span className="text-white/80 text-sm uppercase tracking-[0.3em] mb-4 block reveal stagger-1">
                                     {language === 'DE' ? 'Referenzprojekt' : 'Projet de Référence'}
                                 </span>
-                                <h1 className="text-5xl md:text-7xl font-display text-white leading-tight mb-4 reveal stagger-2">{project.title}</h1>
+                                <h1 className="text-5xl md:text-7xl font-display text-white leading-tight mb-4 reveal stagger-2">
+                                    {project.title}
+                                </h1>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
+            {/* ── Sidebar + main content ── */}
             <section className="max-w-7xl mx-auto px-6 mb-32">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+
                     {/* Sidebar */}
                     <div className="lg:col-span-4 lg:sticky lg:top-32 h-fit reveal">
                         <div className="bg-surface-light dark:bg-surface-dark p-10 rounded-3xl space-y-8">
@@ -101,34 +192,56 @@ const ReferenceDetail = () => {
                                 {language === 'DE' ? 'Projekt Details' : 'Détails du Projet'}
                             </h2>
                             <div className="space-y-6">
-                                <div>
-                                    <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 block mb-1">
-                                        {language === 'DE' ? 'Datum' : 'Date'}
-                                    </span>
-                                    <p className="text-lg font-medium">September 2023</p>
-                                </div>
-                                <div className="h-px bg-slate-200 dark:bg-slate-700"></div>
-                                <div>
-                                    <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 block mb-1">
-                                        {language === 'DE' ? 'Dienstleistung' : 'Service'}
-                                    </span>
-                                    <div className="flex flex-wrap gap-2 mt-2">
-                                        {project.categories?.map((cat) => (
-                                            <span key={cat} className="text-sm font-medium bg-primary/5 text-primary px-3 py-1 rounded-full border border-primary/10">
-                                                {cat}
+
+                                {/* Date */}
+                                {project.dateFormatted && (
+                                    <>
+                                        <div>
+                                            <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 block mb-1">
+                                                {language === 'DE' ? 'Datum' : 'Date'}
                                             </span>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div className="h-px bg-slate-200 dark:bg-slate-700"></div>
-                                <div>
-                                    <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 block mb-1">
-                                        {language === 'DE' ? 'Standort' : 'Lieu'}
-                                    </span>
-                                    <p className="text-lg font-medium">{project.location}</p>
-                                </div>
-                                <div className="h-px bg-slate-200 dark:bg-slate-700"></div>
+                                            <p className="text-lg font-medium">{project.dateFormatted}</p>
+                                        </div>
+                                        <div className="h-px bg-slate-200 dark:bg-slate-700" />
+                                    </>
+                                )}
+
+                                {/* Categories */}
+                                {project.categories.length > 0 && (
+                                    <>
+                                        <div>
+                                            <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 block mb-1">
+                                                {language === 'DE' ? 'Dienstleistung' : 'Service'}
+                                            </span>
+                                            <div className="flex flex-wrap gap-2 mt-2">
+                                                {project.categories.map((cat) => (
+                                                    <span
+                                                        key={cat}
+                                                        className="text-sm font-medium bg-primary/5 text-primary px-3 py-1 rounded-full border border-primary/10"
+                                                    >
+                                                        {cat}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="h-px bg-slate-200 dark:bg-slate-700" />
+                                    </>
+                                )}
+
+                                {/* Location */}
+                                {project.location && (
+                                    <>
+                                        <div>
+                                            <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 block mb-1">
+                                                {language === 'DE' ? 'Standort' : 'Lieu'}
+                                            </span>
+                                            <p className="text-lg font-medium">{project.location}</p>
+                                        </div>
+                                        <div className="h-px bg-slate-200 dark:bg-slate-700" />
+                                    </>
+                                )}
                             </div>
+
                             <Link
                                 to="/kontakt"
                                 className="block w-full text-center py-5 mt-4 border border-primary text-primary hover:bg-primary hover:text-white rounded-full transition-all uppercase text-xs font-bold tracking-widest"
@@ -138,163 +251,77 @@ const ReferenceDetail = () => {
                         </div>
                     </div>
 
-                    {/* Main Content */}
+                    {/* Main content */}
                     <div className="lg:col-span-8 reveal stagger-1">
                         <div className="prose prose-slate prose-lg dark:prose-invert max-w-none">
                             <h2 className="font-display text-3xl text-primary mb-8">
                                 {language === 'DE' ? 'Herausforderung & Umsetzung' : 'Défi & Mise en oeuvre'}
                             </h2>
-                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6 whitespace-pre-wrap">
-                                {language === 'DE' ? project.challengeDE : project.challengeFR}
-                            </p>
-                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-12 whitespace-pre-wrap">
-                                {language === 'DE' ? project.implementationDE : project.implementationFR}
-                            </p>
+                            {project.description && (
+                                <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6 whitespace-pre-wrap">
+                                    {project.description}
+                                </p>
+                            )}
                         </div>
 
-                        <div className="mt-16 space-y-12">
-                            {/* Before/After Slider */}
-                            <div className="relative w-full h-[600px] overflow-hidden rounded-3xl no-select group shadow-2xl bg-slate-100">
-                                <img
-                                    alt="Nachher"
-                                    className="absolute inset-0 w-full h-full object-cover"
-                                    src={project.afterImage}
-                                />
-                                <span className="absolute top-6 right-6 font-montserrat text-[10px] text-white/90 uppercase tracking-[0.2em] z-10 bg-black/20 backdrop-blur-sm px-3 py-1 rounded">
-                                    {language === 'DE' ? 'NACHHER' : 'APRÈS'}
-                                </span>
-
-                                <div
-                                    className="absolute inset-0 overflow-hidden border-r-2 border-primary/30"
-                                    style={{ width: `${sliderValue}%` }}
-                                >
-                                    <img
-                                        alt="Vorher"
-                                        className="absolute inset-0 w-[800px] md:w-[1200px] lg:w-[1600px] h-full object-cover max-w-none"
-                                        src={project.beforeImage}
-                                    />
-                                    <span className="absolute top-6 left-6 font-montserrat text-[10px] text-white/90 uppercase tracking-[0.2em] z-10 bg-black/20 backdrop-blur-sm px-3 py-1 rounded">
-                                        {language === 'DE' ? 'VORHER' : 'AVANT'}
+                        {/* Before / After Slider — only rendered when both images available */}
+                        {hasBeforeAfter && (
+                            <div className="mt-16">
+                                <div className="relative w-full h-[600px] overflow-hidden rounded-3xl no-select group shadow-2xl bg-slate-100">
+                                    {/* After image (background) */}
+                                    {project.afterImage && (
+                                        <img
+                                            alt="Nachher"
+                                            className="absolute inset-0 w-full h-full object-cover"
+                                            src={project.afterImage}
+                                        />
+                                    )}
+                                    <span className="absolute top-6 right-6 font-montserrat text-[10px] text-white/90 uppercase tracking-[0.2em] z-10 bg-black/20 backdrop-blur-sm px-3 py-1 rounded">
+                                        {language === 'DE' ? 'NACHHER' : 'APRÈS'}
                                     </span>
-                                </div>
 
-                                <div
-                                    className="absolute inset-y-0 -ml-[1px] w-[2px] bg-white cursor-ew-resize z-20"
-                                    style={{ left: `${sliderValue}%` }}
-                                >
-                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-white rounded-full flex items-center justify-center slider-handle-shadow border-4 border-white transition-transform group-hover:scale-105">
-                                        <span className="material-symbols-outlined text-primary text-3xl font-bold select-none">swap_horiz</span>
-                                    </div>
-                                </div>
-
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="100"
-                                    value={sliderValue}
-                                    onChange={(e) => setSliderValue(e.target.value)}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-30"
-                                />
-                            </div>
-
-                            {/* Gallery Carousel */}
-                            <div className="relative group/carousel reveal stagger-2">
-                                <div className="flex items-center justify-between mb-8">
-                                    <h3 className="text-2xl font-display text-primary">
-                                        {language === 'DE' ? 'Projekt-Galerie' : 'Galerie du Projet'}
-                                    </h3>
-                                    <div className="flex gap-4">
-                                        <button
-                                            onClick={prevSlide}
-                                            className="w-12 h-12 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-400 hover:border-primary hover:text-primary transition-all"
+                                    {/* Before image (clipped overlay) */}
+                                    {project.beforeImage && (
+                                        <div
+                                            className="absolute inset-0 overflow-hidden border-r-2 border-primary/30"
+                                            style={{ width: `${sliderValue}%` }}
                                         >
-                                            <span className="material-symbols-outlined">arrow_back</span>
-                                        </button>
-                                        <button
-                                            onClick={nextSlide}
-                                            className="w-12 h-12 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-400 hover:border-primary hover:text-primary transition-all"
-                                        >
-                                            <span className="material-symbols-outlined">arrow_forward</span>
-                                        </button>
-                                    </div>
-                                </div>
+                                            <img
+                                                alt="Vorher"
+                                                className="absolute inset-0 w-[800px] md:w-[1200px] lg:w-[1600px] h-full object-cover max-w-none"
+                                                src={project.beforeImage}
+                                            />
+                                            <span className="absolute top-6 left-6 font-montserrat text-[10px] text-white/90 uppercase tracking-[0.2em] z-10 bg-black/20 backdrop-blur-sm px-3 py-1 rounded">
+                                                {language === 'DE' ? 'VORHER' : 'AVANT'}
+                                            </span>
+                                        </div>
+                                    )}
 
-                                {/* Viewport: clips the sliding track horizontally */}
-                                <div className="overflow-hidden">
-                                    {/* Track: slides horizontally, py-6 gives shadow breathing room */}
+                                    {/* Divider handle */}
                                     <div
-                                        className="flex transition-transform duration-700 ease-in-out py-6"
-                                        style={{ transform: `translateX(-${currentGalleryIndex * 50}%)` }}
+                                        className="absolute inset-y-0 -ml-[1px] w-[2px] bg-white cursor-ew-resize z-20"
+                                        style={{ left: `${sliderValue}%` }}
                                     >
-                                        {project.galleryImages?.map((img, idx) => (
-                                            <div
-                                                key={idx}
-                                                className="min-w-[50%] px-2 md:px-3 cursor-zoom-in"
-                                                onClick={() => openLightbox(idx)}
-                                            >
-                                                {/* Shadow container — no overflow rule so shadow paints freely */}
-                                                <div className="relative aspect-video shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group/img rounded-2xl">
-                                                    {/* Clip container — rounds corners and hides image bleed */}
-                                                    <div className="w-full h-full rounded-2xl overflow-hidden relative bg-slate-100 backface-hidden">
-                                                        <img
-                                                            src={img}
-                                                            alt={`${project.title} - ${idx + 1}`}
-                                                            className="w-full h-full object-cover scale-[1.05] transition-transform duration-700 group-hover/img:scale-[1.15]"
-                                                        />
-                                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
-                                                            <span className="material-symbols-outlined text-white text-4xl">zoom_in</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
+                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-white rounded-full flex items-center justify-center slider-handle-shadow border-4 border-white transition-transform group-hover:scale-105">
+                                            <span className="material-symbols-outlined text-primary text-3xl font-bold select-none">swap_horiz</span>
+                                        </div>
                                     </div>
+
+                                    {/* Range input for dragging */}
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        value={sliderValue}
+                                        onChange={(e) => setSliderValue(Number(e.target.value))}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-30"
+                                    />
                                 </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </section>
-
-            {/* Lightbox */}
-            {isLightboxOpen && (
-                <div className="fixed inset-0 z-[110] bg-black/95 flex items-center justify-center p-6 md:p-12">
-                    <button
-                        onClick={() => setIsLightboxOpen(false)}
-                        className="absolute top-8 right-8 text-white/60 hover:text-white transition-colors"
-                    >
-                        <span className="material-symbols-outlined text-4xl">close</span>
-                    </button>
-
-                    <button
-                        onClick={() => setLightboxIndex((prev) => (prev - 1 + project.galleryImages.length) % project.galleryImages.length)}
-                        className="absolute left-4 md:left-8 text-white/60 hover:text-white transition-colors"
-                    >
-                        <span className="material-symbols-outlined text-5xl">chevron_left</span>
-                    </button>
-
-                    <div className="relative w-full max-w-5xl aspect-video">
-                        <img
-                            src={project.galleryImages[lightboxIndex]}
-                            alt="Project Gallery Large"
-                            className="w-full h-full object-contain"
-                        />
-                    </div>
-
-                    <button
-                        onClick={() => setLightboxIndex((prev) => (prev + 1) % project.galleryImages.length)}
-                        className="absolute right-4 md:right-8 text-white/60 hover:text-white transition-colors"
-                    >
-                        <span className="material-symbols-outlined text-5xl">chevron_right</span>
-                    </button>
-
-                    <div className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white/40 text-sm tracking-widest uppercase">
-                        {lightboxIndex + 1} / {project.galleryImages?.length}
-                    </div>
-                </div>
-            )}
-
-            {/* CTA Section and Footer handled globally in App.jsx */}
         </>
     );
 };

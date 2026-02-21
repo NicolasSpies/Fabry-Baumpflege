@@ -5,7 +5,7 @@ import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useSoftEntrance } from '../hooks/useSoftEntrance';
 import { useServiceCardsEntrance } from '../hooks/useServiceCardsEntrance';
 import { useParallax } from '../hooks/useParallax';
-import { references } from '../data/references';
+import { getLatestReferences, getCategoryMap, mapReferenceCard } from '../lib/cms';
 import ReferenceCard from '../components/ReferenceCard';
 import BaumpflegeIcon from '../components/BaumpflegeIcon';
 import BaumfaellungIcon from '../components/BaumfaellungIcon';
@@ -63,6 +63,29 @@ import homeHeroImg from '../assets/images/hero/vincent-fabry-header3.jpg';
 const Home = () => {
     const { language } = useLanguage();
     useScrollReveal();
+
+    // ── Latest references from CMS ───────────────────────────────────────────
+    const [latestRefs, setLatestRefs] = useState([]);
+    const [refsLoading, setRefsLoading] = useState(true);
+
+    useEffect(() => {
+        async function loadLatest() {
+            try {
+                const [raw, catMap] = await Promise.all([
+                    getLatestReferences(3),
+                    getCategoryMap(),
+                ]);
+                setLatestRefs(raw.map(item => mapReferenceCard(item, catMap)));
+            } catch (err) {
+                console.error('[Home] Failed to load latest references:', err);
+                // Fail gracefully — show empty grid, not a crash
+                setLatestRefs([]);
+            } finally {
+                setRefsLoading(false);
+            }
+        }
+        loadLatest();
+    }, []);
 
     const stats = [
         { value: '35+', label: { DE: 'Zufriedene Kunden', FR: 'Clients satisfaits' } },
@@ -346,9 +369,19 @@ const Home = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {references.slice(0, 3).map((project) => (
-                            <ReferenceCard key={project.id} project={project} language={language} forceSquare={true} />
-                        ))}
+                        {refsLoading ? (
+                            <div className="col-span-3 flex justify-center py-12">
+                                <div className="w-10 h-10 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+                            </div>
+                        ) : latestRefs.length === 0 ? (
+                            <p className="col-span-3 text-center text-slate-400 py-12">
+                                {language === 'DE' ? 'Keine Referenzen gefunden.' : 'Aucune référence trouvée.'}
+                            </p>
+                        ) : (
+                            latestRefs.map((project) => (
+                                <ReferenceCard key={project.id} project={project} language={language} forceSquare={true} />
+                            ))
+                        )}
                     </div>
 
                     <div className="mt-16 text-center reveal">
