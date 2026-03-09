@@ -11,7 +11,7 @@
 // on every request. Do NOT change the path prefix for French — Polylang does
 // not map /fr/wp-json to this REST API.
 //
-const CMS_BASE = '/cms/wp/v2';
+const CMS_BASE = import.meta.env.VITE_API_URL || '/cms/wp/v2';
 
 // ─── Language helpers ─────────────────────────────────────────────────────────
 
