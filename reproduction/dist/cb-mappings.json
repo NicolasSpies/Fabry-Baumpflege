@@ -1,0 +1,157 @@
+{
+  "project": "jio",
+  "publishedAt": "2026-03-16T16:39:44.458Z",
+  "pages": {
+    "_component": {
+      "instances": {}
+    },
+    "Home": {
+      "instances": {
+        "HeroSection": {
+          "component": "HeroSection",
+          "props": {
+            "title_main": {
+              "fieldPath": "customFields.startseite_second_headline",
+              "sourceId": "72rz30oc",
+              "isUnstable": false
+            },
+            "description": {
+              "fieldPath": "customFields.startseite_intro_text_header",
+              "sourceId": "72rz30oc",
+              "isUnstable": false
+            },
+            "image": {
+              "fieldPath": "customFields.startseite_headerbild.url",
+              "sourceId": "72rz30oc",
+              "isUnstable": false
+            },
+            "title_top": {
+              "fieldPath": "customFields.startseite_first_headline",
+              "sourceId": "72rz30oc",
+              "isUnstable": false
+            }
+          }
+        },
+        "ServicesSection": {
+          "component": "ServicesSection",
+          "props": {
+            "label": {
+              "fieldPath": "customFields.startseite_titel_leistungen",
+              "sourceId": "72rz30oc",
+              "isUnstable": false
+            },
+            "title": {
+              "fieldPath": "customFields.startseite_untertitel_leistungen",
+              "sourceId": "72rz30oc",
+              "isUnstable": false
+            }
+          }
+        },
+        "Home": {
+          "component": "Home",
+          "props": {}
+        }
+      }
+    },
+    "AboutMe": {
+      "instances": {
+        "AboutMe": {
+          "component": "AboutMe",
+          "props": {}
+        }
+      }
+    },
+    "TestimonialsSection": {
+      "instances": {
+        "TestimonialCard": {
+          "component": "TestimonialCard",
+          "props": {
+            "rating_raw": {
+              "fieldPath": "customFields.sterne",
+              "sourceId": "3e1h8b0b",
+              "isUnstable": false
+            },
+            "text": {
+              "fieldPath": "customFields.kundenstimme_text",
+              "sourceId": "3e1h8b0b",
+              "isUnstable": false
+            },
+            "author": {
+              "fieldPath": "title",
+              "sourceId": "3e1h8b0b",
+              "isUnstable": false
+            }
+          }
+        }
+      }
+    },
+    "References": {
+      "instances": {
+        "ReferencesGridSection": {
+          "component": "ReferencesGridSection",
+          "props": {
+            "id": {
+              "fieldPath": "customFields.bild_nachher.id",
+              "sourceId": "icfjdb5l",
+              "isUnstable": false
+            },
+            "title": {
+              "fieldPath": "title",
+              "sourceId": "icfjdb5l",
+              "isUnstable": false
+            },
+            "description": {
+              "fieldPath": "customFields.beschreibung",
+              "sourceId": "icfjdb5l",
+              "isUnstable": false
+            },
+            "thumbnailImage": {
+              "fieldPath": "featured_image.url",
+              "sourceId": "icfjdb5l",
+              "isUnstable": false
+            }
+          }
+        }
+      }
+    },
+    "ReferenceDetail": {
+      "instances": {
+        "ReferenceDetailSection": {
+          "component": "ReferenceDetailSection",
+          "props": {
+            "title": {
+              "fieldPath": "title",
+              "sourceId": "icfjdb5l",
+              "isUnstable": false
+            },
+            "description": {
+              "fieldPath": "customFields.beschreibung",
+              "sourceId": "icfjdb5l",
+              "isUnstable": false
+            },
+            "thumbnailImage": {
+              "fieldPath": "featured_image.url",
+              "sourceId": "icfjdb5l",
+              "isUnstable": false
+            },
+            "beforeImage": {
+              "fieldPath": "customFields.bild_vorher.url",
+              "sourceId": "icfjdb5l",
+              "isUnstable": false
+            },
+            "gallery": {
+              "fieldPath": "customFields.galerie[0].url",
+              "sourceId": "icfjdb5l",
+              "isUnstable": false
+            },
+            "afterImage": {
+              "fieldPath": "customFields.bild_nachher.url",
+              "sourceId": "icfjdb5l",
+              "isUnstable": false
+            }
+          }
+        }
+      }
+    }
+  }
+}

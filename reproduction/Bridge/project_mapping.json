@@ -1,0 +1,14 @@
+{
+  "name": "Fabry Baumpflege Flow Configuration",
+  "version": "1.0.0",
+  "paths": {
+    "sources": "./Sources",
+    "bridge": "./Bridge",
+    "output": "./src"
+  },
+  "configurations": {
+    "framework": "vite+react",
+    "cms_proxy": "/cms",
+    "assets_root": "./public"
+  }
+}

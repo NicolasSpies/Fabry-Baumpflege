@@ -1,0 +1,61 @@
+import React, { useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { useParallax } from '@/cms/hooks/useParallax';
+
+
+const AboutSection = ({ 
+    label = "Über uns", 
+    title = "Expertise in Baumpflege", 
+    description = "Wir sind Ihr zuverlässiger Partner für alle Belange rund um den Baum.", 
+    quote = "Qualität ist unser Anspruch.", 
+    cta = "Mehr erfahren", 
+    image, 
+    ctaHref 
+}) => {
+
+const expertiseImgRef = useRef(null);
+    useParallax(expertiseImgRef, { speed: 0.04, maxTravel: 20, scale: 1.1 });
+
+    return (
+        <section className="py-24 px-6 overflow-hidden bg-white dark:bg-surface-dark/50" id="about">
+            <div className="max-w-7xl mx-auto">
+                <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+                    <div className="w-full lg:w-1/2 relative">
+                        <div className="absolute -top-10 -left-10 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -z-10" />
+                        <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
+                            <img
+                                ref={expertiseImgRef}
+                                alt="About"
+                                className="w-full h-[650px] object-cover"
+                                src={image}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent p-10 flex items-end">
+                                <p className="text-white italic font-serif text-2xl border-l-4 border-primary pl-4 drop-shadow-lg">
+                                    {quote}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="w-full lg:w-1/2 space-y-10">
+                        <div className="space-y-4">
+                            <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs block">{label}</span>
+                            <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight reveal">{title}</h2>
+                        </div>
+                        <p className="text-lg leading-[1.8] text-slate-700 dark:text-slate-300 font-sans">{description}</p>
+                        <div className="pt-4">
+                            <Link
+                                to={ctaHref}
+                                className="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all group border-b border-primary/30 pb-1 hover:border-primary"
+                            >
+                                {cta}
+                                <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+export default AboutSection;
