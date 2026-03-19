@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { useParallax } from '@/cms/hooks/useParallax';
+import CmsImage from '@/cms/components/ui/CmsImage';
 
 
 const PhilosophySection = ({ 
@@ -17,11 +18,12 @@ const heroPortraitRef = useRef(null);
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center w-full">
                 <div className="relative order-2 lg:order-1">
                     <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl reveal">
-                        <img
+                        <CmsImage
+                            image={image}
                             ref={heroPortraitRef}
                             alt="Portrait"
                             className="w-full aspect-square object-cover"
-                            src={image}
+                            sizes="(max-width: 1024px) 100vw, 50vw"
                             style={{ transition: 'none' }}
                         />
                     </div>

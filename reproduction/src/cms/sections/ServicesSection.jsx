@@ -6,6 +6,7 @@ import BaumpflegeIcon from '@/cms/components/icons/BaumpflegeIcon';
 import BaumfaellungIcon from '@/cms/components/icons/BaumfaellungIcon';
 import GartenpflegeIcon from '@/cms/components/icons/GartenpflegeIcon';
 import BepflanzungIcon from '@/cms/components/icons/BepflanzungIcon';
+import CmsImage from '@/cms/components/ui/CmsImage';
 
 const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, iconVariant = 'outline' }) => {
     const IconComponent = () => {
@@ -27,7 +28,7 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
                 {/* Visual enhancement: Show service image if available, else show gradient blob */}
                 {image ? (
                     <div className="absolute inset-x-0 bottom-0 top-1/2 opacity-0 group-hover:opacity-10 transition-opacity duration-700">
-                         <img src={image} className="w-full h-full object-cover grayscale" alt="" />
+                         <CmsImage image={image} className="w-full h-full object-cover grayscale" alt="" sizes="(max-width: 1024px) 100vw, 25vw" loading="lazy" />
                     </div>
                 ) : (
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors duration-500"></div>

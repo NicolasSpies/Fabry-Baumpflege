@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useParallax } from '@/cms/hooks/useParallax';
+import CmsImage from '@/cms/components/ui/CmsImage';
 
 const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref }) => {
 
@@ -10,11 +11,13 @@ const heroRef = useRef(null);
     return (
         <section className="relative h-screen w-full overflow-hidden flex items-center">
             <div className="absolute inset-0 z-0">
-                <img
+                <CmsImage
+                    image={image}
                     ref={heroRef}
                     alt="Hero"
                     className="w-full h-[120%] object-cover object-top filter brightness-[0.80] contrast-[1.05]"
-                    src={image}
+                    sizes="100vw"
+                    fetchPriority="high"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
             </div>

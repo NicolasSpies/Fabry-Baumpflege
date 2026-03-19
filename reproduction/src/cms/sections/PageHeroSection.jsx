@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { useParallax } from '@/cms/hooks/useParallax';
+import CmsImage from '@/cms/components/ui/CmsImage';
 
 
 const PageHeroSection = ({ title, image }) => {
@@ -9,11 +10,13 @@ const heroRef = useRef(null);
 
     return (
         <section className="relative h-[60vh] flex items-center justify-center pt-20 overflow-hidden">
-            <img
+            <CmsImage
+                image={image}
                 ref={heroRef}
                 alt="Hero"
                 className="absolute inset-0 w-full h-full object-cover"
-                src={image}
+                sizes="100vw"
+                fetchPriority="high"
             />
             <div className="absolute inset-0 bg-black/30" />
             <div className="relative z-10 text-center reveal">

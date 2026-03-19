@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Icon from '@/cms/components/ui/Icon';
+import CmsImage from '@/cms/components/ui/CmsImage';
 
 const ReferenceContentSection = ({ 
     challengeTitle, 
@@ -25,12 +26,12 @@ const ReferenceContentSection = ({
             {hasBeforeAfter && (
                 <div className="mt-16">
                     <div className="relative w-full h-[600px] overflow-hidden rounded-3xl no-select group shadow-2xl bg-slate-100">
-                        {afterImage && <img alt={afterLabel} className="absolute inset-0 w-full h-full object-cover" src={afterImage} />}
+                        {afterImage && <CmsImage image={afterImage} alt={afterLabel} className="absolute inset-0 w-full h-full object-cover" sizes="(max-width: 1280px) 100vw, 1200px" />}
                         <span className="absolute top-6 right-6 font-sans text-[10px] text-white/90 uppercase tracking-[0.2em] z-10 bg-black/20 backdrop-blur-sm px-3 py-1 rounded">{afterLabel}</span>
 
                         {beforeImage && (
                             <div className="absolute inset-0 overflow-hidden border-r-2 border-primary/30" style={{ width: `${sliderValue}%` }}>
-                                <img alt={beforeLabel} className="absolute inset-0 w-[800px] md:w-[1200px] lg:w-[1600px] h-full object-cover max-w-none" src={beforeImage} />
+                                <CmsImage image={beforeImage} alt={beforeLabel} className="absolute inset-0 w-[800px] md:w-[1200px] lg:w-[1600px] h-full object-cover max-w-none" sizes="(max-width: 1280px) 100vw, 1200px" />
                                 <span className="absolute top-6 left-6 font-sans text-[10px] text-white/90 uppercase tracking-[0.2em] z-10 bg-black/20 backdrop-blur-sm px-3 py-1 rounded">{beforeLabel}</span>
                             </div>
                         )}
@@ -57,10 +58,11 @@ const ReferenceContentSection = ({
                                onClick={() => onOpenLightbox(idx)}
                                className="aspect-square rounded-3xl overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-500 block text-left"
                            >
-                               <img
-                                   src={img}
+                               <CmsImage
+                                   image={img}
                                    alt={`Project Gallery ${idx + 1}`}
                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                   sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
                                    loading="lazy"
                                />
                            </button>

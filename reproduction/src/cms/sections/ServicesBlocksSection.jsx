@@ -5,16 +5,18 @@ import GartenpflegeIcon from '@/cms/components/icons/GartenpflegeIcon';
 import BepflanzungIcon from '@/cms/components/icons/BepflanzungIcon';
 import { useParallax } from '@/cms/hooks/useParallax';
 import Icon from '@/cms/components/ui/Icon';
+import CmsImage from '@/cms/components/ui/CmsImage';
 
 const ServiceImage = ({ src, alt }) => {
     const ref = useRef(null);
     useParallax(ref, { speed: 0.04, maxTravel: 20, scale: 1.1 });
     return (
-        <img
+        <CmsImage
+            image={src}
             ref={ref}
             alt={alt}
             className="w-full h-full object-cover"
-            src={src}
+            sizes="(max-width: 1024px) 100vw, 50vw"
         />
     );
 };

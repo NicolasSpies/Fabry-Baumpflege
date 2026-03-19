@@ -53,6 +53,127 @@ export function decodeHtmlEntities(value) {
         .replace(/&gt;/gi, '>');
 }
 
+function buildResponsiveSourceList(image) {
+    if (!image || typeof image !== 'object') return [];
+
+    const collected = [];
+    const pushSource = (entry, key) => {
+        if (!entry || typeof entry !== 'object' || !entry.url) return;
+        collected.push({
+            key,
+            url: entry.url,
+            width: Number(entry.width) || undefined,
+            height: Number(entry.height) || undefined,
+            mime_type: entry.mime_type || '',
+        });
+    };
+
+    if (image.sources && typeof image.sources === 'object') {
+        Object.entries(image.sources).forEach(([key, entry]) => pushSource(entry, key));
+    }
+
+    if (image.full?.url && !collected.some((entry) => entry.url === image.full.url)) {
+        pushSource(image.full, 'full');
+    }
+
+    if (image.fallback?.url && !collected.some((entry) => entry.url === image.fallback.url)) {
+        pushSource(image.fallback, 'fallback');
+    }
+
+    if (image.src && !collected.some((entry) => entry.url === image.src)) {
+        pushSource(
+            { url: image.src, width: image.width, height: image.height, mime_type: image.mime_type },
+            'src'
+        );
+    }
+
+    return collected
+        .filter((entry) => entry.url)
+        .sort((a, b) => (a.width || Number.MAX_SAFE_INTEGER) - (b.width || Number.MAX_SAFE_INTEGER));
+}
+
+export function normalizeCmsImage(image) {
+    if (!image) return null;
+
+    if (typeof image === 'string') {
+        return {
+            src: image,
+            url: image,
+            srcSet: '',
+            sizes: '',
+            alt: '',
+            width: undefined,
+            height: undefined,
+            full: { url: image },
+            sources: {},
+            fallback: { url: image },
+        };
+    }
+
+    if (typeof image !== 'object' || Array.isArray(image)) return null;
+
+    const sourceList = buildResponsiveSourceList(image);
+    const preferredSource =
+        image.sources?.cc_medium ||
+        image.sources?.cc_large ||
+        image.sources?.cc_small ||
+        image.full ||
+        image.fallback ||
+        sourceList[0] ||
+        null;
+
+    const src =
+        image.src ||
+        image.url ||
+        image.source_url ||
+        preferredSource?.url ||
+        '';
+
+    const width = Number(image.width) || preferredSource?.width;
+    const height = Number(image.height) || preferredSource?.height;
+    const srcSet =
+        image.srcSet ||
+        image.srcset ||
+        sourceList
+            .filter((entry) => entry.width)
+            .map((entry) => `${entry.url} ${entry.width}w`)
+            .join(', ');
+
+    return {
+        ...image,
+        src,
+        url: image.url || src,
+        srcSet,
+        sizes: image.sizes || '',
+        alt: image.alt || '',
+        width,
+        height,
+        full: image.full || (src ? { url: src, width, height } : null),
+        sources: image.sources || {},
+        fallback: image.fallback || (src ? { url: src, width, height } : null),
+    };
+}
+
+export function getCmsImageProps(image, options = {}) {
+    const normalized = normalizeCmsImage(image);
+    if (!normalized?.src) return null;
+
+    const props = {
+        src: normalized.src,
+        alt: options.alt ?? normalized.alt ?? '',
+    };
+
+    if (normalized.srcSet) props.srcSet = normalized.srcSet;
+    if (options.sizes || normalized.sizes) props.sizes = options.sizes || normalized.sizes;
+    if (normalized.width) props.width = normalized.width;
+    if (normalized.height) props.height = normalized.height;
+    if (options.loading) props.loading = options.loading;
+    if (options.decoding) props.decoding = options.decoding;
+    if (options.fetchPriority) props.fetchPriority = options.fetchPriority;
+
+    return props;
+}
+
 function getRootApiBase() {
     const base = String(CMS_API_BASE || '').replace(/\/+$/, '');
 
@@ -480,6 +601,10 @@ export async function prefetchReferenceDetail(id, language = 'DE') {
  */
 export async function resolveMedia(idOrUrl) {
     if (!idOrUrl) return null;
+    const normalized = normalizeCmsImage(idOrUrl);
+    if (normalized?.src && typeof idOrUrl === 'object') {
+        return normalized;
+    }
     if (typeof idOrUrl === 'string' && (idOrUrl.startsWith('http') || idOrUrl.startsWith('data:') || idOrUrl.startsWith('/') || idOrUrl.startsWith('./') || idOrUrl.startsWith('../'))) {
         return idOrUrl;
     }
@@ -507,8 +632,7 @@ export function mapReferenceCard(item, catMap = {}) {
     // then fall back to standard wp:featuredmedia embed.
     const cf = item.customFields || item.acf || item.meta || {};
     const thumbnail =
-        item.featured_image?.url ||
-        item.featured_image?.source_url ||
+        item.featured_image ||
         item._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
         item._embedded?.['wp:featuredmedia']?.[0]?.guid?.rendered ||
         '';

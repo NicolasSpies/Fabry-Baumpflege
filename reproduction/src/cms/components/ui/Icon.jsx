@@ -4,12 +4,14 @@ const Svg = ({ children, className = '', viewBox = '0 0 24 24', fill = 'none', s
     <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox={viewBox}
+        width="1em"
+        height="1em"
         fill={fill}
         stroke={stroke}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
-        className={className}
+        className={`inline-block shrink-0 align-middle ${className}`.trim()}
         aria-hidden="true"
         {...props}
     >

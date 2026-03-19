@@ -317,7 +317,7 @@ function unwrap(v: any): any {
  */
 function extractImageValue(
   resolvedVal: any
-): { url?: string; mediaId?: number; skip?: true } {
+): { url?: string; mediaId?: number; object?: any; skip?: true } {
 
   // ── Case 1: direct string (URL or potentially an ID) ──────────────────────
   if (typeof resolvedVal === 'string') {
@@ -342,6 +342,17 @@ function extractImageValue(
 
   // ── Case 3: media object → extract the best available URL ──────────────────
   if (resolvedVal && typeof resolvedVal === 'object') {
+    if (
+      resolvedVal.src ||
+      resolvedVal.srcSet ||
+      resolvedVal.srcset ||
+      resolvedVal.sources ||
+      resolvedVal.full?.url ||
+      resolvedVal.fallback?.url
+    ) {
+      return { object: resolvedVal };
+    }
+
     const candidate =
       resolvedVal.source_url                           ||
       resolvedVal.url                                  ||
@@ -436,13 +447,31 @@ export function resolveInstanceProps(
         rawVal = resolvePath(fieldPath, normalizedGlobal);
       }
 
+      if (
+        isImageProp(propName) &&
+        typeof rawVal === 'string' &&
+        /\.(url|source_url)$/.test(fieldPath)
+      ) {
+        const parentFieldPath = fieldPath.replace(/\.(url|source_url)$/, '');
+        const parentValue =
+          resolvePath(parentFieldPath, normalizedData) ??
+          (isSharedSource && normalizedGlobal ? resolvePath(parentFieldPath, normalizedGlobal) : null);
+
+        if (parentValue && typeof parentValue === 'object') {
+          rawVal = parentValue;
+        }
+      }
+
       if (isImageProp(propName)) {
         // ── Image prop: robust multi-format extraction ──────────────────────────
         if (Array.isArray(rawVal)) {
           // Gallery / Array of images
           const galleryUrls = rawVal
-            .map(item => extractImageValue(item).url)
-            .filter((url): url is string => !!url);
+            .map(item => {
+              const extracted = extractImageValue(item);
+              return extracted.object || extracted.url || null;
+            })
+            .filter((item) => !!item);
           
           if (galleryUrls.length > 0) {
             resolvedProps[propName] = galleryUrls;
@@ -450,7 +479,9 @@ export function resolveInstanceProps(
         } else {
           // Single image
           const extracted = extractImageValue(rawVal);
-          if (extracted.url) {
+          if (extracted.object) {
+            resolvedProps[propName] = extracted.object;
+          } else if (extracted.url) {
             resolvedProps[propName] = extracted.url;
           }
         }
@@ -506,11 +537,27 @@ export async function resolveInstancePropsAsync(
         rawVal = resolvePath(fieldPath, normalizedGlobal);
       }
 
+      if (
+        isImageProp(propName) &&
+        typeof rawVal === 'string' &&
+        /\.(url|source_url)$/.test(fieldPath)
+      ) {
+        const parentFieldPath = fieldPath.replace(/\.(url|source_url)$/, '');
+        const parentValue =
+          resolvePath(parentFieldPath, normalizedData) ??
+          (isSharedSource && normalizedGlobal ? resolvePath(parentFieldPath, normalizedGlobal) : null);
+
+        if (parentValue && typeof parentValue === 'object') {
+          rawVal = parentValue;
+        }
+      }
+
       if (isImageProp(propName)) {
         if (Array.isArray(rawVal)) {
           // Async Gallery handling
           const galleryPromises = rawVal.map(async (item) => {
             const extracted = extractImageValue(item);
+            if (extracted.object) return extracted.object;
             if (extracted.url) return extracted.url;
             if (extracted.mediaId) return await resolveMedia(extracted.mediaId);
             return null;
@@ -518,7 +565,7 @@ export async function resolveInstancePropsAsync(
           
           asyncTasks.push(
             Promise.all(galleryPromises).then(results => {
-              const validUrls = results.filter((url): url is string => !!url);
+              const validUrls = results.filter((url) => !!url);
               if (validUrls.length > 0) {
                 resolvedProps[propName] = validUrls;
               }
@@ -527,7 +574,9 @@ export async function resolveInstancePropsAsync(
         } else {
           // Single Image Async
           const extracted = extractImageValue(rawVal);
-          if (extracted.url) {
+          if (extracted.object) {
+            resolvedProps[propName] = extracted.object;
+          } else if (extracted.url) {
             resolvedProps[propName] = extracted.url;
           } else if (extracted.mediaId) {
             asyncTasks.push(

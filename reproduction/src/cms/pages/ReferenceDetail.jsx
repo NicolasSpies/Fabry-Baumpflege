@@ -8,6 +8,7 @@ import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
 import { definePreview } from '@/cms/lib/preview';
 import { ReferenceDetailSkeleton } from '@/cms/components/ui/PageSkeleton';
 import Icon from '@/cms/components/ui/Icon';
+import CmsImage from '@/cms/components/ui/CmsImage';
 
 import ReferenceHeroSection from '@/cms/sections/ReferenceHeroSection';
 import ReferenceSidebarSection from '@/cms/sections/ReferenceSidebarSection';
@@ -153,7 +154,7 @@ const ReferenceDetail = () => {
                 const cf = ref.customFields || ref.acf || ref.meta || {};
 
                 const [thumbnail, beforeUrl, afterUrl, resolvedGallery] = await Promise.all([
-                    resolveMedia(ref.featured_image?.url || ref.featured_image?.source_url || ref._embedded?.['wp:featuredmedia']?.[0]?.source_url || null),
+                    resolveMedia(ref.featured_image || ref._embedded?.['wp:featuredmedia']?.[0]?.source_url || null),
                     resolveMedia(cf.bild_vorher || ref.acf?.before_image),
                     resolveMedia(cf.bild_nachher || ref.acf?.after_image),
                     Promise.all((cf.galerie || ref.acf?.gallery || []).map(img => resolveMedia(img)))
@@ -347,10 +348,11 @@ const ReferenceDetail = () => {
                     )}
 
                     <div className="relative max-w-5xl w-full h-full flex items-center justify-center">
-                        <img 
-                            src={projectGallery[activeImageIndex]} 
+                        <CmsImage
+                            image={projectGallery[activeImageIndex]}
                             alt="Project Gallery"
                             className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-500"
+                            sizes="100vw"
                             onClick={(e) => e.stopPropagation()}
                         />
                         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 text-xs tracking-widest uppercase font-medium">

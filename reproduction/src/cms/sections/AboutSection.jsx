@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useParallax } from '@/cms/hooks/useParallax';
 import Icon from '@/cms/components/ui/Icon';
+import CmsImage from '@/cms/components/ui/CmsImage';
 
 
 const AboutSection = ({ 
@@ -24,11 +25,12 @@ const expertiseImgRef = useRef(null);
                     <div className="w-full lg:w-1/2 relative">
                         <div className="absolute -top-10 -left-10 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -z-10" />
                         <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
-                            <img
+                            <CmsImage
+                                image={image}
                                 ref={expertiseImgRef}
                                 alt="About"
                                 className="w-full h-[650px] object-cover"
-                                src={image}
+                                sizes="(max-width: 1024px) 100vw, 50vw"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent p-10 flex items-end">
                                 <p className="text-white italic font-serif text-2xl border-l-4 border-primary pl-4 drop-shadow-lg">

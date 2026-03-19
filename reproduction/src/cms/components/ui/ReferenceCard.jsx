@@ -5,6 +5,7 @@ import { useLanguage } from '@/cms/i18n/useLanguage';
 import { resolveInstanceProps } from '@/cms/bridge-resolver';
 import { prefetchReferenceDetail } from '@/cms/lib/cms';
 import Icon from '@/cms/components/ui/Icon';
+import CmsImage from '@/cms/components/ui/CmsImage';
 
 const preloadReferenceDetailPage = () => import('@/cms/pages/ReferenceDetail');
 
@@ -58,10 +59,12 @@ const ReferenceCard = ({ id, title, description, location, thumbnailImage, anima
             style={animateEntry ? { animationDelay: `${staggerIndex * 0.1}s` } : {}}
         >
             <div className="relative w-full overflow-hidden aspect-[4/5] sm:aspect-square">
-                <img
+                <CmsImage
+                    image={props.thumbnailImage}
                     alt={props.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    src={props.thumbnailImage}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-primary/70 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 text-white" style={{ willChange: 'opacity' }}>
                     <span className="text-[10px] uppercase tracking-widest mb-2 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-100">

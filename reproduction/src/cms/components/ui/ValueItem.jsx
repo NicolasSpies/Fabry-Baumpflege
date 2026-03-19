@@ -1,15 +1,17 @@
 import React, { useRef } from 'react';
 import { useParallax } from '@/cms/hooks/useParallax';
+import CmsImage from '@/cms/components/ui/CmsImage';
 
 const ParallaxImage = ({ src, alt, className = "", speed = 0.04, maxTravel = 24 }) => {
     const ref = useRef(null);
     useParallax(ref, { speed, maxTravel, scale: 1.15 });
     return (
-        <img
+        <CmsImage
+            image={src}
             ref={ref}
             alt={alt}
             className={`w-full h-full object-cover ${className}`}
-            src={src}
+            sizes="(max-width: 768px) 100vw, 33vw"
         />
     );
 };
