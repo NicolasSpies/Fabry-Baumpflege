@@ -23,7 +23,7 @@ const ReferenceSidebarSection = ({
                     <>
                         <div>
                             <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 block mb-1">{dateLabel}</span>
-                            <p className="text-base md:text-lg font-medium">{dateValue}</p>
+                            <p className="text-base font-medium">{dateValue}</p>
                         </div>
                         <div className="h-px bg-slate-200 dark:bg-slate-700" />
                     </>
@@ -45,7 +45,7 @@ const ReferenceSidebarSection = ({
                     <>
                         <div>
                             <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 block mb-1">{locationLabel}</span>
-                            <p className="text-base md:text-lg font-medium">{locationValue}</p>
+                            <p className="text-base font-medium">{locationValue}</p>
                         </div>
                         <div className="h-px bg-slate-200 dark:bg-slate-700" />
                     </>

@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { useSoftEntrance } from '@/cms/hooks/useSoftEntrance';
 
 const ServicesIntroSection = ({
+    title,
     description,
 }) => {
     const sectionRef = useRef(null);
@@ -11,7 +12,12 @@ const ServicesIntroSection = ({
         <section className="pt-6 md:pt-8 pb-6 md:pb-8 px-4 md:px-6 text-center bg-white overflow-hidden">
             <div ref={sectionRef} className="max-w-7xl mx-auto">
                 <div className="space-y-6 soft-entrance-item">
-                    <p className="text-base md:text-lg opacity-90 max-w-2xl mx-auto leading-relaxed text-slate-600">
+                    {title ? (
+                        <h1 className="font-serif text-primary leading-[0.95] md:leading-[0.95] text-[2.75rem] md:text-[5rem] lg:text-[6.5rem] font-bold tracking-tight">
+                            {title}
+                        </h1>
+                    ) : null}
+                    <p className="text-base opacity-90 max-w-2xl mx-auto leading-relaxed text-slate-600">
                         {description}
                     </p>
                 </div>

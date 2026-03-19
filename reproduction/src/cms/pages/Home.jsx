@@ -8,6 +8,7 @@ import { definePreview } from '@/cms/lib/preview';
 // ── Sections ────────────────────────────────────────────────────────────────
 import HeroSection from '@/cms/sections/HeroSection';
 import StatsSection from '@/cms/sections/StatsSection';
+import HomeIntroSection from '@/cms/sections/HomeIntroSection';
 import ServicesSection from '@/cms/sections/ServicesSection';
 import ReferencesSection from '@/cms/sections/ReferencesSection';
 import TestimonialsSection from '@/cms/sections/TestimonialsSection';
@@ -31,6 +32,10 @@ export const previewData = definePreview({
         {
             section: 'StatsSection',
             fields: ['stat1_value', 'stat1_label', 'stat2_value', 'stat2_label', 'stat3_value', 'stat3_label', 'stat4_value', 'stat4_label']
+        },
+        {
+            section: 'HomeIntroSection',
+            fields: ['title', 'description']
         },
         {
             section: 'ServicesSection',
@@ -85,13 +90,13 @@ const Home = () => {
             services: {
                 ...content.services,
                 s1_title: content.services.s1_title || cf.titel_leistung_1 || '',
-                s1_description: content.services.s1_description || cf.beschreibung_leistung_1 || '',
+                s1_description: content.services.s1_description || cf.zusammenfassung_baumpflege || cf.beschreibung_leistung_1 || '',
                 s2_title: content.services.s2_title || cf.titel_leistung_2 || '',
-                s2_description: content.services.s2_description || cf.beschreibung_leistung_2 || '',
+                s2_description: content.services.s2_description || cf.zusammenfassung_baumfllung || cf.beschreibung_leistung_2 || '',
                 s3_title: content.services.s3_title || cf.titel_leistung_3 || '',
-                s3_description: content.services.s3_description || cf.beschreibung_leistung_3 || '',
+                s3_description: content.services.s3_description || cf.zusammenfassung_gartenpflege || cf.beschreibung_leistung_3 || '',
                 s4_title: content.services.s4_title || cf.titel_leistung_4 || '',
-                s4_description: content.services.s4_description || cf.beschreibung_leistung_4 || '',
+                s4_description: content.services.s4_description || cf.zusammenfassung_bepflanzung || cf.beschreibung_leistung_4 || '',
             },
         };
     };
@@ -110,6 +115,10 @@ const Home = () => {
             stat2_value: '', stat2_label: '',
             stat3_value: '', stat3_label: '',
             stat4_value: '', stat4_label: '',
+        },
+        intro: {
+            title: '',
+            description: '',
         },
         services: {
             label: '',
@@ -289,11 +298,16 @@ const Home = () => {
             {/* Page: Home → Section: StatsSection */}
             <StatsSection {...getProps('StatsSection', pageData.stats)} compact={true} />
 
+            {/* Page: Home → Section: HomeIntroSection */}
+            <HomeIntroSection {...getProps('HomeIntroSection', pageData.intro)} />
+
             {/* Page: Home → Section: ServicesSection */}
             <ServicesSection
                 {...getProps('ServicesSection', pageData.services)}
                 getServiceHref={(id) => `${getLocalizedPath('services', language)}#${id}`}
                 ctaLabel={t('expertise.learn_more')}
+                viewAllLabel={t('nav.services')}
+                allServicesHref={getLocalizedPath('services', language)}
                 iconVariant="outline"
             />
 

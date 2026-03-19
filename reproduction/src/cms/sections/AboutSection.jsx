@@ -44,7 +44,7 @@ const expertiseImgRef = useRef(null);
                             <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs block">{label}</span>
                             <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight reveal">{title}</h2>
                         </div>
-                        <p className="text-lg leading-[1.8] text-slate-700 dark:text-slate-300 font-sans">{description}</p>
+                        <p className="text-base leading-[1.8] text-slate-700 dark:text-slate-300 font-sans">{description}</p>
                         <div className="pt-4">
                             <Link
                                 to={ctaHref}

@@ -7,6 +7,7 @@ import BaumfaellungIcon from '@/cms/components/icons/BaumfaellungIcon';
 import GartenpflegeIcon from '@/cms/components/icons/GartenpflegeIcon';
 import BepflanzungIcon from '@/cms/components/icons/BepflanzungIcon';
 import CmsImage from '@/cms/components/ui/CmsImage';
+import Icon from '@/cms/components/ui/Icon';
 
 function renderServiceIcon(icon, iconVariant) {
     switch (icon) {
@@ -74,6 +75,8 @@ const ServicesSection = ({
     label,
     title,
     ctaLabel = '',
+    viewAllLabel = '',
+    allServicesHref = '',
     iconVariant = 'outline',
     getServiceHref,
     // Use aligned sX_ prefixing to match ServicesBlocksSection
@@ -209,6 +212,17 @@ const ServicesSection = ({
                         />
                     </div>
                 </div>
+                {viewAllLabel && allServicesHref ? (
+                    <div className="text-center mt-16">
+                        <Link
+                            to={allServicesHref}
+                            className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm uppercase tracking-widest"
+                        >
+                            {viewAllLabel}
+                            <Icon name="arrow_forward" className="text-sm" />
+                        </Link>
+                    </div>
+                ) : null}
             </div>
         </section>
     );

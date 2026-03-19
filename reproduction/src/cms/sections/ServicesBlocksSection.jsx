@@ -61,7 +61,7 @@ const ServiceBlockInternal = ({ id, title, description, list, image, reverse, to
                             </div>
                         </div>
                         {description && (
-                            <p className="max-w-[34rem] text-[1.05rem] md:text-[1.1rem] lg:text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                            <p className="max-w-[34rem] text-base leading-relaxed text-slate-600 dark:text-slate-400">
                                 {description}
                             </p>
                         )}

@@ -20,7 +20,7 @@ export const previewData = definePreview({
     sections: [
         {
             section: 'ServicesIntroSection',
-            fields: ['title']
+            fields: ['title', 'description']
         },
         {
             section: 'ServicesBlocksSection',
@@ -68,9 +68,9 @@ const Services = () => {
     };
 
     const getInitialContent = () => ({
-        hero: {
+        intro: {
             title: '',
-            image: '',
+            description: '',
         },
         blocks: {
             s1_title: '', s1_description: '', s1_list: [], s1_image: '',
@@ -129,9 +129,7 @@ const Services = () => {
 
     return (
         <main className="pt-28">
-            <ServicesIntroSection
-                description={t('services.page_intro')}
-            />
+            <ServicesIntroSection {...getProps('ServicesIntroSection', pageData.intro)} />
 
             {/* Combined Static Service Blocks */}
             <ServicesBlocksSection {...getProps('ServicesBlocksSection', pageData.blocks)} />

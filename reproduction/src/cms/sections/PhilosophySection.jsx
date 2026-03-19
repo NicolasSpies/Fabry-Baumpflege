@@ -38,7 +38,7 @@ const PhilosophySection = ({
                     <h2 className="text-[2.1rem] sm:text-5xl lg:text-6xl font-serif text-primary mb-5 md:mb-12 leading-[1.02] italic">
                         {quote}
                     </h2>
-                    <p className="max-w-[34rem] text-[1rem] md:text-xl leading-[1.7] text-slate-600 dark:text-slate-400 font-light">
+                    <p className="max-w-[34rem] text-base leading-[1.7] text-slate-600 dark:text-slate-400 font-light">
                         {text}
                     </p>
                 </div>

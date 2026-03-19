@@ -12,12 +12,12 @@
           "component": "HeroSection",
           "props": {
             "title_top": {
-              "fieldPath": "customFields.startseite_first_headline",
+              "fieldPath": "customFields.startseite_first_headline_h1",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },
             "title_main": {
-              "fieldPath": "customFields.startseite_second_headline",
+              "fieldPath": "customFields.startseite_second_headline_h1",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },
@@ -38,6 +38,21 @@
             },
             "ctaHref": {
               "fieldPath": "customFields.startseite_header_button.url",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
+        "HomeIntroSection": {
+          "component": "HomeIntroSection",
+          "props": {
+            "title": {
+              "fieldPath": "customFields.h2_titel_startseite",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "description": {
+              "fieldPath": "customFields.startseite_intro_beschreibung",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             }

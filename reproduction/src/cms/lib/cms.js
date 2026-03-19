@@ -158,21 +158,32 @@ export function getCmsImageProps(image, options = {}) {
     const normalized = normalizeCmsImage(image);
     if (!normalized?.src) return null;
 
+    const preferredMediumSource =
+        normalized.sources?.cc_medium ||
+        normalized.sources?.cc_large ||
+        normalized.full ||
+        normalized.fallback ||
+        null;
     const preferredMobileSource =
         normalized.sources?.cc_small ||
         normalized.fallback ||
         normalized.full ||
         null;
+    const lockToMediumMobile = Boolean(options.preferMedium && options.preferSmall && preferredMediumSource?.url);
     const lockToSmallMobile = Boolean(options.preferSmall && preferredMobileSource?.url);
-    const activeSource = lockToSmallMobile ? preferredMobileSource : normalized;
+    const activeSource = lockToMediumMobile
+        ? preferredMediumSource
+        : lockToSmallMobile
+            ? preferredMobileSource
+            : normalized;
 
     const props = {
         src: activeSource.url || activeSource.src || normalized.src,
         alt: options.alt ?? normalized.alt ?? '',
     };
 
-    if (!lockToSmallMobile && normalized.srcSet) props.srcSet = normalized.srcSet;
-    if (!lockToSmallMobile && (options.sizes || normalized.sizes)) {
+    if (!lockToSmallMobile && !lockToMediumMobile && normalized.srcSet) props.srcSet = normalized.srcSet;
+    if (!lockToSmallMobile && !lockToMediumMobile && (options.sizes || normalized.sizes)) {
         props.sizes = options.sizes || normalized.sizes;
     }
     if (activeSource.width || normalized.width) props.width = activeSource.width || normalized.width;

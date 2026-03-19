@@ -29,6 +29,7 @@ const PageHeroSection = ({ title, image }) => {
                 image={image}
                 ref={heroRef}
                 alt=""
+                preferMediumSource
                 className="absolute inset-0 w-full h-full object-cover"
                 sizes="100vw"
                 loading="eager"

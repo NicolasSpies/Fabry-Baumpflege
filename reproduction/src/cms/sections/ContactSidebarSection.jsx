@@ -35,7 +35,7 @@ return (
                                 {address_link ? (
                                     <a href={address_link} target="_blank" rel="noopener noreferrer" className="text-base md:text-lg lg:text-[1.02rem] font-sans text-slate-700 dark:text-slate-200 leading-relaxed hover:text-primary break-words lg:whitespace-nowrap">{address}</a>
                                 ) : (
-                                    <p className="text-base md:text-lg lg:text-[1.02rem] font-sans text-slate-700 dark:text-slate-200 leading-relaxed break-words lg:whitespace-nowrap">{address}</p>
+                                    <p className="text-base font-sans text-slate-700 dark:text-slate-200 leading-relaxed break-words lg:whitespace-nowrap">{address}</p>
                                 )}
                             </li>
                         )}

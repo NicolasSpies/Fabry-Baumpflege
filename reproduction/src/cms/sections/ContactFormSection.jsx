@@ -446,7 +446,7 @@ const ContactFormSection = ({
                                             <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/80">
                                                 {messages.successTitle}
                                             </p>
-                                            <p className="mt-1 text-base md:text-lg font-medium text-white">
+                                            <p className="mt-1 text-base font-medium text-white">
                                                 {submitMessage}
                                             </p>
                                         </div>
