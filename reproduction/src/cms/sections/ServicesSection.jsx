@@ -7,41 +7,13 @@ import BaumfaellungIcon from '@/cms/components/icons/BaumfaellungIcon';
 import GartenpflegeIcon from '@/cms/components/icons/GartenpflegeIcon';
 import BepflanzungIcon from '@/cms/components/icons/BepflanzungIcon';
 
-const ServiceCardInternal = ({ title, description, icon, href, image }) => {
-    // Detect if title contains combined content and description is missing or using a default fallback
-    let displayTitle = title;
-    let displayDescription = description;
-
-    // Check if the current description matches any of the known default/fallback strings
-    const fallbacks = [
-        "Pflege für vitale & sichere Bäume",
-        "Sichere Fällung in jeder Lage",
-        "Ihr Garten in besten Händen",
-        "Gezielte Auswahl für langlebiges Grün",
-        "Detaillierte Projektbeschreibung...",
-        "Your garden in best hands"
-    ];
-    const isFallback = !description || fallbacks.some(f => description.includes(f));
-
-    if (title && isFallback) {
-        // Try splitting by common separators like ' – ' or ' - '
-        if (title.includes(' – ')) {
-            const [t, ...rest] = title.split(' – ');
-            displayTitle = t;
-            displayDescription = rest.join(' – ');
-        } else if (title.includes(' - ')) {
-            const [t, ...rest] = title.split(' - ');
-            displayTitle = t;
-            displayDescription = rest.join(' - ');
-        }
-    }
-
+const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, iconVariant = 'outline' }) => {
     const IconComponent = () => {
         switch (icon) {
-            case 'BaumpflegeIcon': return <BaumpflegeIcon className="w-6 h-6 fill-current" />;
-            case 'BaumfaellungIcon': return <BaumfaellungIcon className="w-6 h-6 fill-current" />;
-            case 'GartenpflegeIcon': return <GartenpflegeIcon className="w-6 h-6 fill-current" />;
-            case 'BepflanzungIcon': return <BepflanzungIcon className="w-6 h-6 fill-current" />;
+            case 'BaumpflegeIcon': return <BaumpflegeIcon variant={iconVariant} className="w-6 h-6" />;
+            case 'BaumfaellungIcon': return <BaumfaellungIcon variant={iconVariant} className="w-6 h-6" />;
+            case 'GartenpflegeIcon': return <GartenpflegeIcon variant={iconVariant} className="w-6 h-6" />;
+            case 'BepflanzungIcon': return <BepflanzungIcon variant={iconVariant} className="w-6 h-6" />;
             default: return null;
         }
     };
@@ -66,16 +38,17 @@ const ServiceCardInternal = ({ title, description, icon, href, image }) => {
                         <IconComponent />
                     </div>
                     <h3 className="text-2xl font-serif text-primary mb-4 group-hover:text-[#3E5F25] dark:group-hover:text-primary transition-colors">
-                        {displayTitle}
+                        {title}
                     </h3>
-                    <p className="text-slate-600 dark:text-slate-400 text-[0.9375rem] leading-relaxed font-sans mb-8 flex-grow">
-                        {displayDescription}
-                    </p>
+                    {description && (
+                        <p className="text-slate-600 dark:text-slate-400 text-[0.9375rem] leading-relaxed font-sans mb-8 flex-grow">
+                            {description}
+                        </p>
+                    )}
                     <div className="flex items-center text-primary font-bold text-xs tracking-[0.15em] uppercase mt-auto">
-                        <span className="mr-2 group-hover:mr-4 transition-all duration-300">
-                            LEARN MORE
+                        <span>
+                            {ctaLabel}
                         </span>
-                        <span className="material-symbols-outlined text-base">arrow_forward</span>
                     </div>
                 </div>
             </Link>
@@ -84,8 +57,10 @@ const ServiceCardInternal = ({ title, description, icon, href, image }) => {
 };
 
 const ServicesSection = ({ 
-    label = "Unsere Leistungen", 
-    title = "Baumpflege & Forstarbeiten",
+    label,
+    title,
+    ctaLabel = '',
+    iconVariant = 'outline',
     getServiceHref,
     page = 'Home',
     section = 'ServicesSection',
@@ -119,38 +94,46 @@ const ServicesSection = ({
                 <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-6">
                     <div className="soft-entrance-item">
                         <ServiceCardInternal
-                            title={s1_title || "Baumpflege"}
-                            description={s1_description || "Pflege für vitale & sichere Bäume"}
+                            title={s1_title}
+                            description={s1_description}
                             icon={s1_icon}
                             href={getHref(s1_id)}
                             image={s1_image}
+                            ctaLabel={ctaLabel}
+                            iconVariant={iconVariant}
                         />
                     </div>
                     <div className="soft-entrance-item">
                         <ServiceCardInternal
-                            title={s2_title || "Baumfällung"}
-                            description={s2_description || "Sichere Fällung in jeder Lage"}
+                            title={s2_title}
+                            description={s2_description}
                             icon={s2_icon}
                             href={getHref(s2_id)}
                             image={s2_image}
+                            ctaLabel={ctaLabel}
+                            iconVariant={iconVariant}
                         />
                     </div>
                     <div className="soft-entrance-item">
                         <ServiceCardInternal
-                            title={s3_title || "Gartenpflege"}
-                            description={s3_description || "Ihr Garten in besten Händen"}
+                            title={s3_title}
+                            description={s3_description}
                             icon={s3_icon}
                             href={getHref(s3_id)}
                             image={s3_image}
+                            ctaLabel={ctaLabel}
+                            iconVariant={iconVariant}
                         />
                     </div>
                     <div className="soft-entrance-item">
                         <ServiceCardInternal
-                            title={s4_title || "Bepflanzung"}
-                            description={s4_description || "Gezielte Auswahl für langlebiges Grün"}
+                            title={s4_title}
+                            description={s4_description}
                             icon={s4_icon}
                             href={getHref(s4_id)}
                             image={s4_image}
+                            ctaLabel={ctaLabel}
+                            iconVariant={iconVariant}
                         />
                     </div>
                 </div>

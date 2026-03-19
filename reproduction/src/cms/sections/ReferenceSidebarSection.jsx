@@ -2,15 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const ReferenceSidebarSection = ({ 
-    title = "Projekt-Details",
-    dateLabel = "Datum",
+    title = '',
+    dateLabel = '',
     dateValue,
-    serviceLabel = "Leistung",
+    serviceLabel = '',
     categories = [],
-    locationLabel = "Standort",
+    locationLabel = '',
     locationValue,
-    ctaLabel = "Ähnliches Projekt anfragen",
-    ctaLink = "/kontakt"
+    ctaLabel = '',
+    ctaLink = '/kontakt'
 }) => {
     return (
         <div className="bg-surface-light dark:bg-surface-dark p-10 rounded-3xl space-y-8">

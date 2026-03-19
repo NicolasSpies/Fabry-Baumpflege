@@ -1,10 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
 import ReferenceCard from '@/cms/components/ui/ReferenceCard';
+import Icon from '@/cms/components/ui/Icon';
 
 
 const ReferencesSection = ({ 
-    label = "Referenzen", 
-    title = "Unsere Projekte", 
+    label,
+    title,
     view_all = "Alle Projekte ansehen", 
     items = [], 
     language = "de", 
@@ -45,7 +46,7 @@ const ReferencesSection = ({
                             className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm uppercase tracking-widest"
                         >
                             {view_all}
-                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                            <Icon name="arrow_forward" className="text-sm" />
                         </a>
                     </div>
                 )}

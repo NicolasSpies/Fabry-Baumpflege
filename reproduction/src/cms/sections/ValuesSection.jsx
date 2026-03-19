@@ -2,14 +2,14 @@ import React from 'react';
 import ValueItem from '@/cms/components/ui/ValueItem';
 
 const ValuesSection = ({ 
-    val1_title = "Präzision", 
-    val1_text = "Jeder Schnitt zählt", 
+    val1_title,
+    val1_text,
     val1_image,
-    val2_title = "Nachhaltigkeit", 
-    val2_text = "Für künftige Generationen", 
+    val2_title,
+    val2_text,
     val2_image,
-    val3_title = "Expertise", 
-    val3_text = "Fundiertes Fachwissen", 
+    val3_title,
+    val3_text,
     val3_image,
     page = 'AboutMe',
     section = 'ValuesSection'

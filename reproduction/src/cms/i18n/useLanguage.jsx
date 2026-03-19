@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { translations } from './translations';
 import { ROUTES } from './routes';
@@ -12,8 +12,7 @@ export function getLangFromPath(path) {
     return path.startsWith('/fr') ? 'FR' : 'DE';
 }
 
-/** Map a pathname + source language + target language to the corresponding target path.
- *  Only handles static routes. Detail pages must use pll_translations for resolution. */
+/** Map a pathname + source language + target language to the corresponding target path. */
 function mapPathToTargetLang(currentPath, currentLang, targetLang) {
     const targetRoutes = ROUTES[targetLang];
     const currentRoutes = ROUTES[currentLang];
@@ -29,6 +28,13 @@ function mapPathToTargetLang(currentPath, currentLang, targetLang) {
         }
     }
 
+    const currentDetailBase = normalize(currentRoutes.referenceDetail.split('/:')[0]);
+    if (normalizedCurrent === currentDetailBase || normalizedCurrent.startsWith(`${currentDetailBase}/`)) {
+        const slug = normalizedCurrent.slice(currentDetailBase.length).replace(/^\//, '');
+        const targetDetailBase = normalize(targetRoutes.referenceDetail.split('/:')[0]);
+        return slug ? `${targetDetailBase}/${slug}` : targetDetailBase;
+    }
+
     // Fallback to home for unknown paths
     return targetLang === 'FR' ? '/fr' : '/';
 }
@@ -41,9 +47,6 @@ export function LanguageProvider({ children }) {
 
     // Language is always derived from URL — never from localStorage or state alone
     const [language, setLanguageState] = useState(() => getLangFromPath(window.location.pathname));
-
-    // Ref to an async handler registered by the active ReferenceDetail component.
-    const detailSwitchRef = useRef(null);
 
     // Global CMS data (e.g., Site Options, Startseite data) shared across pages
     const [globalCmsData, setGlobalCmsData] = useState(null);
@@ -62,39 +65,20 @@ export function LanguageProvider({ children }) {
         return translations[langCode]?.[key] ?? translations['de']?.[key] ?? key;
     }, [language]);
 
-    // setLanguage — navigates to the correct route.
-    // On detail pages, delegates to the registered detailSwitchRef handler so
-    // ReferenceDetail can perform pll_translations resolution first.
+    // setLanguage — navigates to the corresponding localized route and preserves detail ids.
     const setLanguage = useCallback((newLang) => {
         if (newLang === language) return;
-
-        if (detailSwitchRef.current) {
-            // Let ReferenceDetail handle navigation via pll_translations
-            detailSwitchRef.current(newLang);
-            return;
-        }
 
         // Static routes — map to the corresponding target language path
         const targetPath = mapPathToTargetLang(location.pathname, language, newLang);
         navigate(targetPath);
     }, [language, location.pathname, navigate]);
 
-    // registerDetailSwitch / unregisterDetailSwitch — called by ReferenceDetail
-    // to intercept language switches while a reference is loaded.
-    const registerDetailSwitch = useCallback((handler) => {
-        detailSwitchRef.current = handler;
-    }, []);
-    const unregisterDetailSwitch = useCallback(() => {
-        detailSwitchRef.current = null;
-    }, []);
-
     return (
         <LanguageContext.Provider value={{ 
             language, 
             setLanguage, 
             t, 
-            registerDetailSwitch, 
-            unregisterDetailSwitch,
             globalCmsData,
             setGlobalCmsData
         }}>

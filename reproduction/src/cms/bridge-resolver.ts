@@ -218,6 +218,25 @@ function normalizeUrl(v: string): string {
   }
 }
 
+function decodeHtmlEntities(value: string): string {
+  if (!value || !value.includes('&')) return value;
+
+  if (typeof document !== 'undefined') {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = value;
+    return textarea.value;
+  }
+
+  return value
+    .replace(/&#8211;|&#x2013;/gi, '–')
+    .replace(/&#8212;|&#x2014;/gi, '—')
+    .replace(/&#038;|&amp;/gi, '&')
+    .replace(/&#039;|&apos;/gi, "'")
+    .replace(/&quot;/gi, '"')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>');
+}
+
 /**
  * RICH OBJECT UNWRAPPER (Recursive & Semantic)
  */
@@ -231,7 +250,7 @@ function unwrap(v: any): any {
 
   // 2. Handle general strings (URLs, etc.)
   if (typeof v === 'string') {
-    return normalizeUrl(v);
+    return decodeHtmlEntities(normalizeUrl(v));
   }
 
   if (typeof v !== 'object') return v;
@@ -267,11 +286,11 @@ function unwrap(v: any): any {
   // B. Single wrappers
   if (url && !text) return normalizeUrl(url);
   if (text && !url && !link) {
-    if (v.rendered && typeof v.rendered === 'string') return v.rendered;
+    if (v.rendered && typeof v.rendered === 'string') return decodeHtmlEntities(v.rendered);
     if (Object.keys(v).length <= 5) return text;
     return v;
   }
-  if (v.rendered && typeof v.rendered === 'string') return v.rendered;
+  if (v.rendered && typeof v.rendered === 'string') return decodeHtmlEntities(v.rendered);
 
   return v;
 }
@@ -364,6 +383,12 @@ function isImageProp(propName: string): boolean {
   );
 }
 
+function isEmptyValue(value: any): boolean {
+  if (value === undefined || value === null || value === '') return true;
+  if (Array.isArray(value)) return value.length === 0;
+  return false;
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
@@ -398,7 +423,6 @@ export function resolveInstanceProps(
     Object.entries(instanceMapping.props).forEach(([propName, mapping]: [string, any]) => {
       const fieldPath = mapping?.fieldPath;
       if (!fieldPath) return;
-
       // Smart Fallback Detection:
       // If sourceId is '39fpj02s' (Options) or 'nnnd3pjq' (Home/Startseite),
       // this property is intended to be a site-wide shared value.
@@ -475,7 +499,6 @@ export async function resolveInstancePropsAsync(
     Object.entries(instanceMapping.props).forEach(([propName, mapping]: [string, any]) => {
       const fieldPath = mapping?.fieldPath;
       if (!fieldPath) return;
-
       const isSharedSource = mapping.sourceId === '39fpj02s' || mapping.sourceId === 'nnnd3pjq';
       let rawVal = resolvePath(fieldPath, normalizedData);
 

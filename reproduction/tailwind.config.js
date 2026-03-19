@@ -23,7 +23,6 @@ export default {
             fontFamily: {
                 display: ["Playfair Display", "serif"],
                 sans: ["Inter", "sans-serif"],
-                montserrat: ["Montserrat", "sans-serif"],
             },
             borderRadius: {
                 DEFAULT: "0.5rem",

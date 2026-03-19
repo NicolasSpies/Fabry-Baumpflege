@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { ROUTES } from '@/cms/i18n/routes';
-import { PLLCode, getReferenceBySlug, getTermsByIds, resolveMedia, getReferenceById } from '@/cms/lib/cms';
+import { getReferenceById, getTermsByIds, resolveMedia, decodeHtmlEntities } from '@/cms/lib/cms';
 import { resolveInstanceProps, resolveInstancePropsAsync } from '@/cms/bridge-resolver';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
 import { definePreview } from '@/cms/lib/preview';
+import { ReferenceDetailSkeleton } from '@/cms/components/ui/PageSkeleton';
+import Icon from '@/cms/components/ui/Icon';
 
 import ReferenceHeroSection from '@/cms/sections/ReferenceHeroSection';
 import ReferenceSidebarSection from '@/cms/sections/ReferenceSidebarSection';
@@ -35,10 +37,9 @@ export const previewData = definePreview({
     source: '/cms/wp/v2/references?_embed=1&per_page=1'
 });
 
-const ReferenceDetail = (props) => {
+const ReferenceDetail = () => {
     const { slug } = useParams();
-    const { language, t, registerDetailSwitch, unregisterDetailSwitch } = useLanguage();
-    const navigate = useNavigate();
+    const { language, t } = useLanguage();
 
     // ─── State ───────────────────────────────────────────────────────────────
     const [status, setStatus] = useState('loading');  // 'loading' | 'ready' | 'error' | 'notfound'
@@ -50,25 +51,25 @@ const ReferenceDetail = (props) => {
     // ─── Data Resolution ─────────────────────────────────────────────────────
     const getLocalContent = () => ({
         hero: {
-            title: "Beispielprojekt",
+            title: '',
             categoryLabel: t('refs.reference_project'),
-            image: ""
+            image: ''
         },
         sidebar: {
             title: t('refs.project_details'),
             dateLabel: t('refs.date'),
-            dateValue: "Januar 2024",
+            dateValue: '',
             serviceLabel: t('refs.service'),
-            categories: ["Baumpflege"],
+            categories: [],
             locationLabel: t('refs.location'),
-            locationValue: "Halloux",
+            locationValue: '',
             ctaLabel: t('refs.request_similar'),
         },
         content: {
             challengeTitle: t('refs.challenge'),
-            description: "Detaillierte Projektbeschreibung...",
-            beforeImage: "",
-            afterImage: "",
+            description: '',
+            beforeImage: '',
+            afterImage: '',
             beforeLabel: t('refs.before'),
             afterLabel: t('refs.after'),
             gallery: [],
@@ -116,9 +117,7 @@ const ReferenceDetail = (props) => {
     }, [activeImageIndex, projectGallery]);
 
     // ─── Refs ─────────────────────────────────────────────────────────────────
-    const pllTranslationsRef = useRef(null);
     const primaryAbortRef = useRef(null);
-    const switchAbortRef = useRef(null);
 
     useScrollReveal([project]);
 
@@ -143,28 +142,13 @@ const ReferenceDetail = (props) => {
                 setProject(null);
                 setRawProject(null);
 
-                let ref = await getReferenceBySlug(slug, language, controller.signal);
+                const ref = await getReferenceById(slug, language, controller.signal);
                 if (controller.signal.aborted) return;
 
                 if (!ref) {
                     setStatus('notfound');
                     return;
                 }
-
-                const expectedLang = PLLCode[language];
-                if (ref.pll_lang && ref.pll_lang !== expectedLang) {
-                    const translationId = ref.pll_translations?.[expectedLang];
-                    if (translationId) {
-                        const translated = await getReferenceById(translationId, language, controller.signal);
-                        if (controller.signal.aborted) return;
-                        if (translated) ref = translated;
-                    } else {
-                        setStatus('notfound');
-                        return;
-                    }
-                }
-
-                pllTranslationsRef.current = ref.pll_translations ?? null;
 
                 const cf = ref.customFields || ref.acf || ref.meta || {};
 
@@ -199,7 +183,17 @@ const ReferenceDetail = (props) => {
                 
                 const local = getLocalContent();
                 setProject({
-                    hero: { ...local.hero, title: ref.title?.rendered, image: thumbnail },
+                    hero: {
+                        ...local.hero,
+                        title: decodeHtmlEntities(
+                            ref.title?.rendered ||
+                            (typeof ref.title === 'string' ? ref.title : '') ||
+                            ref.post_title ||
+                            ref.name ||
+                            ''
+                        ),
+                        image: thumbnail
+                    },
                     sidebar: { 
                         ...local.sidebar, 
                         dateValue: formattedDate, 
@@ -208,7 +202,7 @@ const ReferenceDetail = (props) => {
                     },
                     content: { 
                         ...local.content, 
-                        description: cf.beschreibung || ref.acf?.short_description || '', 
+                        description: decodeHtmlEntities(cf.beschreibung || ref.acf?.short_description || ''), 
                         beforeImage: beforeUrl, 
                         afterImage: afterUrl,
                         challengeTitle: cf.challenge_title || ref.acf?.challenge_title || local.content.challengeTitle,
@@ -257,54 +251,6 @@ const ReferenceDetail = (props) => {
         return () => { cancelled = true; };
     }, [rawProject, project]);
 
-    // ─── Language-Switch Handler ──────────────────────────────────────────────
-    useEffect(() => {
-        const handler = async (targetLang) => {
-            if (switchAbortRef.current) switchAbortRef.current.abort();
-            const controller = new AbortController();
-            switchAbortRef.current = controller;
-
-            try {
-                const translations = pllTranslationsRef.current;
-                const targetCodeShort = PLLCode[targetLang].toLowerCase();
-                
-                let targetId = null;
-                if (translations) {
-                    targetId = translations[targetCodeShort];
-                    if (!targetId) {
-                        const matchedKey = Object.keys(translations).find(k => k.startsWith(targetCodeShort));
-                        if (matchedKey) targetId = translations[matchedKey];
-                    }
-                }
-
-                if (!targetId) {
-                    navigate(ROUTES[targetLang].references);
-                    return;
-                }
-
-                const translatedRef = await getReferenceById(targetId, targetLang, controller.signal);
-                if (controller.signal.aborted) return;
-
-                if (translatedRef?.slug) {
-                    const detailBase = ROUTES[targetLang].referenceDetail.split('/:')[0];
-                    navigate(`${detailBase}/${translatedRef.slug}`);
-                } else {
-                    navigate(ROUTES[targetLang].references);
-                }
-            } catch (err) {
-                if (err.name === 'AbortError') return;
-                console.error('[ReferenceDetail] Translation resolution failed:', err);
-                navigate(ROUTES[targetLang].references);
-            }
-        };
-
-        registerDetailSwitch(handler);
-        return () => {
-            unregisterDetailSwitch();
-            if (switchAbortRef.current) switchAbortRef.current.abort();
-        };
-    }, [registerDetailSwitch, unregisterDetailSwitch, navigate]);
-
     // ─── Render States ────────────────────────────────────────────────────────
     if (status === 'notfound') {
         return (
@@ -332,7 +278,9 @@ const ReferenceDetail = (props) => {
         );
     }
 
-    if (!project) return null;
+    if (status === 'loading' || !project) {
+        return <ReferenceDetailSkeleton />;
+    }
 
     // ─── Success Layout ───────────────────────────────────────────────────────
     return (
@@ -342,7 +290,7 @@ const ReferenceDetail = (props) => {
                     to={ROUTES[language].references}
                     className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-slate-400 hover:text-primary transition-colors"
                 >
-                    <span className="material-symbols-outlined text-sm">arrow_back</span>
+                    <Icon name="arrow_back" className="text-sm" />
                     {t('refs.back_to_overview')}
                 </Link>
             </section>
@@ -378,7 +326,7 @@ const ReferenceDetail = (props) => {
                         onClick={closeLightbox}
                         className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors z-50"
                     >
-                        <span className="material-symbols-outlined text-4xl">close</span>
+                        <Icon name="close" className="text-4xl" />
                     </button>
 
                     {projectGallery.length > 1 && (
@@ -387,13 +335,13 @@ const ReferenceDetail = (props) => {
                                 onClick={prevImage}
                                 className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-all z-50 group"
                             >
-                                <span className="material-symbols-outlined text-3xl md:text-4xl group-hover:-translate-x-1 transition-transform">arrow_back_ios_new</span>
+                                <Icon name="arrow_back_ios_new" className="text-3xl md:text-4xl group-hover:-translate-x-1 transition-transform" />
                             </button>
                             <button 
                                 onClick={nextImage}
                                 className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-all z-50 group"
                             >
-                                <span className="material-symbols-outlined text-3xl md:text-4xl group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
+                                <Icon name="arrow_forward_ios" className="text-3xl md:text-4xl group-hover:translate-x-1 transition-transform" />
                             </button>
                         </>
                     )}

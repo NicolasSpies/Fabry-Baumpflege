@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Icon from '@/cms/components/ui/Icon';
 
 
 const SignatureSection = ({ 
-    title = "Ihr Baum in besten Händen", 
-    name = "Fabry Baumpflege", 
+    title,
+    name,
     label = "Ihr Partner für die Natur", 
     cta = "Jetzt anfragen", 
     ctaHref = "/kontakt" 
@@ -29,7 +30,7 @@ return (
                     className="inline-flex items-center gap-4 bg-primary text-white px-12 py-5 rounded-full text-lg font-bold uppercase tracking-widest hover:bg-opacity-90 transition-all group shadow-xl reveal stagger-2"
                 >
                     {cta}
-                    <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    <Icon name="arrow_forward" className="group-hover:translate-x-1 transition-transform" />
                 </Link>
             </div>
         </section>

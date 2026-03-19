@@ -3,9 +3,9 @@ import { useParallax } from '@/cms/hooks/useParallax';
 
 
 const PhilosophySection = ({ 
-    label = "Unsere Philosophie", 
-    quote = "Bäume sind das Gedächtnis der Erde.", 
-    text = "Wir pflegen Ihre Bäume mit Leidenschaft und Fachverstand für eine grüne Zukunft.", 
+    label,
+    quote,
+    text,
     image 
 }) => {
 

@@ -5,6 +5,7 @@ import { getLocalizedPath } from '@/cms/i18n/routes';
 import { definePreview } from '@/cms/lib/preview';
 import logo from '@/assets/Baumpflege-Fabry-Logo.svg';
 import { resolveInstanceProps } from '@/cms/bridge-resolver';
+import Icon from '@/cms/components/ui/Icon';
 
 /**
  * Preview Metadata for ContentBridge scanning.
@@ -111,9 +112,9 @@ const Navbar = ({
     };
 
     return (
-        <nav className={`fixed top-0 w-full z-[100] transition-all duration-500 ease-in-out ${isScrolled || isMenuOpen
-            ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 py-0 shadow-sm'
-            : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-100/50 dark:border-slate-800/50 py-2'
+        <nav className={`fixed top-0 w-full z-[100] transition-[background-color,border-color,box-shadow,padding] duration-300 ease-out ${isScrolled || isMenuOpen
+            ? 'bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 py-0 shadow-sm'
+            : 'bg-white dark:bg-slate-900 border-b border-slate-100/60 dark:border-slate-800/60 py-2'
             }`}>
             <div ref={containerRef} className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 <Link
@@ -130,7 +131,7 @@ const Navbar = ({
                     <img
                         ref={logoRef}
                         alt="Fabry Baumpflege Logo"
-                        className={`w-auto object-contain transition-all duration-500 ${isScrolled ? 'h-12' : 'h-16'}`}
+                        className={`w-auto object-contain transition-[height] duration-300 ${isScrolled ? 'h-12' : 'h-16'}`}
                         src={logo}
                     />
                 </Link>
@@ -146,21 +147,21 @@ const Navbar = ({
                         <div className="flex items-center gap-2 text-xs tracking-[0.2em] font-bold">
                             <button
                                 onClick={() => setLanguage('DE')}
-                                className={`transition-all duration-300 ${language === 'DE' ? 'opacity-100 text-primary' : 'opacity-40 hover:opacity-70 text-slate-600 dark:text-slate-400'}`}
+                                className={`transition-[opacity,color] duration-300 ${language === 'DE' ? 'opacity-100 text-primary' : 'opacity-40 hover:opacity-70 text-slate-600 dark:text-slate-400'}`}
                             >
                                 DE
                             </button>
                             <span className="opacity-20">|</span>
                             <button
                                 onClick={() => setLanguage('FR')}
-                                className={`transition-all duration-300 ${language === 'FR' ? 'opacity-100 text-primary' : 'opacity-40 hover:opacity-70 text-slate-600 dark:text-slate-400'}`}
+                                className={`transition-[opacity,color] duration-300 ${language === 'FR' ? 'opacity-100 text-primary' : 'opacity-40 hover:opacity-70 text-slate-600 dark:text-slate-400'}`}
                             >
                                 FR
                             </button>
                         </div>
                         <Link
                             to={getLocalizedPath('contact', language)}
-                            className="bg-primary text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all text-xs font-bold uppercase tracking-widest whitespace-nowrap"
+                            className="bg-primary text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-colors text-xs font-bold uppercase tracking-widest whitespace-nowrap"
                         >
                             {actualCtaLabel}
                         </Link>
@@ -173,15 +174,13 @@ const Navbar = ({
                         onClick={toggleMenu}
                         aria-label="Toggle Menu"
                     >
-                        <span className={`material-symbols-outlined text-3xl transition-transform duration-300 ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
-                            {isMenuOpen ? 'close' : 'menu'}
-                        </span>
+                        <Icon name={isMenuOpen ? 'close' : 'menu'} className={`text-3xl transition-transform duration-300 ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`} />
                     </button>
                 )}
             </div>
 
             {(isMenuOpen && isMobileMode) && (
-                <div className="absolute top-full left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl border-b border-slate-100 dark:border-slate-800 flex flex-col items-center py-8 gap-8 z-[100] animate-in slide-in-from-top duration-300">
+                <div className="absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl border-b border-slate-100 dark:border-slate-800 flex flex-col items-center py-8 gap-8 z-[100] animate-in slide-in-from-top duration-300">
                     <div className="flex flex-col items-center gap-6 w-full px-6">
                         {renderLinks(true)}
                     </div>
@@ -190,7 +189,7 @@ const Navbar = ({
                         <Link
                             to={getLocalizedPath('contact', language)}
                             onClick={closeMenu}
-                            className="bg-primary text-white px-8 py-3 rounded-full text-sm uppercase tracking-widest font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all text-center w-full max-w-[200px]"
+                            className="bg-primary text-white px-8 py-3 rounded-full text-sm uppercase tracking-widest font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-[transform,box-shadow,background-color] text-center w-full max-w-[200px]"
                         >
                             {actualCtaLabel}
                         </Link>
@@ -199,14 +198,14 @@ const Navbar = ({
                     <div className="flex items-center justify-center gap-6 mt-4 pt-6 border-t border-slate-100 dark:border-slate-800/50 w-full text-sm tracking-[0.3em] font-bold">
                         <button
                             onClick={() => { setLanguage('DE'); closeMenu(); }}
-                            className={`transition-all duration-300 ${language === 'DE' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
+                            className={`transition-[opacity,color,transform] duration-300 ${language === 'DE' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
                         >
                             DE
                         </button>
                         <span className="opacity-20 text-xl font-light">|</span>
                         <button
                             onClick={() => { setLanguage('FR'); closeMenu(); }}
-                            className={`transition-all duration-300 ${language === 'FR' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
+                            className={`transition-[opacity,color,transform] duration-300 ${language === 'FR' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
                         >
                             FR
                         </button>

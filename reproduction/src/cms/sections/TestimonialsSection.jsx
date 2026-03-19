@@ -35,6 +35,12 @@ const TestimonialsSection = ({
     // ── Live CMS testimonials ──────────────────────────────────────────────
     const [items, setItems] = useState(fallbackItems ?? []);
 
+    // Keep section state in sync with async parent updates.
+    // Without this, the section can stay empty until it remounts.
+    useEffect(() => {
+        setItems(fallbackItems ?? []);
+    }, [fallbackItems, language]);
+
     useEffect(() => {
         let cancelled = false;
         async function load() {

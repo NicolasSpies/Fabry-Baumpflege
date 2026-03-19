@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/cms/i18n/routes';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { resolveInstanceProps } from '@/cms/bridge-resolver';
+import { prefetchReferenceDetail } from '@/cms/lib/cms';
+import Icon from '@/cms/components/ui/Icon';
+
+const preloadReferenceDetailPage = () => import('@/cms/pages/ReferenceDetail');
 
 /**
  * Reusable Reference Card Component.
@@ -15,11 +19,42 @@ const ReferenceCard = ({ id, title, description, location, thumbnailImage, anima
     const { t } = useLanguage();
     const detailBase = ROUTES[language].referenceDetail.split('/:')[0];
     const detailPath = `${detailBase}/${id}`; 
+    const linkRef = useRef(null);
+    const hasPrefetchedRef = useRef(false);
+
+    const prefetchDetail = () => {
+        if (hasPrefetchedRef.current) return;
+        hasPrefetchedRef.current = true;
+        preloadReferenceDetailPage();
+        prefetchReferenceDetail(id, language);
+    };
+
+    useEffect(() => {
+        const node = linkRef.current;
+        if (!node || typeof IntersectionObserver === 'undefined') return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries.some((entry) => entry.isIntersecting)) {
+                    prefetchDetail();
+                    observer.disconnect();
+                }
+            },
+            { rootMargin: '240px' }
+        );
+
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, [id, language]);
 
     return (
         <Link
+            ref={linkRef}
             to={detailPath}
-            className={`group relative rounded-2xl bg-white dark:bg-slate-800 block shadow-md hover:shadow-xl transition-all duration-500 overflow-hidden ${animateEntry ? 'animate-entrance' : ''}`}
+            onMouseEnter={prefetchDetail}
+            onFocus={prefetchDetail}
+            onTouchStart={prefetchDetail}
+            className={`group relative rounded-2xl bg-white dark:bg-slate-800 block shadow-md hover:shadow-xl transition-[box-shadow] duration-500 overflow-hidden ${animateEntry ? 'animate-entrance' : ''}`}
             style={animateEntry ? { animationDelay: `${staggerIndex * 0.1}s` } : {}}
         >
             <div className="relative w-full overflow-hidden aspect-[4/5] sm:aspect-square">
@@ -29,20 +64,20 @@ const ReferenceCard = ({ id, title, description, location, thumbnailImage, anima
                     src={props.thumbnailImage}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-primary/70 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 text-white" style={{ willChange: 'opacity' }}>
-                    <span className="text-[10px] uppercase tracking-widest mb-2 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100">
+                    <span className="text-[10px] uppercase tracking-widest mb-2 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-100">
                         {props.location}
                     </span>
-                    <h3 className="font-serif text-2xl mb-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-200">
+                    <h3 className="font-serif text-2xl mb-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-200">
                         {props.title}
                     </h3>
-                    <p className="text-xs opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-300 line-clamp-2">
+                    <p className="text-xs opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-300 line-clamp-2">
                         {props.description}
                     </p>
 
-                    <div className="mt-4 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-2 group-hover:translate-y-0 transition-all duration-500 delay-400">
+                    <div className="mt-4 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-2 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-400">
                         <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest border-b border-white/40 pb-1">
                             {t('expertise.learn_more')}
-                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                            <Icon name="arrow_forward" className="text-sm" />
                         </span>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, mapPageContent, getForm } from '@/cms/lib/cms';
+import { getPage, mapPageContent, getForm, PAGE_IDS } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
@@ -11,15 +11,12 @@ import ContactFormSection from '@/cms/sections/ContactFormSection';
 import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
 
 
-// ── Assets ──────────────────────────────────────────────────────────────────
-import servicesHeroImg from '@/assets/images/hero/services_hero.png';
-
 /**
  * Preview Metadata for ContentBridge scanning.
  */
 export const previewData = definePreview({
     page: 'Contact',
-    source: '/cms/wp/v2/pages?slug=kontakt',
+    source: '/content-core/v1/post/page/22',
     sections: [
         {
             section: 'PageHeroSection',
@@ -27,7 +24,7 @@ export const previewData = definePreview({
         },
         {
             section: 'ContactSidebarSection',
-            fields: ['details_label', 'phone', 'email', 'office_label', 'address', 'area_label', 'area_text']
+            fields: ['contact_person', 'phone', 'email', 'office_label', 'address', 'area_label', 'area_text']
         },
         {
             section: 'ContactFormSection',
@@ -40,33 +37,47 @@ const Contact = () => {
     const { language, t, globalCmsData } = useLanguage();
     useScrollReveal();
 
-    const getLocalContent = () => ({
+    const getInitialContent = () => ({
         hero: {
-            title: t('contact.title'),
-            image: servicesHeroImg,
+            title: '',
+            image: '',
         },
         sidebar: {
-            details_label: t('contact.details'),
-            phone: "+32 476 32 09 69",
-            email: "info@fabry-baumpflege.be",
-            office_label: t('contact.office'),
-            address: "Halloux 16, 4830 Limbourg",
-            address_link: "https://www.google.com/maps/dir/?api=1&destination=Halloux+16,+4830+Limbourg",
-            area_label: t('contact.area'),
-            area_text: t('contact.area_text'),
+            contact_person: '',
+            phone: '',
+            email: '',
+            office_label: '',
+            address: '',
+            address_link: '',
+            area_label: '',
+            area_text: '',
         },
         form: {
+            heading: '',
+            button: '',
+        },
+    });
+
+    const getFallbackContent = () => ({
+        ...getInitialContent(),
+        sidebar: {
+            ...getInitialContent().sidebar,
+            office_label: t('contact.office'),
+            area_label: t('contact.area'),
+        },
+        form: {
+            ...getInitialContent().form,
             heading: t('contact.help_heading'),
             button: t('contact.send'),
         },
     });
 
-    const [pageData, setPageData] = useState(getLocalContent());
+    const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);
     const [formSchema, setFormSchema] = useState(null);
 
     useEffect(() => {
-        setPageData(getLocalContent());
+        setPageData(getInitialContent());
     }, [language, t]);
 
     useEffect(() => {
@@ -77,15 +88,15 @@ const Contact = () => {
                 if (cancelled) return;
                 
                 const [page, form] = await Promise.all([
-                    getPage('kontakt', language),
-                    getForm('kontakt', language)
+                    getPage(PAGE_IDS.contact, language),
+                    getForm('formular', language)
                 ]);
 
                 if (cancelled) return;
-                
+
                 if (page) {
                     setRawPage(page);
-                    setPageData(prev => mapPageContent(page, prev, 'Contact'));
+                    setPageData(mapPageContent(page, getFallbackContent(), 'Contact'));
                 }
                 if (form) {
                     setFormSchema(form);
@@ -118,6 +129,7 @@ const Contact = () => {
                     <ContactFormSection 
                         {...getProps('ContactFormSection', pageData.form)} 
                         formSchema={formSchema}
+                        language={language}
                     />
                 </div>
             </div>

@@ -4,6 +4,7 @@ import BaumfaellungIcon from '@/cms/components/icons/BaumfaellungIcon';
 import GartenpflegeIcon from '@/cms/components/icons/GartenpflegeIcon';
 import BepflanzungIcon from '@/cms/components/icons/BepflanzungIcon';
 import { useParallax } from '@/cms/hooks/useParallax';
+import Icon from '@/cms/components/ui/Icon';
 
 const ServiceImage = ({ src, alt }) => {
     const ref = useRef(null);
@@ -19,40 +20,13 @@ const ServiceImage = ({ src, alt }) => {
 };
 
 const ServiceBlockInternal = ({ id, title, description, list, image, reverse, bg }) => {
-    // Detect if title contains combined content and description is missing or using a default fallback
-    let displayTitle = title;
-    let displayDescription = description;
-
-    const fallbacks = [
-        "Pflege für vitale & sichere Bäume",
-        "Sichere Fällung in jeder Lage",
-        "Ihr Garten in besten Händen",
-        "Gezielte Auswahl für langlebiges Grün",
-        "Detaillierte Projektbeschreibung...",
-        "Your garden in best hands"
-    ];
-    const isFallback = !description || fallbacks.some(f => description.includes(f));
-
-    if (title && isFallback) {
-        // Try splitting by common separators like ' – ' or ' - '
-        if (title.includes(' – ')) {
-            const [t, ...rest] = title.split(' – ');
-            displayTitle = t;
-            displayDescription = rest.join(' – ');
-        } else if (title.includes(' - ')) {
-            const [t, ...rest] = title.split(' - ');
-            displayTitle = t;
-            displayDescription = rest.join(' - ');
-        }
-    }
-
     const IconComponent = () => {
         switch (id) {
-            case 'baumpflege': return <BaumpflegeIcon className="w-16 h-16 flex items-center justify-center text-6xl text-primary" />;
-            case 'baumfaellung': return <BaumfaellungIcon className="w-16 h-16 text-primary" />;
-            case 'gartenpflege': return <GartenpflegeIcon className="w-16 h-16 flex items-center justify-center text-6xl text-primary" />;
-            case 'bepflanzung': return <BepflanzungIcon className="w-16 h-16 flex items-center justify-center text-6xl text-primary" />;
-            default: return <span className="material-symbols-outlined text-primary text-6xl font-light">info</span>;
+            case 'baumpflege': return <BaumpflegeIcon variant="outline" className="w-16 h-16 text-primary" />;
+            case 'baumfaellung': return <BaumfaellungIcon variant="outline" className="w-16 h-16 text-primary" />;
+            case 'gartenpflege': return <GartenpflegeIcon variant="outline" className="w-16 h-16 text-primary" />;
+            case 'bepflanzung': return <BepflanzungIcon variant="outline" className="w-16 h-16 text-primary" />;
+            default: return <Icon name="info" className="text-primary text-6xl font-light" />;
         }
     };
 
@@ -65,26 +39,28 @@ const ServiceBlockInternal = ({ id, title, description, list, image, reverse, bg
                 <div className={`flex flex-col lg:flex-row items-center gap-16 ${reverse ? 'lg:flex-row-reverse' : ''}`}>
                     <div className="w-full lg:w-1/2">
                         <div className="relative rounded-xl overflow-hidden shadow-2xl reveal h-[500px]">
-                            <ServiceImage src={image} alt={displayTitle} />
+                            <ServiceImage src={image} alt={title} />
                         </div>
                     </div>
                     <div className="w-full lg:w-1/2 space-y-8 reveal stagger-1">
                         <div className="space-y-6">
                             <IconComponent />
                             <h2 className="text-4xl font-serif text-primary leading-tight font-medium">
-                                {displayTitle}
+                                {title}
                             </h2>
                         </div>
-                        <p className="text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                            {displayDescription}
-                        </p>
+                        {description && (
+                            <p className="text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                                {description}
+                            </p>
+                        )}
                         <ul className="space-y-4">
                             {(list || []).map((feature, fIdx) => {
                                 const text = typeof feature === 'object' ? (feature?.text || feature?.label || '') : feature;
                                 if (!text) return null;
                                 return (
                                     <li key={fIdx} className="flex items-start gap-3">
-                                        <span className="material-symbols-outlined text-[#9bb221] mt-1 shrink-0">check</span>
+                                        <Icon name="check" className="text-[#9bb221] mt-1 shrink-0" />
                                         <span className="text-slate-600 dark:text-slate-400 leading-relaxed">{text}</span>
                                     </li>
                                 );

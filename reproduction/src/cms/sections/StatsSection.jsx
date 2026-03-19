@@ -4,14 +4,14 @@ import StatCounter from '@/cms/components/ui/StatCounter';
 
 
 const StatsSection = ({ 
-    stat1_value = "35+", 
-    stat1_label = "Kunden",
-    stat2_value = "125+", 
-    stat2_label = "Bäume",
-    stat3_value = "5+", 
-    stat3_label = "Jahre Erfahrung",
-    stat4_value = "0", 
-    stat4_label = "Unfälle",
+    stat1_value,
+    stat1_label,
+    stat2_value,
+    stat2_label,
+    stat3_value,
+    stat3_label,
+    stat4_value,
+    stat4_label,
     page = 'Home',
     section = 'StatsSection'
 }) => {

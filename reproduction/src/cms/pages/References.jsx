@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
-import { PLLCode, getReferences, getReferenceCategories, mapReferenceCard } from '@/cms/lib/cms';
+import { getReferences, getReferenceCategories, mapReferenceCard, getPage, PAGE_IDS, decodeHtmlEntities } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 import ReferenceCard from '@/cms/components/ui/ReferenceCard';
 import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
+import Icon from '@/cms/components/ui/Icon';
 
 /**
  * Preview Metadata for ContentBridge scanning.
  */
 export const previewData = definePreview({
     page: 'References',
-    source: '/cms/wp/v2/references?_embed=1&per_page=100',
+    source: '/content-core/v1/post/page/28',
     sections: [
         {
             section: 'ReferencesHeaderSection',
@@ -31,7 +32,6 @@ export const previewData = definePreview({
 
 const References = () => {
     const { language, t } = useLanguage();
-    const pllLang = PLLCode[language];
 
     const [allRefs, setAllRefs] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -39,8 +39,18 @@ const References = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isInitialRender, setIsInitialRender] = useState(true);
+    const [rawPage, setRawPage] = useState(null);
 
-    const getLocalContent = () => ({
+    const getInitialContent = () => ({
+        header: {
+            intro: '',
+            load_more: '',
+            all: '',
+        },
+        items: []
+    });
+
+    const getFallbackContent = () => ({
         header: {
             intro: t('refs.intro'),
             load_more: t('refs.load_more'),
@@ -49,7 +59,7 @@ const References = () => {
         items: []
     });
 
-    const [pageData, setPageData] = useState(getLocalContent());
+    const [pageData, setPageData] = useState(getInitialContent());
 
     useEffect(() => {
         const timer = setTimeout(() => setIsInitialRender(false), 1500);
@@ -57,6 +67,10 @@ const References = () => {
     }, []);
 
     useEffect(() => { setActiveCatId(null); }, [language]);
+
+    useEffect(() => {
+        setPageData(getInitialContent());
+    }, [language, t]);
 
     useEffect(() => {
         let cancelled = false;
@@ -67,31 +81,37 @@ const References = () => {
 
                 setIsLoading(true);
                 setError(null);
-                const [rawRefs, rawCats] = await Promise.all([
+                const [page, rawRefs, rawCats] = await Promise.all([
+                    getPage(PAGE_IDS.references, language),
                     getReferences(language),
                     getReferenceCategories(language),
                 ]);
                 if (cancelled) return;
+                const pageIntro = decodeHtmlEntities(page?.customFields?.referenzen_field_intro || '');
+
+                setRawPage(page || null);
 
                 const catMap = rawCats.reduce((acc, c) => { acc[c.id] = c.name; return acc; }, {});
-                const refsForLang = Array.isArray(rawRefs)
-                    ? rawRefs.filter(item => {
-                        if (!item.pll_lang) return true; // Permissive: if no lang set, keep it
-                        return item.pll_lang.toLowerCase() === pllLang.toLowerCase();
-                    })
-                    : [];
-                
+                const refsForLanguage = Array.isArray(rawRefs) ? rawRefs : [];
+
                 if (import.meta.env.DEV) {
-                    console.log(`[References] ${Array.isArray(rawRefs) ? rawRefs.length : 0} items from CMS, ${refsForLang.length} kept after lang filter ("${pllLang}").`);
+                    console.log(`[References] ${refsForLanguage.length} items loaded for "${language}".`);
                 }
 
-                const mappedRefs = refsForLang.map(item => ({
+                const mappedRefs = refsForLanguage.map(item => ({
                     ...mapReferenceCard(item, catMap),
                     data: item
                 }));
                 
                 setAllRefs(mappedRefs);
-                setPageData(prev => ({ ...prev, items: mappedRefs }));
+                const fallback = getFallbackContent();
+                setPageData({
+                    header: {
+                        ...fallback.header,
+                        intro: pageIntro || fallback.header.intro,
+                    },
+                    items: mappedRefs,
+                });
 
                 // ─── Filter Categories by Language ──────────────────────────────────────
                 // The /kategorie endpoint often lacks language metadata.
@@ -135,7 +155,7 @@ const References = () => {
         }
         loadCollection();
         return () => { cancelled = true; };
-    }, [language, pllLang]);
+    }, [language]);
 
     const filteredRefs = activeCatId === null
         ? allRefs
@@ -146,7 +166,7 @@ const References = () => {
 
 
     const getProps = (instanceName, localProps) => 
-        resolveInstanceProps('References', instanceName, localProps, null); // Collections handle their own hydration
+        resolveInstanceProps('References', instanceName, localProps, rawPage); // Header can hydrate from page data
 
     if (error) {
         return (
@@ -171,12 +191,12 @@ const References = () => {
             </section>
 
             {/* Page: References → Section: ReferencesCategoryFilter */}
-            <section className="sticky top-20 z-40 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-y border-slate-100 dark:border-slate-800 py-4">
+            <section className="relative z-10 bg-background-light dark:bg-background-dark border-y border-slate-100 dark:border-slate-800 py-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-nowrap md:flex-wrap items-center justify-start md:justify-center gap-3 md:gap-8 overflow-x-auto px-6 scrollbar-hide">
                         <button
                             onClick={() => setActiveCatId(null)}
-                            className={`flex-shrink-0 px-6 py-2 rounded-full text-sm font-medium uppercase tracking-widest transition-all ${activeCatId === null ? 'bg-[#2a411a] text-white shadow-lg' : 'text-slate-500 hover:text-primary'}`}
+                            className={`flex-shrink-0 px-6 py-2 rounded-full text-sm font-medium uppercase tracking-widest transition-[background-color,color,box-shadow] ${activeCatId === null ? 'bg-[#2a411a] text-white shadow-lg' : 'text-slate-500 hover:text-primary'}`}
                         >
                             {headerProps.all}
                         </button>
@@ -184,7 +204,7 @@ const References = () => {
                             <button
                                 key={cat.id}
                                 onClick={() => setActiveCatId(cat.id)}
-                                className={`flex-shrink-0 px-6 py-2 rounded-full text-sm font-medium uppercase tracking-widest transition-all ${activeCatId !== null && String(activeCatId) === String(cat.id) ? 'bg-[#2a411a] text-white shadow-lg' : 'text-slate-500 hover:text-primary'}`}
+                                className={`flex-shrink-0 px-6 py-2 rounded-full text-sm font-medium uppercase tracking-widest transition-[background-color,color,box-shadow] ${activeCatId !== null && String(activeCatId) === String(cat.id) ? 'bg-[#2a411a] text-white shadow-lg' : 'text-slate-500 hover:text-primary'}`}
                             >
                                 {cat.name}
                             </button>
@@ -221,9 +241,9 @@ const References = () => {
                         </div>
                     )}
                     <div className="mt-20 text-center">
-                        <button className="inline-flex items-center gap-3 px-12 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300">
+                        <button className="inline-flex items-center gap-3 px-12 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-colors duration-300">
                             {headerProps.load_more}
-                            <span className="material-symbols-outlined">refresh</span>
+                            <Icon name="refresh" className="text-base" />
                         </button>
                     </div>
                 </div>

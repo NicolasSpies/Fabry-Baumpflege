@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from '@/cms/components/ui/Navbar';
 import Footer from '@/cms/components/ui/Footer';
+import PageSkeleton from '@/cms/components/ui/PageSkeleton';
 import ScrollToTop from '@/cms/components/ui/ScrollToTop';
-import Home from '@/cms/pages/Home';
-import Services from '@/cms/pages/Services';
-import References from '@/cms/pages/References';
-import ReferenceDetail from '@/cms/pages/ReferenceDetail';
-import Contact from '@/cms/pages/Contact';
-import AboutMe from '@/cms/pages/AboutMe';
 import { ROUTES } from '@/cms/i18n/routes';
 import { useLanguage } from '@/cms/i18n/useLanguage';
-import { getPage, getOptions } from '@/cms/lib/cms';
+import { getOptions } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 import { resolveInstanceProps, awaitMappings, setGlobalCmsData as setBridgeGlobalData, setBridgeLanguage } from '@/cms/bridge-resolver';
+
+const Home = lazy(() => import('@/cms/pages/Home'));
+const Services = lazy(() => import('@/cms/pages/Services'));
+const References = lazy(() => import('@/cms/pages/References'));
+const ReferenceDetail = lazy(() => import('@/cms/pages/ReferenceDetail'));
+const Contact = lazy(() => import('@/cms/pages/Contact'));
+const AboutMe = lazy(() => import('@/cms/pages/AboutMe'));
 
 /**
  * Global Preview Metadata for ContentBridge scanning.
@@ -48,7 +50,7 @@ function App() {
   });
   const [rawGlobal, setRawGlobal] = useState(null);
 
-  // Fetch global data (from startseite as the primary site-wide source)
+  // Fetch only true global CMS data for shell components.
   useEffect(() => {
     let cancelled = false;
     async function loadGlobal() {
@@ -56,31 +58,13 @@ function App() {
         await awaitMappings();
         if (cancelled) return;
         setBridgeLanguage(language);
-        
-        const [startseite, leistungen, options] = await Promise.all([
-          getPage('startseite', language),
-          getPage('leistungen', language),
-          getOptions(language)
-        ]);
+
+        const options = await getOptions(language);
         if (cancelled) return;
-        
-        // Merge page data and options.
-        // We include both startseite and leistungen in the global pool so that
-        // shared components (like services preview) can resolve their props site-wide.
-        const mergedGlobal = {
-          ...(startseite || {}),
-          ...(leistungen || {}),
-          ...(options || {}),
-          customFields: {
-            ...(startseite?.acf || startseite?.customFields || {}),
-            ...(leistungen?.acf || leistungen?.customFields || {}),
-            ...(options?.acf || options?.customFields || {}),
-          }
-        };
-        
-        setRawGlobal(mergedGlobal);
-        setGlobalCmsData(mergedGlobal);
-        setBridgeGlobalData(mergedGlobal);
+
+        setRawGlobal(options);
+        setGlobalCmsData(options);
+        setBridgeGlobalData(options);
       } catch (err) {
         console.error('[App] Global load failed:', err);
       }
@@ -95,27 +79,31 @@ function App() {
   return (
     <>
       <ScrollToTop />
-      <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
+        <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
         <Navbar {...getShellProps('Navbar', globalData.navbar)} />
-        <Routes>
-          {/* German Routes */}
-          <Route path={ROUTES.DE.home} element={<Home />} />
-          <Route path={ROUTES.DE.services} element={<Services />} />
-          <Route path={ROUTES.DE.references} element={<References />} />
-          <Route path={ROUTES.DE.referenceDetail} element={<ReferenceDetail />} />
-          <Route path={ROUTES.DE.contact} element={<Contact />} />
-          <Route path={ROUTES.DE.about} element={<AboutMe />} />
+        <div className="flex-1 flex flex-col">
+          <Suspense fallback={<PageSkeleton />}>
+            <Routes>
+              {/* German Routes */}
+              <Route path={ROUTES.DE.home} element={<Home />} />
+              <Route path={ROUTES.DE.services} element={<Services />} />
+              <Route path={ROUTES.DE.references} element={<References />} />
+              <Route path={ROUTES.DE.referenceDetail} element={<ReferenceDetail />} />
+              <Route path={ROUTES.DE.contact} element={<Contact />} />
+              <Route path={ROUTES.DE.about} element={<AboutMe />} />
 
-          {/* French Routes */}
-          <Route path={ROUTES.FR.home} element={<Home />} />
-          <Route path={ROUTES.FR.services} element={<Services />} />
-          <Route path={ROUTES.FR.references} element={<References />} />
-          <Route path={ROUTES.FR.referenceDetail} element={<ReferenceDetail />} />
-          <Route path={ROUTES.FR.contact} element={<Contact />} />
-          <Route path={ROUTES.FR.about} element={<AboutMe />} />
+              {/* French Routes */}
+              <Route path={ROUTES.FR.home} element={<Home />} />
+              <Route path={ROUTES.FR.services} element={<Services />} />
+              <Route path={ROUTES.FR.references} element={<References />} />
+              <Route path={ROUTES.FR.referenceDetail} element={<ReferenceDetail />} />
+              <Route path={ROUTES.FR.contact} element={<Contact />} />
+              <Route path={ROUTES.FR.about} element={<AboutMe />} />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </div>
         <Footer {...getShellProps('Footer', globalData.footer)} />
       </div>
     </>

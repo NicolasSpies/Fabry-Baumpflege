@@ -7,52 +7,210 @@
 // leaks into the browser bundle. The dev proxy in vite.config.js forwards
 // /cms/* → CMS_HOST/wp-json/* using the same cmsConfig.js value.
 //
-import { CMS_API_BASE } from '@/cms/lib/cmsConfig';
-import { references as localReferences, referenceCategories as localCategories } from '@/cms/data/references';
-import { testimonials as localTestimonials } from '@/cms/data/testimonials';
+import { CMS_API_BASE, CMS_HOST } from '@/cms/lib/cmsConfig';
 
 // ─── Language helpers ─────────────────────────────────────────────────────────
 
-/** Polylang locale codes used in ?lang= query params and pll_lang fields. */
+/** Language codes used in API query params and legacy Polylang fields. */
 export const PLLCode = { DE: 'de', FR: 'fr' };
+export const DEFAULT_LANGUAGE = 'DE';
+export const PAGE_IDS = {
+    home: 14,
+    services: 16,
+    about: 18,
+    contact: 22,
+    references: 28,
+};
+
+const CMS_CACHE_TTL_MS = 5 * 60 * 1000;
+const cmsResponseCache = new Map();
+const cmsInflightCache = new Map();
+
+function cloneCmsPayload(payload) {
+    if (payload === undefined || payload === null) return payload;
+    if (typeof structuredClone === 'function') {
+        return structuredClone(payload);
+    }
+    return JSON.parse(JSON.stringify(payload));
+}
+
+export function decodeHtmlEntities(value) {
+    if (typeof value !== 'string' || !value.includes('&')) return value;
+
+    if (typeof document !== 'undefined') {
+        const textarea = document.createElement('textarea');
+        textarea.innerHTML = value;
+        return textarea.value;
+    }
+
+    return value
+        .replace(/&#8211;|&#x2013;/gi, '–')
+        .replace(/&#8212;|&#x2014;/gi, '—')
+        .replace(/&#038;|&amp;/gi, '&')
+        .replace(/&#039;|&apos;/gi, "'")
+        .replace(/&quot;/gi, '"')
+        .replace(/&lt;/gi, '<')
+        .replace(/&gt;/gi, '>');
+}
+
+function getRootApiBase() {
+    const base = String(CMS_API_BASE || '').replace(/\/+$/, '');
+
+    if (!base) return '/cms';
+    if (base === '/cms' || base.startsWith('/cms/')) {
+        return base.replace(/\/wp\/v2$/, '');
+    }
+    if (base.includes('/wp-json/')) {
+        return base.replace(/\/wp\/v2$/, '');
+    }
+    if (base.endsWith('/wp-json')) {
+        return base;
+    }
+    if (base.endsWith('/wp/v2')) {
+        return `${base.slice(0, -'/wp/v2'.length)}/wp-json`;
+    }
+
+    return `${base}/wp-json`;
+}
+
+function getAbsoluteCmsRootApiBase() {
+    const host = String(CMS_HOST || '').replace(/\/+$/, '').replace(/^http:\/\//i, 'https://');
+
+    if (!host) return 'https://cms.fabry-baumpflege.be/wp-json';
+    if (host.includes('/wp-json')) return host.replace(/\/wp\/v2$/, '');
+    if (host.endsWith('/wp/v2')) return `${host.slice(0, -'/wp/v2'.length)}/wp-json`;
+
+    return `${host}/wp-json`;
+}
 
 // ─── Core fetch helper ────────────────────────────────────────────────────────
 
 /**
  * Fetch from the CMS REST API.
  * @param {string} endpoint  - path starting with /  e.g. '/references?_embed=1'
- * @param {string} language  - 'DE' | 'FR'  — appended as ?lang=de/fr
+ * @param {string} language  - 'DE' | 'FR'
  * @param {AbortSignal} [signal]
  */
 export async function fetchFromCMS(endpoint, language = 'DE', signal = null) {
     const langCode = PLLCode[language] ?? 'de';
-    const separator = endpoint.includes('?') ? '&' : '?';
-    
+
     /**
      * Determine the correct API base.
      * Most WP endpoints are under /wp/v2, but custom plugins (like content-core)
      * register their namespaces at the root level of /wp-json/.
      */
     const isRootNamespace = endpoint.startsWith('/content-core') || endpoint.startsWith('/polylang');
-    const apiBase = isRootNamespace 
+    const apiBase = isRootNamespace
         ? CMS_API_BASE.replace('/wp/v2', '') 
         : CMS_API_BASE;
+    const separator = endpoint.includes('?') ? '&' : '?';
+    const languageParam = `language=${encodeURIComponent(langCode)}`;
+    const legacyLangParam = isRootNamespace ? '' : `&lang=${encodeURIComponent(langCode)}`;
 
-    const url = `${apiBase}${endpoint}${separator}lang=${langCode}`;
-    const response = await fetch(url, signal ? { signal } : undefined);
-    
-    if (!response.ok) {
-        throw new Error(`CMS fetch failed: ${response.status} ${response.statusText} — ${url}`);
+    // Content Core expects `language`, while legacy WP endpoints still rely on `lang`.
+    const url = `${apiBase}${endpoint}${separator}${languageParam}${legacyLangParam}`;
+
+    const now = Date.now();
+    const cached = cmsResponseCache.get(url);
+    if (cached && cached.expiresAt > now) {
+        return cloneCmsPayload(cached.data);
     }
-    return response.json();
+    if (cached) {
+        cmsResponseCache.delete(url);
+    }
+
+    if (!signal) {
+        const inflight = cmsInflightCache.get(url);
+        if (inflight) {
+            return cloneCmsPayload(await inflight);
+        }
+    }
+
+    const requestPromise = (async () => {
+        const response = await fetch(url, signal ? { signal } : undefined);
+
+        if (!response.ok) {
+            throw new Error(`CMS fetch failed: ${response.status} ${response.statusText} — ${url}`);
+        }
+
+        return response.json();
+    })();
+
+    if (!signal) {
+        cmsInflightCache.set(url, requestPromise);
+    }
+
+    try {
+        const payload = await requestPromise;
+        if (!signal) {
+            cmsResponseCache.set(url, {
+                data: payload,
+                expiresAt: Date.now() + CMS_CACHE_TTL_MS,
+            });
+        }
+        return cloneCmsPayload(payload);
+    } finally {
+        if (!signal) {
+            cmsInflightCache.delete(url);
+        }
+    }
+}
+
+function stripHtml(value) {
+    if (typeof value !== 'string') return value;
+
+    if (typeof document !== 'undefined') {
+        const div = document.createElement('div');
+        div.innerHTML = value;
+        return div.textContent || div.innerText || '';
+    }
+
+    return value.replace(/<[^>]+>/g, '').trim();
+}
+
+export async function submitForm(slug, values, language = 'DE', signal = null) {
+    const langCode = PLLCode[language] ?? 'de';
+    const apiBase = getAbsoluteCmsRootApiBase();
+    const url = `${apiBase}/content-core/v1/forms/${encodeURIComponent(slug)}/submit?language=${encodeURIComponent(langCode)}&lang=${encodeURIComponent(langCode)}`;
+    const isFormData = typeof FormData !== 'undefined' && values instanceof FormData;
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+        },
+        ...(isFormData
+            ? { body: values }
+            : {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                },
+                body: new URLSearchParams(values || {}),
+            }),
+        ...(signal ? { signal } : {}),
+    });
+
+    const contentType = response.headers.get('content-type') || '';
+    const payload = contentType.includes('application/json')
+        ? await response.json()
+        : { message: stripHtml(await response.text()) };
+
+    if (!response.ok) {
+        const error = new Error(stripHtml(payload?.message) || `Form submit failed: ${response.status}`);
+        error.payload = payload;
+        error.status = response.status;
+        throw error;
+    }
+
+    return payload;
 }
 
 /**
- * Fetch a specific page by slug and return its raw data.
+ * Fetch a specific page by numeric ID through Content Core.
  */
-export async function getPage(slug, language = 'DE', signal = null) {
-    const pages = await fetchFromCMS(`/pages?slug=${encodeURIComponent(slug)}&_embed=1`, language, signal);
-    const page = Array.isArray(pages) && pages.length > 0 ? pages[0] : null;
+export async function getPage(pageId, language = 'DE', signal = null) {
+    if (!pageId) return null;
+    const page = await fetchFromCMS(`/content-core/v1/post/page/${pageId}`, language, signal);
 
     // ── DEV DIAGNOSTIC: print the exact WP page object shape ─────────────────
     // This tells us definitively which keys the WP REST API returns for this page,
@@ -68,7 +226,7 @@ export async function getPage(slug, language = 'DE', signal = null) {
             }
             return acc;
         }, {});
-        console.group(`[CMS] getPage("${slug}", "${language}") — raw WP shape`);
+        console.group(`[CMS] getPage(${pageId}, "${language}") — raw page shape`);
         console.table(shape);
         // Also log the full customFields / acf / meta if they exist
         if (page.customFields) console.log('  customFields:', page.customFields);
@@ -78,6 +236,40 @@ export async function getPage(slug, language = 'DE', signal = null) {
     }
 
     return page;
+}
+
+function isEmptyCmsValue(value) {
+    if (value === undefined || value === null || value === '') return true;
+    if (Array.isArray(value)) return value.length === 0;
+    return false;
+}
+
+function mergeCmsValues(primary, fallback) {
+    if (isEmptyCmsValue(primary)) return fallback;
+    if (isEmptyCmsValue(fallback)) return primary;
+
+    if (Array.isArray(primary) || Array.isArray(fallback)) {
+        return Array.isArray(primary) && primary.length > 0 ? primary : fallback;
+    }
+
+    if (typeof primary === 'object' && typeof fallback === 'object' && primary && fallback) {
+        const merged = { ...fallback, ...primary };
+        const keys = new Set([...Object.keys(fallback), ...Object.keys(primary)]);
+
+        keys.forEach((key) => {
+            merged[key] = mergeCmsValues(primary[key], fallback[key]);
+        });
+
+        return merged;
+    }
+
+    return primary;
+}
+
+export function mergeCmsContent(primary, fallback) {
+    if (!primary) return fallback;
+    if (!fallback) return primary;
+    return mergeCmsValues(primary, fallback);
 }
 
 /**
@@ -119,7 +311,6 @@ export async function getForm(slug, language = 'DE', signal = null) {
 
 /** Fetch all reference_category terms for the given language. */
 export async function getReferenceCategories(language = 'DE') {
-    const lang = PLLCode[language] || 'de';
     const endpoints = ['/kategorie', '/reference_category'];
     for (const endpoint of endpoints) {
         try {
@@ -136,12 +327,7 @@ export async function getReferenceCategories(language = 'DE') {
             if (import.meta.env.DEV) console.warn(`[CMS] Failed to load categories from ${endpoint}:`, error?.message);
         }
     }
-    // Fallback to local categories
-    return localCategories.map(cat => ({
-        id: cat.id,
-        name: cat.name[lang] || cat.name['de'],
-        slug: cat.slug
-    }));
+    return [];
 }
 
 /** Returns an id→name map built from getReferenceCategories. */
@@ -182,7 +368,6 @@ export async function getTermsByIds(ids, language = 'DE', signal = null) {
  * Fetch all published kundenstimmen (testimonials) from the CMS.
  */
 export async function getTestimonials(language = 'DE') {
-    const lang = PLLCode[language] || 'de';
     try {
         const testimonials = await fetchFromCMS('/kundenstimmen?_embed=1&per_page=50', language);
         if (Array.isArray(testimonials) && testimonials.length > 0) {
@@ -194,40 +379,9 @@ export async function getTestimonials(language = 'DE') {
             }));
         }
     } catch (err) {
-        console.warn('[CMS] getTestimonials from CMS failed, using local fallback:', err?.message);
+        console.warn('[CMS] getTestimonials from CMS failed:', err?.message);
     }
-    // Fallback
-    return localTestimonials.map(t => ({
-        id: t.id,
-        title: { rendered: t.author },
-        customFields: {
-            kundenstimme_text: t.text[lang] || t.text['de'],
-            sterne: t.rating
-        }
-    }));
-}
-
-function mapLocalToReference(item, lang) {
-    return {
-        id: item.id,
-        slug: item.slug,
-        pll_lang: lang,
-        date: item.date,
-        title: { rendered: item.title[lang] || item.title['de'] },
-        acf: {
-            short_description: item.description[lang] || item.description['de'],
-            location: item.location,
-            challenge: item.challenge[lang] || item.challenge['de'],
-            before_image: item.beforeImage,
-            after_image: item.afterImage,
-            gallery: item.gallery || []
-        },
-        _embedded: {
-            'wp:featuredmedia': [{ source_url: item.thumbnailImage }],
-            'wp:term': [[...localCategories.filter(c => item.categories.includes(c.id)).map(c => ({ name: c.name[lang] || c.name['de'] }))]]
-        },
-        reference_category: item.categories
-    };
+    return [];
 }
 
 /**
@@ -265,27 +419,22 @@ export async function getReferences(language = 'DE') {
         if (import.meta.env.DEV) console.log(`[CMS] Loaded ${result.length} references from CMS.`);
         return result;
     }
-    console.warn('[CMS] getReferences — all endpoints failed, using local fallback.');
-    const lang = PLLCode[language] || 'de';
-    return localReferences.map(r => mapLocalToReference(r, lang));
+    console.warn('[CMS] getReferences — all endpoints failed.');
+    return [];
 }
 
 /** Fetch the newest `limit` references for the given language (homepage preview). */
 export async function getLatestReferences(limit = 3, language = 'DE') {
     const result = await fetchReferencesFromCMS(`?_embed=1&per_page=${limit}`, language);
     if (result) return result;
-    const lang = PLLCode[language] || 'de';
-    return localReferences.slice(0, limit).map(r => mapLocalToReference(r, lang));
+    return [];
 }
 
 /** Fetch references filtered to a single category term id, newest first. */
 export async function getReferencesByCategory(categoryId, language = 'DE') {
     const result = await fetchReferencesFromCMS(`?_embed=1&per_page=100&reference_category=${categoryId}`, language);
     if (result) return result;
-    const lang = PLLCode[language] || 'de';
-    return localReferences
-        .filter(r => r.categories.includes(categoryId))
-        .map(r => mapLocalToReference(r, lang));
+    return [];
 }
 
 /** Fetch a single reference by slug. */
@@ -295,9 +444,7 @@ export async function getReferenceBySlug(slug, language = 'DE', signal = null) {
         if (import.meta.env.DEV) console.log(`[CMS] Loaded reference "${slug}" from CMS.`);
         return result[0];
     }
-    const lang = PLLCode[language] || 'de';
-    const found = localReferences.find(r => r.slug === slug);
-    return found ? mapLocalToReference(found, lang) : null;
+    return null;
 }
 
 /** Fetch a single reference by numeric ID. */
@@ -310,9 +457,19 @@ export async function getReferenceById(id, language = 'DE', signal = null) {
     // Slug fallback
     const result = await fetchReferencesFromCMS(`?slug=${encodeURIComponent(id)}&_embed=1`, language, signal);
     if (Array.isArray(result) && result.length > 0) return result[0];
-    const lang = PLLCode[language] || 'de';
-    const found = localReferences.find(r => r.id === id || r.slug === id);
-    return found ? mapLocalToReference(found, lang) : null;
+    return null;
+}
+
+export async function prefetchReferenceDetail(id, language = 'DE') {
+    if (!id) return null;
+    try {
+        return await getReferenceById(id, language);
+    } catch (error) {
+        if (import.meta.env.DEV) {
+            console.warn('[CMS] Reference detail prefetch failed:', error?.message);
+        }
+        return null;
+    }
 }
 
 // ─── Media ────────────────────────────────────────────────────────────────────
@@ -343,7 +500,7 @@ export async function resolveMedia(idOrUrl) {
 
 /**
  * Map a raw WordPress reference item to the shape expected by ReferenceCard.
- * Preserves pll_lang and pll_translations for language filtering and switching.
+ * Preserves raw language metadata for diagnostics and backward compatibility.
  */
 export function mapReferenceCard(item, catMap = {}) {
     // Thumbnail: check 'featured_image' (returned by some WP REST plugins/themes),
@@ -367,8 +524,8 @@ export function mapReferenceCard(item, catMap = {}) {
         }
     }
 
-    // Use slug as the primary id for URL routing; fall back to numeric id.
-    const id = item.slug || (item.id ? String(item.id) : '');
+    // Keep the original CMS id stable across languages. The API handles translation fallback.
+    const id = item.id ? String(item.id) : (item.slug || '');
 
     // Category IDs: Support multiple field names and ensure we have both IDs and slugs for filtering.
     // This makes the filter robust against ID vs Slug mismatches.
@@ -381,9 +538,15 @@ export function mapReferenceCard(item, catMap = {}) {
     return {
         id,
         slug: item.slug || (item.id ? String(item.id) : ''),
-        title: item.title?.rendered || '',
+        title: decodeHtmlEntities(
+            item.title?.rendered ||
+            (typeof item.title === 'string' ? item.title : '') ||
+            item.post_title ||
+            item.name ||
+            ''
+        ),
         // Description: try customFields.beschreibung (CB-mapped field), then acf fallback
-        description: cf.beschreibung || item.acf?.short_description || '',
+        description: decodeHtmlEntities(cf.beschreibung || item.acf?.short_description || ''),
         // Location: try customFields.referenz_ort (CB-mapped field), then acf fallback
         location: cf.referenz_ort || item.acf?.location || '',
         thumbnailImage: thumbnail,
@@ -413,9 +576,23 @@ export function mapPageContent(rawPage, localContent, pageId) {
     // Deep clone to avoid mutating the original fallback object
     const content = JSON.parse(JSON.stringify(localContent));
 
-    // Map WP page title into hero.title_main if available
-    if (rawPage.title?.rendered && content.hero) {
-        content.hero.title_main = rawPage.title.rendered;
+    const pageTitle =
+        decodeHtmlEntities(
+            rawPage.title?.rendered ||
+            (typeof rawPage.title === 'string' ? rawPage.title : '') ||
+            rawPage.post_title ||
+            rawPage.name ||
+            ''
+        );
+
+    // Map the page title into the expected hero title fields if available.
+    if (pageTitle && content.hero) {
+        if ('title' in content.hero) {
+            content.hero.title = pageTitle;
+        }
+        if ('title_main' in content.hero) {
+            content.hero.title_main = pageTitle;
+        }
     }
 
     // Generic field source merge: try both rawPage.acf and rawPage.customFields.

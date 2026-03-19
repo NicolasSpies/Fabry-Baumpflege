@@ -1,14 +1,15 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useParallax } from '@/cms/hooks/useParallax';
+import Icon from '@/cms/components/ui/Icon';
 
 
 const AboutSection = ({ 
-    label = "Über uns", 
-    title = "Expertise in Baumpflege", 
-    description = "Wir sind Ihr zuverlässiger Partner für alle Belange rund um den Baum.", 
-    quote = "Qualität ist unser Anspruch.", 
-    cta = "Mehr erfahren", 
+    label,
+    title,
+    description,
+    quote,
+    cta,
     image, 
     ctaHref 
 }) => {
@@ -48,7 +49,7 @@ const expertiseImgRef = useRef(null);
                                 className="inline-flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all group border-b border-primary/30 pb-1 hover:border-primary"
                             >
                                 {cta}
-                                <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                <Icon name="arrow_forward" className="text-lg group-hover:translate-x-1 transition-transform" />
                             </Link>
                         </div>
                     </div>

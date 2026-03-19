@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, mapPageContent } from '@/cms/lib/cms';
+import { getPage, mapPageContent, PAGE_IDS } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
@@ -11,19 +11,12 @@ import StatsSection from '@/cms/sections/StatsSection';
 import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
 
 
-// ── Assets ──────────────────────────────────────────────────────────────────
-import baumpflegeImg from '@/assets/images/services/baumpflege.png';
-import baumfaellungImg from '@/assets/images/services/baumfaellung.png';
-import gartenpflegeImg from '@/assets/images/services/gartenpflege.png';
-import wurzelnImg from '@/assets/images/services/wurzeln.png';
-import servicesHeroImg from '@/assets/images/hero/services_hero.png';
-
 /**
  * Preview Metadata for ContentBridge scanning.
  */
 export const previewData = definePreview({
     page: 'Services',
-    source: '/cms/wp/v2/pages?slug=leistungen',
+    source: '/content-core/v1/post/page/16',
     sections: [
         {
             section: 'PageHeroSection',
@@ -53,31 +46,53 @@ export const previewData = definePreview({
 const Services = () => {
     const { language, t, globalCmsData } = useLanguage();
     useScrollReveal();
+    const [statsCmsData, setStatsCmsData] = useState(null);
 
-    const getLocalContent = () => ({
+    const mergeHomeStats = (servicesContent, homePage) => {
+        if (!homePage) return servicesContent;
+
+        const homeMapped = mapPageContent(homePage, getInitialContent(), 'Home');
+
+        return {
+            ...servicesContent,
+            stats: {
+                stat1_value: servicesContent.stats.stat1_value || homeMapped.stats.stat1_value || '',
+                stat1_label: servicesContent.stats.stat1_label || homeMapped.stats.stat1_label || '',
+                stat2_value: servicesContent.stats.stat2_value || homeMapped.stats.stat2_value || '',
+                stat2_label: servicesContent.stats.stat2_label || homeMapped.stats.stat2_label || '',
+                stat3_value: servicesContent.stats.stat3_value || homeMapped.stats.stat3_value || '',
+                stat3_label: servicesContent.stats.stat3_label || homeMapped.stats.stat3_label || '',
+                stat4_value: servicesContent.stats.stat4_value || homeMapped.stats.stat4_value || '',
+                stat4_label: servicesContent.stats.stat4_label || homeMapped.stats.stat4_label || '',
+            },
+        };
+    };
+
+    const getInitialContent = () => ({
         hero: {
-            title: t('nav.services'),
-            image: servicesHeroImg,
+            title: '',
+            image: '',
         },
         blocks: {
-            s1_title: t('services.baumpflege.title'), s1_description: t('services.baumpflege.desc'), s1_list: t('services.baumpflege.features') || [], s1_image: baumpflegeImg,
-            s2_title: t('services.baumfaellung.title'), s2_description: t('services.baumfaellung.desc'), s2_list: t('services.baumfaellung.features') || [], s2_image: baumfaellungImg,
-            s3_title: t('services.gartenpflege.title'), s3_description: t('services.gartenpflege.desc'), s3_list: t('services.gartenpflege.features') || [], s3_image: gartenpflegeImg,
-            s4_title: t('services.bepflanzung.title'), s4_description: t('services.bepflanzung.desc'), s4_list: t('services.bepflanzung.features') || [], s4_image: wurzelnImg,
+            s1_title: '', s1_description: '', s1_list: [], s1_image: '',
+            s2_title: '', s2_description: '', s2_list: [], s2_image: '',
+            s3_title: '', s3_description: '', s3_list: [], s3_image: '',
+            s4_title: '', s4_description: '', s4_list: [], s4_image: '',
         },
         stats: {
-            stat1_value: '500+', stat1_label: t('stats.clients'),
-            stat2_value: '2500+', stat2_label: t('stats.trees'),
-            stat3_value: '100+', stat3_label: t('stats.experience'),
-            stat4_value: '100%', stat4_label: t('stats.safety'),
+            stat1_value: '', stat1_label: '',
+            stat2_value: '', stat2_label: '',
+            stat3_value: '', stat3_label: '',
+            stat4_value: '', stat4_label: '',
         },
     });
 
-    const [pageData, setPageData] = useState(getLocalContent());
+    const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);
 
     useEffect(() => {
-        setPageData(getLocalContent());
+        setPageData(getInitialContent());
+        setStatsCmsData(null);
     }, [language, t]);
 
     useEffect(() => {
@@ -86,11 +101,16 @@ const Services = () => {
             try {
                 await awaitMappings();
                 if (cancelled) return;
-                const page = await getPage('leistungen', language);
+                const [page, homePage] = await Promise.all([
+                    getPage(PAGE_IDS.services, language),
+                    getPage(PAGE_IDS.home, language),
+                ]);
                 if (cancelled) return;
                 if (page) {
                     setRawPage(page);
-                    setPageData(prev => mapPageContent(page, prev, 'Services'));
+                    setStatsCmsData(homePage || page);
+                    const mappedServices = mapPageContent(page, getInitialContent(), 'Services');
+                    setPageData(mergeHomeStats(mappedServices, homePage));
                 }
             } catch (err) {
                 console.error('[Services] CMS load failed:', err);
@@ -114,7 +134,11 @@ const Services = () => {
             <ServicesBlocksSection {...getProps('ServicesBlocksSection', pageData.blocks)} />
 
             {/* Page: Services → Section: StatsSection */}
-            <StatsSection {...getProps('StatsSection', pageData.stats)} page="Services" section="StatsSection" />
+            <StatsSection
+                {...resolveInstanceProps('Services', 'StatsSection', pageData.stats, statsCmsData || rawPage || globalCmsData)}
+                page="Services"
+                section="StatsSection"
+            />
         </main>
     );
 };

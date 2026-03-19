@@ -527,9 +527,24 @@
     },
     "Contact": {
       "instances": {
+        "PageHeroSection": {
+          "component": "PageHeroSection",
+          "props": {
+            "image": {
+              "fieldPath": "customFields.kontakt_header.url",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
         "ContactSidebarSection": {
           "component": "ContactSidebarSection",
           "props": {
+            "contact_person": {
+              "fieldPath": "data.contact_person",
+              "sourceId": "39fpj02s",
+              "isUnstable": false
+            },
             "area_text": {
               "fieldPath": "customFields.einsatzgebiet_text",
               "sourceId": "nnnd3pjq",
