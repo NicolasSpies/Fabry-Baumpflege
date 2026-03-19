@@ -18,7 +18,7 @@ const PageHeroSection = ({ title, image }) => {
 
         const timeoutId = window.setTimeout(() => {
             setIsImageReady(true);
-        }, 120);
+        }, 80);
 
         return () => window.clearTimeout(timeoutId);
     }, [imageKey]);
@@ -29,9 +29,9 @@ const PageHeroSection = ({ title, image }) => {
                 image={image}
                 ref={heroRef}
                 alt=""
-                preferSmallSource={false}
                 className="absolute inset-0 w-full h-full object-cover"
                 sizes="100vw"
+                loading="eager"
                 fetchPriority="high"
                 onLoad={() => setIsImageReady(true)}
                 onError={() => setIsImageReady(true)}

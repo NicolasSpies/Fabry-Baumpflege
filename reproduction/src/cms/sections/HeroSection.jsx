@@ -18,7 +18,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref }
 
         const timeoutId = window.setTimeout(() => {
             setIsImageReady(true);
-        }, 120);
+        }, 80);
 
         return () => window.clearTimeout(timeoutId);
     }, [imageKey]);
@@ -30,9 +30,9 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref }
                     image={image}
                     ref={heroRef}
                     alt=""
-                    preferSmallSource={false}
                     className="w-full h-[120%] object-cover object-top md:filter md:brightness-[0.80] md:contrast-[1.05]"
                     sizes="100vw"
+                    loading="eager"
                     fetchPriority="high"
                     onLoad={() => setIsImageReady(true)}
                     onError={() => setIsImageReady(true)}
