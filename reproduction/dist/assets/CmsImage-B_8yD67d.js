@@ -1,1 +1,0 @@
-import{x as u,y as g,j as p}from"./index-CxS6-dvN.js";function C(s){return s}const d=u.forwardRef(function({image:r,alt:n,sizes:t,className:a="",loading:m,decoding:o="async",fetchPriority:i,...c},f){const e=g(r,{alt:n,sizes:t,loading:m,decoding:o,fetchPriority:i});return e?.src?p.jsx("img",{ref:f,className:a,...e,...c}):null});export{d as C,C as d};

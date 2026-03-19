@@ -27,13 +27,18 @@ const TestimonialsSection = ({
     page = 'Home',
     section = 'TestimonialsSection'
 }) => {
-    const marqueeTrackRef = useRef(null);
-    const SPEED_PX_PER_SEC = 40;
+    const sectionRef = useRef(null);
+    const trackRef = useRef(null);
     const offsetRef = useRef(0);
-    const isHoveringRef = useRef(false);
+    const [isInView, setIsInView] = useState(false);
+    const [isPageVisible, setIsPageVisible] = useState(
+        typeof document === 'undefined' ? true : document.visibilityState === 'visible'
+    );
+    const SPEED_PX_PER_SEC = 22;
 
     // ── Live CMS testimonials ──────────────────────────────────────────────
     const [items, setItems] = useState(fallbackItems ?? []);
+    const displayItems = items.length > 1 ? [...items, ...items] : items;
 
     // Keep section state in sync with async parent updates.
     // Without this, the section can stay empty until it remounts.
@@ -57,47 +62,78 @@ const TestimonialsSection = ({
         return () => { cancelled = true; };
     }, [language]);
 
-    // ── Scroll marquee animation ───────────────────────────────────────────
     useEffect(() => {
-        const track = marqueeTrackRef.current;
-        if (!track) return;
-        let prevTimestamp = null;
-        let rafId;
-        const tick = (timestamp) => {
-            if (prevTimestamp === null) prevTimestamp = timestamp;
-            const deltaTime = (timestamp - prevTimestamp) / 1000;
-            prevTimestamp = timestamp;
-            if (!isHoveringRef.current) {
-                const singleSetWidth = track.scrollWidth / 2;
-                if (singleSetWidth > 0) {
-                    offsetRef.current += SPEED_PX_PER_SEC * deltaTime;
-                    if (offsetRef.current >= singleSetWidth) offsetRef.current -= singleSetWidth;
-                    track.style.transform = `translate3d(-${offsetRef.current}px, 0, 0)`;
-                }
-            }
-            rafId = requestAnimationFrame(tick);
-        };
-        rafId = requestAnimationFrame(tick);
-        return () => cancelAnimationFrame(rafId);
+        const section = sectionRef.current;
+        if (!section || typeof IntersectionObserver === 'undefined') return undefined;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                setIsInView(entries.some((entry) => entry.isIntersecting));
+            },
+            { threshold: 0.45, rootMargin: '-8% 0px -8% 0px' }
+        );
+
+        observer.observe(section);
+        return () => observer.disconnect();
     }, []);
 
+    useEffect(() => {
+        if (typeof document === 'undefined') return undefined;
+
+        const handleVisibilityChange = () => {
+            setIsPageVisible(document.visibilityState === 'visible');
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, []);
+
+    useEffect(() => {
+        const track = trackRef.current;
+        if (!track || !isInView || !isPageVisible || items.length <= 1) return undefined;
+
+        let rafId = null;
+        let previousTs = null;
+        const speed =
+            typeof window !== 'undefined' && window.innerWidth < 768
+                ? SPEED_PX_PER_SEC * 0.72
+                : SPEED_PX_PER_SEC;
+
+        const tick = (ts) => {
+            if (previousTs === null) previousTs = ts;
+            const delta = (ts - previousTs) / 1000;
+            previousTs = ts;
+
+            const singleSetWidth = track.scrollWidth / 2;
+            if (singleSetWidth > 0) {
+                offsetRef.current += speed * delta;
+                if (offsetRef.current >= singleSetWidth) {
+                    offsetRef.current -= singleSetWidth;
+                }
+                track.style.transform = `translate3d(-${offsetRef.current}px, 0, 0)`;
+            }
+
+            rafId = window.requestAnimationFrame(tick);
+        };
+
+        rafId = window.requestAnimationFrame(tick);
+        return () => {
+            if (rafId) window.cancelAnimationFrame(rafId);
+        };
+    }, [isInView, isPageVisible, items.length]);
+
     return (
-        <section className="py-24 bg-background-light dark:bg-background-dark overflow-hidden">
-            <div className="max-w-7xl mx-auto px-6 mb-16">
+        <section ref={sectionRef} className="py-20 md:py-24 bg-background-light dark:bg-background-dark overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 mb-12 md:mb-16">
                 <div className="text-center space-y-4">
                     <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">{label}</span>
                     <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">{title}</h2>
                 </div>
             </div>
             <div className="relative">
-                <div
-                    className="w-full relative -my-10 py-10 overflow-hidden cursor-grab active:cursor-grabbing"
-                    onMouseEnter={() => isHoveringRef.current = true}
-                    onMouseLeave={() => { isHoveringRef.current = false; }}
-                    style={{ touchAction: 'pan-y' }}
-                >
-                    <div ref={marqueeTrackRef} className="flex flex-nowrap gap-8 px-6 w-max will-change-transform">
-                        {[...items, ...items].map((tm, idx) => (
+                <div className="w-full overflow-hidden">
+                    <div ref={trackRef} className="flex gap-4 md:gap-8 px-4 md:px-8 w-max items-stretch pb-2 will-change-transform">
+                        {displayItems.map((tm, idx) => (
                             <TestimonialCard
                                 key={idx}
                                 author={tm.author}

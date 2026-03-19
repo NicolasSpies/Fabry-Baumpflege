@@ -179,24 +179,28 @@ const References = () => {
         );
     }
 
+    if (isLoading || !rawPage) {
+        return <main className="pt-28 min-h-screen" />;
+    }
+
     const headerProps = getProps('ReferencesHeaderSection', pageData.header);
 
     return (
         <main className="pt-28">
             {/* Page: References → Section: ReferencesHeaderSection */}
-            <section className="pt-8 pb-8 px-6 text-center">
+            <section className="pt-6 md:pt-8 pb-6 md:pb-8 px-4 md:px-6 text-center">
                 <div className="max-w-7xl mx-auto space-y-6">
-                    <p className="text-lg opacity-90 max-w-2xl mx-auto leading-relaxed">{headerProps.intro}</p>
+                    <p className="text-base md:text-lg opacity-90 max-w-2xl mx-auto leading-relaxed">{headerProps.intro}</p>
                 </div>
             </section>
 
             {/* Page: References → Section: ReferencesCategoryFilter */}
-            <section className="relative z-10 bg-background-light dark:bg-background-dark border-y border-slate-100 dark:border-slate-800 py-4">
+            <section className="relative z-10 bg-background-light dark:bg-background-dark border-y border-slate-100 dark:border-slate-800 py-3 md:py-4">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex flex-nowrap md:flex-wrap items-center justify-start md:justify-center gap-3 md:gap-8 overflow-x-auto px-6 scrollbar-hide">
+                    <div className="flex flex-wrap items-center justify-center gap-2 md:gap-8 px-4 md:px-6">
                         <button
                             onClick={() => setActiveCatId(null)}
-                            className={`flex-shrink-0 px-6 py-2 rounded-full text-sm font-medium uppercase tracking-widest transition-[background-color,color,box-shadow] ${activeCatId === null ? 'bg-[#2a411a] text-white shadow-lg' : 'text-slate-500 hover:text-primary'}`}
+                            className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-full text-[0.65rem] md:text-sm font-medium uppercase tracking-[0.16em] md:tracking-widest transition-[background-color,color,box-shadow] ${activeCatId === null ? 'bg-[#2a411a] text-white shadow-lg' : 'text-slate-500 hover:text-primary'}`}
                         >
                             {headerProps.all}
                         </button>
@@ -204,7 +208,7 @@ const References = () => {
                             <button
                                 key={cat.id}
                                 onClick={() => setActiveCatId(cat.id)}
-                                className={`flex-shrink-0 px-6 py-2 rounded-full text-sm font-medium uppercase tracking-widest transition-[background-color,color,box-shadow] ${activeCatId !== null && String(activeCatId) === String(cat.id) ? 'bg-[#2a411a] text-white shadow-lg' : 'text-slate-500 hover:text-primary'}`}
+                                className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-full text-[0.65rem] md:text-sm font-medium uppercase tracking-[0.16em] md:tracking-widest transition-[background-color,color,box-shadow] ${activeCatId !== null && String(activeCatId) === String(cat.id) ? 'bg-[#2a411a] text-white shadow-lg' : 'text-slate-500 hover:text-primary'}`}
                             >
                                 {cat.name}
                             </button>
@@ -214,34 +218,30 @@ const References = () => {
             </section>
 
             {/* Page: References → Section: ReferencesGridSection → Component: ReferenceCard */}
-            <section className="pb-32 px-6 mt-16">
+            <section className="pb-24 md:pb-32 px-4 md:px-6 mt-10 md:mt-16">
                 <div className="max-w-7xl mx-auto">
-                    {isLoading ? (
-                        <div className="min-h-[40vh] flex items-center justify-center">
-                            <div className="w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin" />
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {filteredRefs.map((project, index) => (
-                                <ReferenceCard
-                                    key={project.id}
-                                    id={project.id}
-                                    title={project.title}
-                                    description={project.description}
-                                    location={project.location}
-                                    thumbnailImage={project.thumbnailImage}
-                                    language={language}
-                                    animateEntry={isInitialRender}
-                                    staggerIndex={index}
-                                    data={project.data}
-                                    page="References"
-                                    section="ReferencesGridSection"
-                                />
-                            ))}
-                        </div>
-                    )}
-                    <div className="mt-20 text-center">
-                        <button className="inline-flex items-center gap-3 px-12 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-colors duration-300">
+                    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8">
+                        {filteredRefs.map((project, index) => (
+                            <ReferenceCard
+                                key={project.id}
+                                id={project.id}
+                                title={project.title}
+                                description={project.description}
+                                location={project.location}
+                                thumbnailImage={project.thumbnailImage}
+                                language={language}
+                                animateEntry={isInitialRender}
+                                staggerIndex={index}
+                                forceSquare={true}
+                                compactMobileOverlay={true}
+                                data={project.data}
+                                page="References"
+                                section="ReferencesGridSection"
+                            />
+                        ))}
+                    </div>
+                    <div className="mt-14 md:mt-20 text-center">
+                        <button className="inline-flex items-center gap-3 px-8 md:px-12 py-3.5 md:py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-colors duration-300 text-xs md:text-base">
                             {headerProps.load_more}
                             <Icon name="refresh" className="text-base" />
                         </button>

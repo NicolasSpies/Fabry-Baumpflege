@@ -26,6 +26,7 @@ export const translations = {
             'Seilklettertechnik (SKT) für schwierige Lagen',
             'Erhalt der natürlichen Baumarchitektur'
         ],
+        'services.page_intro': 'Vier klar definierte Leistungsbereiche. Präzise Baumpflege, sichere Abtragung, strukturierte Gartenpflege und nachhaltige Bepflanzung.',
         'services.baumfaellung.title': 'Baumfällung',
         'services.baumfaellung.desc': 'Sichere Fällungen auch an schwierigen Standorten mittels Seilklettertechnik oder Hubsteiger.',
         'services.baumfaellung.features': [
@@ -191,6 +192,7 @@ export const translations = {
             'Grimpe (SKT) pour les endroits difficiles',
             "Préservation de l'architecture naturelle de l'arbre"
         ],
+        'services.page_intro': "Quatre domaines de service clairement structurés. Entretien des arbres, abattage sécurisé, entretien de jardin précis et plantation durable.",
         'services.baumfaellung.title': 'Abattage',
         'services.baumfaellung.desc': "Abattages sécurisés, même dans des endroits difficiles, grâce à la technique de grimpe encordée ou à la nacelle élévatrice.",
         'services.baumfaellung.features': [

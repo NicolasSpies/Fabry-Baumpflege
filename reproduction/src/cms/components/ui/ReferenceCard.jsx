@@ -12,7 +12,7 @@ const preloadReferenceDetailPage = () => import('@/cms/pages/ReferenceDetail');
 /**
  * Reusable Reference Card Component.
  */
-const ReferenceCard = ({ id, title, description, location, thumbnailImage, animateEntry, staggerIndex, forceSquare, language, data, page = 'Home', section = 'ReferencesSection' }) => {
+const ReferenceCard = ({ id, title, description, location, thumbnailImage, animateEntry, staggerIndex, forceSquare, compactMobileOverlay = false, language, data, page = 'Home', section = 'ReferencesSection' }) => {
     const props = resolveInstanceProps(page, `${section}/ReferenceCard`, {
         id, title, description, location, thumbnailImage
     }, data);
@@ -55,10 +55,10 @@ const ReferenceCard = ({ id, title, description, location, thumbnailImage, anima
             onMouseEnter={prefetchDetail}
             onFocus={prefetchDetail}
             onTouchStart={prefetchDetail}
-            className={`group relative rounded-2xl bg-white dark:bg-slate-800 block shadow-md hover:shadow-xl transition-[box-shadow] duration-500 overflow-hidden ${animateEntry ? 'animate-entrance' : ''}`}
+            className={`group relative rounded-2xl bg-white dark:bg-slate-800 block shadow-sm md:shadow-md md:hover:shadow-xl transition-[box-shadow] duration-500 overflow-hidden ${animateEntry ? 'animate-entrance' : ''}`}
             style={animateEntry ? { animationDelay: `${staggerIndex * 0.1}s` } : {}}
         >
-            <div className="relative w-full overflow-hidden aspect-[4/5] sm:aspect-square">
+            <div className={`relative w-full overflow-hidden ${forceSquare ? 'aspect-square' : 'aspect-[4/5] sm:aspect-square'}`}>
                 <CmsImage
                     image={props.thumbnailImage}
                     alt={props.title}
@@ -66,18 +66,18 @@ const ReferenceCard = ({ id, title, description, location, thumbnailImage, anima
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-primary/70 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 text-white" style={{ willChange: 'opacity' }}>
-                    <span className="text-[10px] uppercase tracking-widest mb-2 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-100">
+                <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-primary/70 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end text-white ${compactMobileOverlay ? 'p-4 md:p-8' : 'p-8'}`} style={{ willChange: 'opacity' }}>
+                    <span className={`uppercase tracking-widest mb-2 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-100 ${compactMobileOverlay ? 'text-[9px] md:text-[10px]' : 'text-[10px]'}`}>
                         {props.location}
                     </span>
-                    <h3 className="font-serif text-2xl mb-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-200">
+                    <h3 className={`font-serif mb-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-200 ${compactMobileOverlay ? 'text-lg md:text-2xl' : 'text-2xl'}`}>
                         {props.title}
                     </h3>
-                    <p className="text-xs opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-300 line-clamp-2">
+                    <p className={`text-xs opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-300 line-clamp-2 ${compactMobileOverlay ? 'hidden md:block' : ''}`}>
                         {props.description}
                     </p>
 
-                    <div className="mt-4 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-2 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-400">
+                    <div className={`mt-4 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-2 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-400 ${compactMobileOverlay ? 'hidden md:block' : ''}`}>
                         <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest border-b border-white/40 pb-1">
                             {t('expertise.learn_more')}
                             <Icon name="arrow_forward" className="text-sm" />

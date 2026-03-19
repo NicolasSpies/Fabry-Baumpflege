@@ -158,15 +158,25 @@ export function getCmsImageProps(image, options = {}) {
     const normalized = normalizeCmsImage(image);
     if (!normalized?.src) return null;
 
+    const preferredMobileSource =
+        normalized.sources?.cc_small ||
+        normalized.fallback ||
+        normalized.full ||
+        null;
+    const lockToSmallMobile = Boolean(options.preferSmall && preferredMobileSource?.url);
+    const activeSource = lockToSmallMobile ? preferredMobileSource : normalized;
+
     const props = {
-        src: normalized.src,
+        src: activeSource.url || activeSource.src || normalized.src,
         alt: options.alt ?? normalized.alt ?? '',
     };
 
-    if (normalized.srcSet) props.srcSet = normalized.srcSet;
-    if (options.sizes || normalized.sizes) props.sizes = options.sizes || normalized.sizes;
-    if (normalized.width) props.width = normalized.width;
-    if (normalized.height) props.height = normalized.height;
+    if (!lockToSmallMobile && normalized.srcSet) props.srcSet = normalized.srcSet;
+    if (!lockToSmallMobile && (options.sizes || normalized.sizes)) {
+        props.sizes = options.sizes || normalized.sizes;
+    }
+    if (activeSource.width || normalized.width) props.width = activeSource.width || normalized.width;
+    if (activeSource.height || normalized.height) props.height = activeSource.height || normalized.height;
     if (options.loading) props.loading = options.loading;
     if (options.decoding) props.decoding = options.decoding;
     if (options.fetchPriority) props.fetchPriority = options.fetchPriority;

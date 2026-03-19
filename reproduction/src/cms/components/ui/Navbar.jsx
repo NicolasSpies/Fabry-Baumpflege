@@ -21,7 +21,9 @@ const Navbar = ({
     const location = useLocation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    const [isMobileMode, setIsMobileMode] = useState(false);
+    const [isMobileMode, setIsMobileMode] = useState(() => (
+        typeof window !== 'undefined' ? window.innerWidth < 1180 : false
+    ));
 
     const containerRef = useRef(null);
     const logoRef = useRef(null);
@@ -35,7 +37,7 @@ const Navbar = ({
             const logoWidth = logoRef.current.getBoundingClientRect().width;
             const navWidth = desktopNavRef.current.scrollWidth;
             const requiredWidth = logoWidth + navWidth + 24;
-            setIsMobileMode(requiredWidth >= availableWidth);
+            setIsMobileMode(window.innerWidth < 1180 || requiredWidth >= availableWidth);
         };
 
         checkCollision();
@@ -66,6 +68,11 @@ const Navbar = ({
 
     const actualLinks = links || fallbackLinks;
     const actualCtaLabel = ctaLabel || t('nav.contact');
+    const menuButtonLabel = isMenuOpen
+        ? (language === 'FR' ? 'Fermer le menu' : 'Menü schließen')
+        : (language === 'FR' ? 'Ouvrir le menu' : 'Menü öffnen');
+    const deLanguageLabel = language === 'FR' ? 'Passer en allemand' : 'Sprache auf Deutsch wechseln';
+    const frLanguageLabel = language === 'FR' ? 'Passer en français' : 'Sprache auf Französisch wechseln';
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -116,7 +123,7 @@ const Navbar = ({
             ? 'bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 py-0 shadow-sm'
             : 'bg-white dark:bg-slate-900 border-b border-slate-100/60 dark:border-slate-800/60 py-2'
             }`}>
-            <div ref={containerRef} className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div ref={containerRef} className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
                 <Link
                     to={getLocalizedPath('home', language)}
                     className="flex items-center gap-2"
@@ -131,7 +138,7 @@ const Navbar = ({
                     <img
                         ref={logoRef}
                         alt="Fabry Baumpflege Logo"
-                        className={`w-auto object-contain transition-[height] duration-300 ${isScrolled ? 'h-12' : 'h-16'}`}
+                        className={`w-auto object-contain transition-[height] duration-300 ${isMobileMode ? 'h-10 md:h-12' : (isScrolled ? 'h-12' : 'h-16')}`}
                         src={logo}
                     />
                 </Link>
@@ -147,6 +154,8 @@ const Navbar = ({
                         <div className="flex items-center gap-2 text-xs tracking-[0.2em] font-bold">
                             <button
                                 onClick={() => setLanguage('DE')}
+                                aria-label={deLanguageLabel}
+                                aria-pressed={language === 'DE'}
                                 className={`transition-[opacity,color] duration-300 ${language === 'DE' ? 'opacity-100 text-primary' : 'opacity-40 hover:opacity-70 text-slate-600 dark:text-slate-400'}`}
                             >
                                 DE
@@ -154,6 +163,8 @@ const Navbar = ({
                             <span className="opacity-20">|</span>
                             <button
                                 onClick={() => setLanguage('FR')}
+                                aria-label={frLanguageLabel}
+                                aria-pressed={language === 'FR'}
                                 className={`transition-[opacity,color] duration-300 ${language === 'FR' ? 'opacity-100 text-primary' : 'opacity-40 hover:opacity-70 text-slate-600 dark:text-slate-400'}`}
                             >
                                 FR
@@ -169,18 +180,28 @@ const Navbar = ({
                 </div>
 
                 {isMobileMode && (
-                    <button
-                        className="text-primary z-50 relative flex items-center justify-center animate-in fade-in duration-300"
-                        onClick={toggleMenu}
-                        aria-label="Toggle Menu"
-                    >
-                        <Icon name={isMenuOpen ? 'close' : 'menu'} className={`text-3xl transition-transform duration-300 ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`} />
-                    </button>
+                    <div className="flex items-center gap-2 z-50 relative animate-in fade-in duration-300">
+                        <Link
+                            to={getLocalizedPath('contact', language)}
+                            className="bg-primary text-white px-3 py-1.5 rounded-full transition-colors text-[0.55rem] font-bold uppercase tracking-[0.14em] whitespace-nowrap"
+                        >
+                            {actualCtaLabel}
+                        </Link>
+                        <button
+                            className="text-primary flex items-center justify-center"
+                            onClick={toggleMenu}
+                            aria-label={menuButtonLabel}
+                            aria-expanded={isMenuOpen}
+                            aria-controls="mobile-navigation"
+                        >
+                            <Icon name={isMenuOpen ? 'close' : 'menu'} className={`text-[1.7rem] transition-transform duration-300 ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`} />
+                        </button>
+                    </div>
                 )}
             </div>
 
             {(isMenuOpen && isMobileMode) && (
-                <div className="absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl border-b border-slate-100 dark:border-slate-800 flex flex-col items-center py-8 gap-8 z-[100] animate-in slide-in-from-top duration-300">
+                <div id="mobile-navigation" className="absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl border-b border-slate-100 dark:border-slate-800 flex flex-col items-center py-8 gap-8 z-[100] animate-in slide-in-from-top duration-300">
                     <div className="flex flex-col items-center gap-6 w-full px-6">
                         {renderLinks(true)}
                     </div>
@@ -198,6 +219,8 @@ const Navbar = ({
                     <div className="flex items-center justify-center gap-6 mt-4 pt-6 border-t border-slate-100 dark:border-slate-800/50 w-full text-sm tracking-[0.3em] font-bold">
                         <button
                             onClick={() => { setLanguage('DE'); closeMenu(); }}
+                            aria-label={deLanguageLabel}
+                            aria-pressed={language === 'DE'}
                             className={`transition-[opacity,color,transform] duration-300 ${language === 'DE' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
                         >
                             DE
@@ -205,6 +228,8 @@ const Navbar = ({
                         <span className="opacity-20 text-xl font-light">|</span>
                         <button
                             onClick={() => { setLanguage('FR'); closeMenu(); }}
+                            aria-label={frLanguageLabel}
+                            aria-pressed={language === 'FR'}
                             className={`transition-[opacity,color,transform] duration-300 ${language === 'FR' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
                         >
                             FR

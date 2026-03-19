@@ -5,7 +5,6 @@ import { getPage, mapPageContent, getForm, PAGE_IDS } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
-import PageHeroSection from '@/cms/sections/PageHeroSection';
 import ContactSidebarSection from '@/cms/sections/ContactSidebarSection';
 import ContactFormSection from '@/cms/sections/ContactFormSection';
 import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
@@ -19,10 +18,6 @@ export const previewData = definePreview({
     source: '/content-core/v1/post/page/22',
     sections: [
         {
-            section: 'PageHeroSection',
-            fields: ['title', 'image']
-        },
-        {
             section: 'ContactSidebarSection',
             fields: ['contact_person', 'phone', 'email', 'office_label', 'address', 'area_label', 'area_text']
         },
@@ -35,8 +30,6 @@ export const previewData = definePreview({
 
 const Contact = () => {
     const { language, t, globalCmsData } = useLanguage();
-    useScrollReveal();
-
     const getInitialContent = () => ({
         hero: {
             title: '',
@@ -75,6 +68,7 @@ const Contact = () => {
     const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);
     const [formSchema, setFormSchema] = useState(null);
+    useScrollReveal([rawPage, formSchema]);
 
     useEffect(() => {
         setPageData(getInitialContent());
@@ -113,14 +107,13 @@ const Contact = () => {
         return resolveInstanceProps('Contact', instanceName, localProps, rawPage);
     };
 
+    if (!rawPage || !formSchema) {
+        return <main className="min-h-screen bg-[#F9FBF7] dark:bg-background-dark" />;
+    }
+
     return (
         <main className="bg-[#F9FBF7] dark:bg-background-dark">
-            {/* Page: Contact → Section: PageHeroSection */}
-            <PageHeroSection 
-                {...getProps('PageHeroSection', pageData.hero)}
-            />
-
-            <div className="max-w-7xl mx-auto px-6 py-24">
+            <div className="max-w-7xl mx-auto px-6 pt-32 pb-24">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
                     {/* Page: Contact → Section: ContactSidebarSection */}
                     <ContactSidebarSection {...getProps('ContactSidebarSection', pageData.sidebar)} />

@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { useParallax } from '@/cms/hooks/useParallax';
+import { useSoftEntrance } from '@/cms/hooks/useSoftEntrance';
 import CmsImage from '@/cms/components/ui/CmsImage';
 
 
@@ -9,34 +10,35 @@ const PhilosophySection = ({
     text,
     image 
 }) => {
-
-const heroPortraitRef = useRef(null);
+    const sectionRef = useRef(null);
+    const heroPortraitRef = useRef(null);
+    useSoftEntrance(sectionRef, { staggerDelayMs: 110, durationMs: 720 });
     useParallax(heroPortraitRef, { speed: 0.08, maxTravel: 40, scale: 1.12 });
 
     return (
-        <section className="relative lg:min-h-[calc(100vh-80px)] flex items-center py-20 lg:py-0 px-6 overflow-hidden bg-background-light dark:bg-background-dark">
-            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center w-full">
-                <div className="relative order-2 lg:order-1">
-                    <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl reveal">
+        <section className="relative lg:min-h-[calc(100vh-80px)] flex items-center py-10 md:py-20 lg:py-0 px-6 overflow-hidden bg-background-light dark:bg-background-dark">
+            <div ref={sectionRef} className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-16 lg:gap-20 items-center w-full">
+                <div className="relative order-2 lg:order-1 soft-entrance-item">
+                    <div className="relative z-10 rounded-xl overflow-hidden shadow-sm md:shadow-2xl aspect-square sm:h-[21rem] md:aspect-auto md:h-[min(78vw,32rem)] lg:h-[38rem]">
                         <CmsImage
                             image={image}
                             ref={heroPortraitRef}
-                            alt="Portrait"
-                            className="w-full aspect-square object-cover"
+                            alt=""
+                            className="w-full h-full object-cover"
                             sizes="(max-width: 1024px) 100vw, 50vw"
                             style={{ transition: 'none' }}
                         />
                     </div>
-                    <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl -z-10" />
+                    <div className="absolute -top-10 -left-10 hidden md:block w-40 h-40 bg-primary/10 rounded-full blur-3xl -z-10" />
                 </div>
-                <div className="text-left order-1 lg:order-2">
-                    <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs mb-8 block reveal">
+                <div className="text-left order-1 lg:order-2 soft-entrance-item">
+                    <span className="text-[#9bb221] font-bold tracking-widest uppercase text-[11px] md:text-xs mb-3 md:mb-8 block">
                         {label}
                     </span>
-                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-primary mb-12 leading-tight italic reveal stagger-1">
+                    <h2 className="text-[2.1rem] sm:text-5xl lg:text-6xl font-serif text-primary mb-5 md:mb-12 leading-[1.02] italic">
                         {quote}
                     </h2>
-                    <p className="text-lg md:text-xl leading-relaxed text-slate-600 dark:text-slate-400 font-light reveal stagger-2">
+                    <p className="max-w-[34rem] text-[1rem] md:text-xl leading-[1.7] text-slate-600 dark:text-slate-400 font-light">
                         {text}
                     </p>
                 </div>

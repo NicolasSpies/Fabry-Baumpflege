@@ -4,7 +4,7 @@ import { resolveInstanceProps } from '@/cms/bridge-resolver';
 /**
  * StatCounter component for animated numbers.
  */
-const StatCounter = ({ statValue, statLabel, className = "", data, page = 'Home', section = 'StatsSection' }) => {
+const StatCounter = ({ statValue, statLabel, className = "", compact = false, data, page = 'Home', section = 'StatsSection' }) => {
     const props = resolveInstanceProps(page, `${section}/StatCounter`, { statValue, statLabel }, data);
     const [count, setCount] = useState(0);
     const countRef = useRef(null);
@@ -38,11 +38,11 @@ const StatCounter = ({ statValue, statLabel, className = "", data, page = 'Home'
     const suffix = safeValStr.includes('+') ? '+' : safeValStr.includes('%') ? '%' : '';
 
     return (
-        <div ref={countRef} className={`text-center px-4 reveal font-sans ${className}`}>
-            <div className="text-4xl md:text-5xl font-serif text-primary mb-2">
+        <div ref={countRef} className={`text-center px-2 md:px-3 reveal font-sans ${className}`}>
+            <div className={`${compact ? 'text-[2.35rem] md:text-[3rem] mb-1' : 'text-4xl md:text-5xl mb-2'} font-serif text-primary leading-none`}>
                 {count}{suffix}
             </div>
-            <div className="text-xs md:text-sm text-[#9bb221] uppercase tracking-widest font-medium">
+            <div className={`${compact ? 'text-[10px] md:text-[12px] tracking-[0.16em] md:tracking-[0.2em]' : 'text-xs md:text-sm tracking-widest'} text-[#9bb221] uppercase font-medium`}>
                 {props.statLabel}
             </div>
         </div>

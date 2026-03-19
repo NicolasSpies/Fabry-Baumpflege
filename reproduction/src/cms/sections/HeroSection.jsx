@@ -1,27 +1,45 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useParallax } from '@/cms/hooks/useParallax';
 import CmsImage from '@/cms/components/ui/CmsImage';
 
 const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref }) => {
-
-const heroRef = useRef(null);
+    const heroRef = useRef(null);
+    const [isImageReady, setIsImageReady] = useState(false);
+    const imageKey = typeof image === 'string' ? image : image?.src || image?.url || image?.full?.url || '';
     useParallax(heroRef, { speed: 0.08, maxTravel: 40, scale: 1.1 });
 
+    useEffect(() => {
+        setIsImageReady(false);
+        if (!imageKey) {
+            setIsImageReady(true);
+            return undefined;
+        }
+
+        const timeoutId = window.setTimeout(() => {
+            setIsImageReady(true);
+        }, 120);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [imageKey]);
+
     return (
-        <section className="relative h-screen w-full overflow-hidden flex items-center">
+        <section className="relative h-[82svh] min-h-[34rem] md:h-screen w-full overflow-hidden flex items-center">
             <div className="absolute inset-0 z-0">
                 <CmsImage
                     image={image}
                     ref={heroRef}
-                    alt="Hero"
-                    className="w-full h-[120%] object-cover object-top filter brightness-[0.80] contrast-[1.05]"
+                    alt=""
+                    preferSmallSource={false}
+                    className="w-full h-[120%] object-cover object-top md:filter md:brightness-[0.80] md:contrast-[1.05]"
                     sizes="100vw"
                     fetchPriority="high"
+                    onLoad={() => setIsImageReady(true)}
+                    onError={() => setIsImageReady(true)}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+                <div className={`absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent transition-opacity duration-500 ${isImageReady ? 'opacity-100' : 'opacity-0'}`} />
             </div>
-            <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-center h-full">
+            <div className={`relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-end md:items-center h-full pb-16 md:pb-0 transition-[opacity,transform] duration-500 ${isImageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'}`}>
                 <div className="w-full md:max-w-2xl space-y-6 md:space-y-7 text-left flex flex-col items-start">
                     <h1 className="font-serif text-white leading-[0.95] md:leading-[0.95] reveal">
                         <span className="text-[1.5rem] md:text-[2.25rem] lg:text-[2.5rem] block mb-[0.125rem] md:mb-1 text-white/75 font-light tracking-wide">

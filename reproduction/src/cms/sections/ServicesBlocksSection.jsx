@@ -21,7 +21,7 @@ const ServiceImage = ({ src, alt }) => {
     );
 };
 
-const ServiceBlockInternal = ({ id, title, description, list, image, reverse, bg }) => {
+const ServiceBlockInternal = ({ id, title, description, list, image, reverse, tone = 'plain', isFirst = false }) => {
     const IconComponent = () => {
         switch (id) {
             case 'baumpflege': return <BaumpflegeIcon variant="outline" className="w-16 h-16 text-primary" />;
@@ -32,38 +32,47 @@ const ServiceBlockInternal = ({ id, title, description, list, image, reverse, bg
         }
     };
 
+    const toneClass = tone === 'soft' ? 'md:bg-surface-light/50 md:dark:bg-surface-dark/20' : '';
+    const mobilePanelClass = 'bg-surface-light/75 border border-primary/10 shadow-sm';
+
     return (
         <section
             id={id}
-            className={`py-32 px-6 overflow-hidden ${bg ? 'bg-surface-light/50 dark:bg-surface-dark/20' : ''}`}
+            className={`${isFirst ? 'pt-4 md:pt-14 pb-9 md:pb-28' : 'py-9 md:py-32'} px-4 md:px-6 overflow-hidden ${toneClass}`}
         >
             <div className="max-w-7xl mx-auto">
-                <div className={`flex flex-col lg:flex-row items-center gap-16 ${reverse ? 'lg:flex-row-reverse' : ''}`}>
+                <div
+                    className={`flex flex-col lg:flex-row items-start lg:items-center gap-8 md:gap-16 lg:gap-20 rounded-[1.75rem] md:rounded-none px-4 py-4 md:p-0 ${mobilePanelClass} md:bg-transparent md:border-0 md:shadow-none ${reverse ? 'lg:flex-row-reverse' : ''}`}
+                >
                     <div className="w-full lg:w-1/2">
-                        <div className="relative rounded-xl overflow-hidden shadow-2xl reveal h-[500px]">
+                        <div className="relative rounded-[1.35rem] md:rounded-xl overflow-hidden shadow-md md:shadow-2xl reveal h-[17.5rem] sm:h-[21rem] md:h-[500px]">
                             <ServiceImage src={image} alt={title} />
                         </div>
                     </div>
-                    <div className="w-full lg:w-1/2 space-y-8 reveal stagger-1">
-                        <div className="space-y-6">
-                            <IconComponent />
-                            <h2 className="text-4xl font-serif text-primary leading-tight font-medium">
-                                {title}
-                            </h2>
+                    <div className="w-full lg:w-1/2 space-y-4 md:space-y-8 lg:space-y-10 reveal stagger-1">
+                        <div className="space-y-5 md:space-y-6 lg:space-y-7">
+                            <div className="flex items-center gap-3 md:gap-4">
+                                <div className="shrink-0 [&>svg]:w-10 [&>svg]:h-10 md:[&>svg]:w-11 md:[&>svg]:h-11 lg:[&>svg]:w-12 lg:[&>svg]:h-12">
+                                    <IconComponent />
+                                </div>
+                                <h2 className="text-[2.35rem] md:text-[2.85rem] lg:text-4xl font-serif text-primary leading-[0.98] font-medium">
+                                    {title}
+                                </h2>
+                            </div>
                         </div>
                         {description && (
-                            <p className="text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                            <p className="max-w-[34rem] text-[1.05rem] md:text-[1.1rem] lg:text-lg leading-relaxed text-slate-600 dark:text-slate-400">
                                 {description}
                             </p>
                         )}
-                        <ul className="space-y-4">
+                        <ul className="space-y-1.5 md:space-y-2.5 lg:space-y-3 pt-5 md:pt-4 border-t border-primary/10">
                             {(list || []).map((feature, fIdx) => {
                                 const text = typeof feature === 'object' ? (feature?.text || feature?.label || '') : feature;
                                 if (!text) return null;
                                 return (
-                                    <li key={fIdx} className="flex items-start gap-3">
-                                        <Icon name="check" className="text-[#9bb221] mt-1 shrink-0" />
-                                        <span className="text-slate-600 dark:text-slate-400 leading-relaxed">{text}</span>
+                                    <li key={fIdx} className="flex items-start gap-2.5 md:gap-3">
+                                        <Icon name="check" className="text-[#9bb221] mt-[0.2rem] shrink-0" />
+                                        <span className="text-[1rem] md:text-[1.02rem] lg:text-[1.05rem] text-slate-600 dark:text-slate-400 leading-[1.45]">{text}</span>
                                     </li>
                                 );
                             })}
@@ -83,10 +92,10 @@ const ServicesBlocksSection = ({
 }) => {
     return (
         <>
-            <ServiceBlockInternal id="baumpflege" title={s1_title} description={s1_description} list={s1_list} image={s1_image} />
-            <ServiceBlockInternal id="baumfaellung" title={s2_title} description={s2_description} list={s2_list} image={s2_image} reverse />
-            <ServiceBlockInternal id="gartenpflege" title={s3_title} description={s3_description} list={s3_list} image={s3_image} />
-            <ServiceBlockInternal id="bepflanzung" title={s4_title} description={s4_description} list={s4_list} image={s4_image} reverse bg />
+            <ServiceBlockInternal id="baumpflege" title={s1_title} description={s1_description} list={s1_list} image={s1_image} tone="plain" isFirst={true} />
+            <ServiceBlockInternal id="baumfaellung" title={s2_title} description={s2_description} list={s2_list} image={s2_image} reverse tone="soft" />
+            <ServiceBlockInternal id="gartenpflege" title={s3_title} description={s3_description} list={s3_list} image={s3_image} tone="plain" />
+            <ServiceBlockInternal id="bepflanzung" title={s4_title} description={s4_description} list={s4_list} image={s4_image} reverse tone="soft" />
         </>
     );
 };

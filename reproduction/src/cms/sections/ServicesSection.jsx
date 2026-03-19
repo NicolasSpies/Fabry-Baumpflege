@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useServiceCardsEntrance } from '@/cms/hooks/useServiceCardsEntrance';
 import { useSoftEntrance } from '@/cms/hooks/useSoftEntrance';
@@ -8,37 +8,50 @@ import GartenpflegeIcon from '@/cms/components/icons/GartenpflegeIcon';
 import BepflanzungIcon from '@/cms/components/icons/BepflanzungIcon';
 import CmsImage from '@/cms/components/ui/CmsImage';
 
-const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, iconVariant = 'outline' }) => {
-    const IconComponent = () => {
-        switch (icon) {
-            case 'BaumpflegeIcon': return <BaumpflegeIcon variant={iconVariant} className="w-6 h-6" />;
-            case 'BaumfaellungIcon': return <BaumfaellungIcon variant={iconVariant} className="w-6 h-6" />;
-            case 'GartenpflegeIcon': return <GartenpflegeIcon variant={iconVariant} className="w-6 h-6" />;
-            case 'BepflanzungIcon': return <BepflanzungIcon variant={iconVariant} className="w-6 h-6" />;
-            default: return null;
-        }
-    };
+function renderServiceIcon(icon, iconVariant) {
+    switch (icon) {
+        case 'BaumpflegeIcon': return <BaumpflegeIcon variant={iconVariant} className="w-6 h-6" />;
+        case 'BaumfaellungIcon': return <BaumfaellungIcon variant={iconVariant} className="w-6 h-6" />;
+        case 'GartenpflegeIcon': return <GartenpflegeIcon variant={iconVariant} className="w-6 h-6" />;
+        case 'BepflanzungIcon': return <BepflanzungIcon variant={iconVariant} className="w-6 h-6" />;
+        default: return null;
+    }
+}
+
+const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, iconVariant = 'outline', isActive = false, cardRef = null }) => {
+    const activeState = isActive
+        ? 'shadow-xl shadow-slate-200/60 -translate-y-2'
+        : '';
+    const imageState = isActive
+        ? 'opacity-10'
+        : 'opacity-0';
+    const titleState = isActive
+        ? 'text-[#3E5F25]'
+        : '';
+    const iconContainerState = isActive
+        ? 'bg-[#3E5F25] text-white'
+        : 'bg-slate-100 dark:bg-slate-800/50 text-[#3E5F25]';
 
     return (
-        <div className="expert-card-anim h-full">
+        <div ref={cardRef} className="expert-card-anim h-full">
             <Link
                 to={href || '#'}
-                className="group relative bg-white dark:bg-surface-dark rounded-[2rem] p-8 md:p-10 hover:-translate-y-2 transition-transform duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full"
+                className={`group relative bg-white dark:bg-surface-dark rounded-[2rem] p-8 md:p-10 transition-[transform,box-shadow] duration-500 shadow-lg md:shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full md:hover:-translate-y-2 md:hover:shadow-xl md:hover:shadow-slate-200/60 ${activeState}`}
             >
                 {/* Visual enhancement: Show service image if available, else show gradient blob */}
                 {image ? (
-                    <div className="absolute inset-x-0 bottom-0 top-1/2 opacity-0 group-hover:opacity-10 transition-opacity duration-700">
+                    <div className={`absolute inset-x-0 bottom-0 top-1/2 transition-opacity duration-700 ${imageState} md:opacity-0 md:group-hover:opacity-10`}>
                          <CmsImage image={image} className="w-full h-full object-cover grayscale" alt="" sizes="(max-width: 1024px) 100vw, 25vw" loading="lazy" />
                     </div>
                 ) : (
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors duration-500"></div>
+                    <div className={`absolute top-0 right-0 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 transition-colors duration-500 ${isActive ? 'bg-primary/10' : ''} md:group-hover:bg-primary/10`}></div>
                 )}
                 
                 <div className="relative z-10 flex flex-col flex-grow">
-                    <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center mb-6 text-[#3E5F25] group-hover:bg-[#3E5F25] group-hover:text-white transition-all duration-300">
-                        <IconComponent />
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 ${iconContainerState} md:group-hover:bg-[#3E5F25] md:group-hover:text-white`}>
+                        {renderServiceIcon(icon, iconVariant)}
                     </div>
-                    <h3 className="text-2xl font-serif text-primary mb-4 group-hover:text-[#3E5F25] dark:group-hover:text-primary transition-colors">
+                    <h3 className={`text-2xl font-serif text-primary mb-4 transition-colors ${titleState} md:group-hover:text-[#3E5F25]`}>
                         {title}
                     </h3>
                     {description && (
@@ -63,9 +76,6 @@ const ServicesSection = ({
     ctaLabel = '',
     iconVariant = 'outline',
     getServiceHref,
-    page = 'Home',
-    section = 'ServicesSection',
-
     // Use aligned sX_ prefixing to match ServicesBlocksSection
     s1_title, s1_description, s1_icon = 'BaumpflegeIcon', s1_id = 'baumpflege', s1_image,
     s2_title, s2_description, s2_icon = 'BaumfaellungIcon', s2_id = 'baumfaellung', s2_image,
@@ -75,8 +85,61 @@ const ServicesSection = ({
 
     const sectionRef = useRef(null);
     const cardsRef = useRef(null);
+    const cardNodeRefs = useRef([]);
+    const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+    const [activeMobileIndex, setActiveMobileIndex] = useState(0);
     useSoftEntrance(sectionRef);
     useServiceCardsEntrance(cardsRef);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return undefined;
+
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        if (!isMobile || typeof IntersectionObserver === 'undefined') {
+            setActiveMobileIndex(0);
+            return undefined;
+        }
+
+        const nodes = cardNodeRefs.current.filter(Boolean);
+        if (!nodes.length) return undefined;
+
+        const ratios = new Map();
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    ratios.set(Number(entry.target.dataset.cardIndex), entry.intersectionRatio);
+                });
+
+                let winnerIndex = 0;
+                let winnerRatio = 0;
+                ratios.forEach((ratio, index) => {
+                    if (ratio > winnerRatio) {
+                        winnerRatio = ratio;
+                        winnerIndex = index;
+                    }
+                });
+
+                setActiveMobileIndex(winnerIndex);
+            },
+            {
+                threshold: [0.2, 0.35, 0.5, 0.65, 0.8],
+                rootMargin: '-12% 0px -12% 0px',
+            }
+        );
+
+        nodes.forEach((node, index) => {
+            node.dataset.cardIndex = String(index);
+            observer.observe(node);
+        });
+
+        return () => observer.disconnect();
+    }, [isMobile]);
 
     const getHref = (id) => getServiceHref ? getServiceHref(id) : `#${id}`;
 
@@ -102,6 +165,8 @@ const ServicesSection = ({
                             image={s1_image}
                             ctaLabel={ctaLabel}
                             iconVariant={iconVariant}
+                            isActive={isMobile && activeMobileIndex === 0}
+                            cardRef={(node) => { cardNodeRefs.current[0] = node; }}
                         />
                     </div>
                     <div className="soft-entrance-item">
@@ -113,6 +178,8 @@ const ServicesSection = ({
                             image={s2_image}
                             ctaLabel={ctaLabel}
                             iconVariant={iconVariant}
+                            isActive={isMobile && activeMobileIndex === 1}
+                            cardRef={(node) => { cardNodeRefs.current[1] = node; }}
                         />
                     </div>
                     <div className="soft-entrance-item">
@@ -124,6 +191,8 @@ const ServicesSection = ({
                             image={s3_image}
                             ctaLabel={ctaLabel}
                             iconVariant={iconVariant}
+                            isActive={isMobile && activeMobileIndex === 2}
+                            cardRef={(node) => { cardNodeRefs.current[2] = node; }}
                         />
                     </div>
                     <div className="soft-entrance-item">
@@ -135,6 +204,8 @@ const ServicesSection = ({
                             image={s4_image}
                             ctaLabel={ctaLabel}
                             iconVariant={iconVariant}
+                            isActive={isMobile && activeMobileIndex === 3}
+                            cardRef={(node) => { cardNodeRefs.current[3] = node; }}
                         />
                     </div>
                 </div>

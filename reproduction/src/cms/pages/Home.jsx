@@ -75,8 +75,6 @@ export const previewData = definePreview({
 
 const Home = () => {
     const { language, t, globalCmsData } = useLanguage();
-    useScrollReveal();
-
     const mergeServicePreviewContent = (content, servicesPage) => {
         if (!servicesPage) return content;
 
@@ -162,6 +160,7 @@ const Home = () => {
     // Tracks whether runtime mappings have been fetched; triggers a re-render
     // so resolveInstanceProps uses the latest manifest, not the bundled fallback.
     const [mappingsReady, setMappingsReady] = useState(false);
+    useScrollReveal([rawPage, pageData.references.items.length, pageData.testimonials.items.length]);
 
     // Re-apply local content on language change
     useEffect(() => {
@@ -276,6 +275,10 @@ const Home = () => {
     const getProps = (instanceName, localProps) => 
         resolveInstanceProps('Home', instanceName, localProps, rawPage || globalCmsData);
 
+    if (!rawPage) {
+        return <main className="min-h-screen" />;
+    }
+
     return (
         <main>
             {/* Page: Home → Section: HeroSection */}
@@ -284,7 +287,7 @@ const Home = () => {
             />
 
             {/* Page: Home → Section: StatsSection */}
-            <StatsSection {...getProps('StatsSection', pageData.stats)} />
+            <StatsSection {...getProps('StatsSection', pageData.stats)} compact={true} />
 
             {/* Page: Home → Section: ServicesSection */}
             <ServicesSection

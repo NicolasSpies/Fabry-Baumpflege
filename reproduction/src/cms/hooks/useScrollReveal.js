@@ -45,6 +45,17 @@ export const useScrollReveal = (dependencies = []) => {
     useEffect(() => {
         if (typeof document === 'undefined') return undefined;
 
+        const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+        if (prefersReducedMotion || isMobile) {
+            document.querySelectorAll('.reveal').forEach((element) => {
+                element.classList.add('reveal-visible');
+                element.removeAttribute('data-reveal-bound');
+            });
+            return undefined;
+        }
+
         const observer = getRevealObserver();
         const rafId = window.requestAnimationFrame(() => {
             const scrollRevealElements = document.querySelectorAll('.reveal:not(.reveal-visible):not([data-reveal-bound])');

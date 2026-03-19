@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import BaumpflegeIcon from '@/cms/components/icons/BaumpflegeIcon';
 import BaumfaellungIcon from '@/cms/components/icons/BaumfaellungIcon';
 import GartenpflegeIcon from '@/cms/components/icons/GartenpflegeIcon';
@@ -10,10 +11,10 @@ import Icon from '@/cms/components/ui/Icon';
 const IconRenderer = ({ icon, isSelected }) => {
     const className = `w-8 h-8 md:w-12 md:h-12 flex items-center justify-center text-3xl md:text-5xl font-light ${isSelected ? 'text-primary' : 'text-slate-400'}`;
     switch (icon) {
-        case 'BaumpflegeIcon': return <BaumpflegeIcon variant={isSelected ? 'solid' : 'outline'} className={className} />;
-        case 'BaumfaellungIcon': return <BaumfaellungIcon variant={isSelected ? 'solid' : 'outline'} className={`w-8 h-8 md:w-12 md:h-12 ${isSelected ? 'text-primary' : 'text-slate-400'}`} />;
-        case 'GartenpflegeIcon': return <GartenpflegeIcon variant={isSelected ? 'solid' : 'outline'} className={className} />;
-        case 'BepflanzungIcon': return <BepflanzungIcon variant={isSelected ? 'solid' : 'outline'} className={className} />;
+        case 'BaumpflegeIcon': return <BaumpflegeIcon variant="outline" className={className} />;
+        case 'BaumfaellungIcon': return <BaumfaellungIcon variant="outline" className={`w-8 h-8 md:w-12 md:h-12 ${isSelected ? 'text-primary' : 'text-slate-400'}`} />;
+        case 'GartenpflegeIcon': return <GartenpflegeIcon variant="outline" className={className} />;
+        case 'BepflanzungIcon': return <BepflanzungIcon variant="outline" className={className} />;
         default: return <Icon name="info" className={`text-3xl md:text-5xl font-light ${isSelected ? 'text-primary' : 'text-slate-400'}`} />;
     }
 };
@@ -29,12 +30,29 @@ const getServiceIcon = (field) => {
     return field?.icon || 'info';
 };
 
+const detectServiceKey = (value) => {
+    const token = String(value || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z]+/g, ' ');
+    const compactToken = token.replace(/\s+/g, '');
+
+    if (token.includes('baum fall') || compactToken.includes('baumfall') || compactToken.includes('baumfaellung') || token.includes('abattage')) return 'baumfaellung';
+    if (token.includes('baum pflege') || compactToken.includes('baumpflege') || token.includes('taille raisonnee') || compactToken.includes('tailleraisonnee')) return 'baumpflege';
+    if (token.includes('garten pflege') || compactToken.includes('gartenpflege') || token.includes('entretien de jardin') || compactToken.includes('entretiendejardin')) return 'gartenpflege';
+    if (token.includes('bepflanz') || compactToken.includes('bepflanz') || token.includes('plantation') || compactToken.includes('plantation')) return 'bepflanzung';
+
+    return null;
+};
+
 const ContactFormSection = ({ 
     heading,
     formSchema = null,
     button: _defaultButtonLabel,
     language = 'DE'
 }) => {
+    const location = useLocation();
     const isFrench = language === 'FR';
     const messages = {
         heading: isFrench ? 'Comment puis-je vous aider ?' : 'Womit kann ich helfen?',
@@ -62,6 +80,19 @@ const ContactFormSection = ({
         : (formSchema || {});
 
     const { fields = [], submit_label, redirect_url } = normalizedSchema;
+    const preselectedServiceKeys = useMemo(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const raw = searchParams.get('services') || '';
+        const fromQuery = raw
+            .split(',')
+            .map((item) => item.trim().toLowerCase())
+            .filter(Boolean);
+        const fromState = Array.isArray(location.state?.preselectedServices)
+            ? location.state.preselectedServices.map((item) => String(item).trim().toLowerCase()).filter(Boolean)
+            : [];
+
+        return [...new Set([...fromQuery, ...fromState])];
+    }, [location.search, location.state]);
     const finalHeading = heading || messages.heading;
     const finalButtonLabel = messages.submit;
     const checkboxFields = fields.filter(f => f.type === 'checkbox');
@@ -108,18 +139,47 @@ const ContactFormSection = ({
         };
     }, [settings.enable_turnstile, turnstileSiteKey, formSchema]);
 
+    useEffect(() => {
+        if (!fields.length || !preselectedServiceKeys.length) return;
+
+        const nextFormData = {};
+        const nextSelectedServices = [];
+
+        fields.forEach((field) => {
+            if (field.type === 'checkbox') {
+                const fieldKey = detectServiceKey(`${field.name} ${field.label}`);
+                if (fieldKey && preselectedServiceKeys.includes(fieldKey)) {
+                    nextFormData[field.name] = true;
+                }
+            }
+
+            if (field.type === 'checkbox_group' && Array.isArray(field.options)) {
+                const matchedValues = field.options
+                    .filter((option) => {
+                        const optionKey = detectServiceKey(`${option.value} ${option.label}`);
+                        return optionKey && preselectedServiceKeys.includes(optionKey);
+                    })
+                    .map((option) => option.value);
+
+                if (matchedValues.length) {
+                    nextFormData[field.name] = matchedValues;
+                    nextSelectedServices.push(...matchedValues);
+                }
+            }
+        });
+
+        if (!Object.keys(nextFormData).length) return;
+
+        setFormData((prev) => ({ ...prev, ...nextFormData }));
+        setSelectedServices([...new Set(nextSelectedServices)]);
+    }, [fields, preselectedServiceKeys]);
+
     // If no schema yet, show a skeleton or loading state
     if (!formSchema) {
         return (
             <div className="lg:col-span-8 reveal stagger-1">
-                <div className="bg-white dark:bg-surface-dark p-10 md:p-16 border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl animate-pulse">
-                    <div className="h-8 w-48 bg-slate-100 dark:bg-slate-800 rounded mb-12"></div>
-                    <div className="grid grid-cols-2 gap-4 mb-12">
-                        <div className="h-40 bg-slate-50 dark:bg-slate-800/50 rounded-xl"></div>
-                        <div className="h-40 bg-slate-50 dark:bg-slate-800/50 rounded-xl"></div>
-                    </div>
+                <div className="bg-white dark:bg-surface-dark p-10 md:p-16 border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl min-h-[42rem]" />
                 </div>
-            </div>
         );
     }
 
@@ -219,47 +279,53 @@ const ContactFormSection = ({
     const renderField = (field) => {
         const { type, label, name, placeholder, required, options = [] } = field;
         const hasError = errors[name];
+        const fieldId = `contact-${name}`;
 
         switch (type) {
             case 'checkbox':
                 return (
-                    <div
+                    <label
                         key={name}
-                        className={`relative border p-6 md:p-8 transition-all duration-300 cursor-pointer flex flex-col items-center text-center gap-4 rounded-xl ${
+                        htmlFor={fieldId}
+                        className={`relative border p-5 md:p-6 transition-all duration-300 cursor-pointer flex flex-col items-center text-center gap-3 rounded-xl ${
                             formData[name]
                                 ? 'border-primary bg-primary/5 ring-1 ring-primary'
                                 : 'border-slate-200 bg-white hover:border-primary shadow-sm'
                         }`}
-                        onClick={() => toggleSingleCheckbox(name)}
                     >
                         <input
+                            id={fieldId}
                             type="checkbox"
                             name={name}
                             checked={!!formData[name]}
                             onChange={() => toggleSingleCheckbox(name)}
                             className="sr-only"
+                            aria-checked={!!formData[name]}
                         />
                         <IconRenderer icon={getServiceIcon(field)} isSelected={!!formData[name]} />
                         <div>
-                            <p className={`text-[10px] md:text-sm font-bold uppercase tracking-widest mb-1 ${formData[name] ? 'text-primary' : 'text-slate-700'}`}>
+                            <p className={`text-[10px] md:text-[13px] font-bold uppercase tracking-widest mb-1 ${formData[name] ? 'text-primary' : 'text-slate-700'}`}>
                                 {label}
                             </p>
                         </div>
-                    </div>
+                    </label>
                 );
             case 'checkbox_group':
                 return (
-                    <div key={name} className="space-y-8 col-span-full">
+                    <fieldset key={name} className="space-y-6 col-span-full">
                         {label && (
-                            <label className={`text-[10px] uppercase tracking-[0.2em] font-bold block ${hasError ? 'text-red-500' : 'text-slate-500'}`}>
+                            <legend className={`text-[10px] uppercase tracking-[0.2em] font-bold block ${hasError ? 'text-red-500' : 'text-slate-500'}`}>
                                 {label} {required && '*'}
-                            </label>
+                            </legend>
                         )}
                         <div className="grid grid-cols-2 gap-4">
                             {options.map((opt) => (
-                                <div
+                                <button
+                                    type="button"
                                     key={opt.value}
-                                    className={`relative border p-6 md:p-8 transition-all duration-300 cursor-pointer flex flex-col items-center text-center gap-4 rounded-xl ${
+                                    aria-pressed={selectedServices.includes(opt.value)}
+                                    aria-label={opt.label}
+                                    className={`relative border p-5 md:p-6 transition-all duration-300 cursor-pointer flex flex-col items-center text-center gap-3 rounded-xl ${
                                         selectedServices.includes(opt.value) 
                                             ? 'border-primary bg-primary/5 ring-1 ring-primary' 
                                             : 'border-slate-200 bg-white hover:border-primary shadow-sm'
@@ -268,32 +334,34 @@ const ContactFormSection = ({
                                 >
                                     <IconRenderer icon={opt.icon || 'info'} isSelected={selectedServices.includes(opt.value)} />
                                     <div>
-                                        <p className={`text-[10px] md:text-sm font-bold uppercase tracking-widest mb-1 ${selectedServices.includes(opt.value) ? 'text-primary' : 'text-slate-700'}`}>
+                                        <p className={`text-[10px] md:text-[13px] font-bold uppercase tracking-widest mb-1 ${selectedServices.includes(opt.value) ? 'text-primary' : 'text-slate-700'}`}>
                                             {opt.label}
                                         </p>
                                         {opt.sub && <p className="text-[9px] md:text-[11px] text-slate-400 uppercase tracking-widest leading-tight">{opt.sub}</p>}
                                     </div>
-                                </div>
+                                </button>
                             ))}
                         </div>
-                    </div>
+                    </fieldset>
                 );
 
             case 'textarea':
                 return (
                     <div key={name} className="relative col-span-full">
-                        <label className={`text-[10px] uppercase tracking-[0.2em] font-bold block mb-2 ${hasError ? 'text-red-500' : 'text-slate-500'}`}>
+                        <label htmlFor={fieldId} className={`text-[10px] uppercase tracking-[0.2em] font-bold block mb-2 ${hasError ? 'text-red-500' : 'text-slate-500'}`}>
                             {label} {required && '*'}
                         </label>
                         <textarea 
-                            rows="4" 
+                            id={fieldId}
+                            rows="3" 
                             name={name}
-                            className={`w-full bg-white border px-5 py-4 rounded-xl transition-colors text-lg focus:ring-0 ${
+                            className={`w-full bg-white border px-5 py-3.5 rounded-xl transition-colors text-base md:text-lg focus:ring-0 ${
                                 hasError ? 'border-red-500 focus:border-red-600' : 'border-slate-200 focus:border-primary'
                             }`}
                             placeholder={placeholder}
                             value={formData[name] || ''}
                             onChange={(e) => handleInputChange(name, e.target.value)}
+                            aria-invalid={hasError ? 'true' : 'false'}
                         />
                     </div>
                 );
@@ -301,18 +369,20 @@ const ContactFormSection = ({
             default: // text, email, tel
                 return (
                     <div key={name} className="relative">
-                        <label className={`text-[10px] uppercase tracking-[0.2em] font-bold block mb-2 ${hasError ? 'text-red-500' : 'text-slate-500'}`}>
+                        <label htmlFor={fieldId} className={`text-[10px] uppercase tracking-[0.2em] font-bold block mb-2 ${hasError ? 'text-red-500' : 'text-slate-500'}`}>
                             {label} {required && '*'}
                         </label>
                         <input 
+                            id={fieldId}
                             type={type} 
                             name={name}
-                            className={`w-full bg-white border px-5 py-4 rounded-xl transition-colors text-lg focus:ring-0 ${
+                            className={`w-full bg-white border px-5 py-3.5 rounded-xl transition-colors text-base md:text-lg focus:ring-0 ${
                                 hasError ? 'border-red-500 focus:border-red-600' : 'border-slate-200 focus:border-primary'
                             }`}
                             placeholder={placeholder || ''}
                             value={formData[name] || ''}
                             onChange={(e) => handleInputChange(name, e.target.value)}
+                            aria-invalid={hasError ? 'true' : 'false'}
                         />
                     </div>
                 );
@@ -321,10 +391,10 @@ const ContactFormSection = ({
 
     return (
         <div className="lg:col-span-8 reveal stagger-1">
-            <div className="bg-white dark:bg-surface-dark p-10 md:p-16 border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl">
-                <form ref={formRef} className="space-y-12" onSubmit={handleSubmit}>
-                    <fieldset disabled={isSubmitting} className="space-y-12 disabled:opacity-70">
-                        <div className="space-y-8">
+            <div className="bg-white dark:bg-surface-dark p-8 md:p-9 border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl">
+                <form ref={formRef} className="space-y-6 md:space-y-8" onSubmit={handleSubmit}>
+                    <fieldset disabled={isSubmitting} className="space-y-6 md:space-y-8 disabled:opacity-70">
+                        <div className="space-y-6">
                             <h2 className="text-2xl font-serif italic text-primary">{finalHeading}</h2>
                             {checkboxFields.length > 0 && (
                                 <div className="grid grid-cols-2 gap-4">
@@ -334,7 +404,7 @@ const ContactFormSection = ({
                             {nonCheckboxFields.filter(f => f.type === 'checkbox_group').map(renderField)}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {nonCheckboxFields.filter(f => f.type !== 'checkbox_group' && f.type !== 'textarea').map(renderField)}
                         </div>
 
@@ -365,7 +435,7 @@ const ContactFormSection = ({
                             </div>
                         )}
 
-                        <div className="pt-6">
+                        <div className="pt-0 md:pt-2">
                             {submitState === 'success' ? (
                                 <div className="w-full rounded-[2rem] border border-primary/15 bg-primary px-6 py-5 text-white shadow-lg shadow-primary/15 transition-all duration-500">
                                     <div className="flex items-center gap-4">
@@ -383,8 +453,8 @@ const ContactFormSection = ({
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                                    <div className="min-h-[3.5rem] flex items-center">
+                                <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
+                                    <div className="min-h-0 md:min-h-[3.5rem] flex items-center">
                                         {submitState === 'error' && submitMessage && (
                                             <div className="inline-flex items-center gap-3 rounded-full border border-red-200 bg-red-50 px-5 py-3 text-sm text-red-700">
                                                 <Icon name="error" className="text-base" />
@@ -395,7 +465,7 @@ const ContactFormSection = ({
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="bg-primary text-white w-full md:w-auto px-14 py-5 text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-opacity-90 transition-colors flex items-center justify-center rounded-full shadow-lg disabled:cursor-not-allowed disabled:opacity-80"
+                                        className="bg-primary text-white w-full md:w-auto px-14 py-4 text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-opacity-90 transition-colors flex items-center justify-center rounded-full shadow-lg disabled:cursor-not-allowed disabled:opacity-80"
                                     >
                                         {isSubmitting ? messages.sending : finalButtonLabel}
                                     </button>

@@ -15,9 +15,9 @@ const ValuesSection = ({
     section = 'ValuesSection'
 }) => {
     return (
-        <section className="py-24 lg:py-32 px-6">
+        <section className="py-8 md:py-24 lg:py-32 px-6">
             <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-12">
                     <ValueItem 
                         title={val1_title} 
                         text={val1_text} 

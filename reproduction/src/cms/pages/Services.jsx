@@ -5,7 +5,7 @@ import { getPage, mapPageContent, PAGE_IDS } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
-import PageHeroSection from '@/cms/sections/PageHeroSection';
+import ServicesIntroSection from '@/cms/sections/ServicesIntroSection';
 import ServicesBlocksSection from '@/cms/sections/ServicesBlocksSection';
 import StatsSection from '@/cms/sections/StatsSection';
 import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
@@ -19,8 +19,8 @@ export const previewData = definePreview({
     source: '/content-core/v1/post/page/16',
     sections: [
         {
-            section: 'PageHeroSection',
-            fields: ['title', 'image']
+            section: 'ServicesIntroSection',
+            fields: ['title']
         },
         {
             section: 'ServicesBlocksSection',
@@ -45,7 +45,6 @@ export const previewData = definePreview({
 
 const Services = () => {
     const { language, t, globalCmsData } = useLanguage();
-    useScrollReveal();
     const [statsCmsData, setStatsCmsData] = useState(null);
 
     const mergeHomeStats = (servicesContent, homePage) => {
@@ -89,6 +88,7 @@ const Services = () => {
 
     const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);
+    useScrollReveal([rawPage, statsCmsData]);
 
     useEffect(() => {
         setPageData(getInitialContent());
@@ -123,11 +123,14 @@ const Services = () => {
     const getProps = (instanceName, localProps) => 
         resolveInstanceProps('Services', instanceName, localProps, rawPage || globalCmsData);
 
+    if (!rawPage || !statsCmsData) {
+        return <main className="min-h-screen" />;
+    }
+
     return (
-        <main>
-            {/* Page: Services → Section: PageHeroSection */}
-            <PageHeroSection 
-                {...getProps('PageHeroSection', pageData.hero)}
+        <main className="pt-28">
+            <ServicesIntroSection
+                description={t('services.page_intro')}
             />
 
             {/* Combined Static Service Blocks */}

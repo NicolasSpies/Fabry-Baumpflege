@@ -36,8 +36,6 @@ export const previewData = definePreview({
 
 const AboutMe = () => {
     const { language, t, globalCmsData } = useLanguage();
-    useScrollReveal();
-
     const getInitialContent = () => ({
         philosophy: {
             label: '',
@@ -70,6 +68,7 @@ const AboutMe = () => {
 
     const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);
+    useScrollReveal([rawPage]);
 
     useEffect(() => {
         setPageData(getInitialContent());
@@ -100,7 +99,7 @@ const AboutMe = () => {
     };
 
     return (
-        <main className="pt-20">
+        <main className="pt-10 md:pt-20">
             {/* Page: AboutMe → Section: PhilosophySection */}
             <PhilosophySection 
                 {...getProps('PhilosophySection', pageData.philosophy)} 

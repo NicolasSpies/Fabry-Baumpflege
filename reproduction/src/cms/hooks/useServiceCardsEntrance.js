@@ -16,6 +16,19 @@ export const useServiceCardsEntrance = (ref, options = {}) => {
         const items = Array.from(container.querySelectorAll(itemSelector));
         if (items.length === 0) return;
 
+        const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+        if (prefersReducedMotion || isMobile) {
+            items.forEach((item) => {
+                item.style.opacity = '1';
+                item.style.transform = 'none';
+                item.style.willChange = 'auto';
+                item.style.transition = 'none';
+            });
+            return;
+        }
+
         // Initialize state before animation
         items.forEach((item) => {
             item.style.opacity = '0';

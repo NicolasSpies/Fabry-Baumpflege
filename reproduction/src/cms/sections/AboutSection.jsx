@@ -24,11 +24,11 @@ const expertiseImgRef = useRef(null);
                 <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
                     <div className="w-full lg:w-1/2 relative">
                         <div className="absolute -top-10 -left-10 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -z-10" />
-                        <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
+                        <div className="relative rounded-2xl overflow-hidden shadow-lg md:shadow-2xl group">
                             <CmsImage
                                 image={image}
                                 ref={expertiseImgRef}
-                                alt="About"
+                                alt=""
                                 className="w-full h-[650px] object-cover"
                                 sizes="(max-width: 1024px) 100vw, 50vw"
                             />

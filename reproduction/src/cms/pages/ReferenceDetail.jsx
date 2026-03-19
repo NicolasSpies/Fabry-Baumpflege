@@ -49,6 +49,22 @@ const ReferenceDetail = () => {
     const [hydratedProps, setHydratedProps] = useState(null);
     const [activeImageIndex, setActiveImageIndex] = useState(null);
 
+    const detectServiceKey = (value) => {
+        const token = String(value || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z]+/g, ' ');
+        const compactToken = token.replace(/\s+/g, '');
+
+        if (token.includes('baum fall') || compactToken.includes('baumfall') || compactToken.includes('baumfaellung') || token.includes('abattage')) return 'baumfaellung';
+        if (token.includes('baum pflege') || compactToken.includes('baumpflege') || token.includes('taille raisonnee') || compactToken.includes('tailleraisonnee')) return 'baumpflege';
+        if (token.includes('garten pflege') || compactToken.includes('gartenpflege') || token.includes('entretien de jardin') || compactToken.includes('entretiendejardin')) return 'gartenpflege';
+        if (token.includes('bepflanz') || compactToken.includes('bepflanz') || token.includes('plantation') || compactToken.includes('plantation')) return 'bepflanzung';
+
+        return null;
+    };
+
     // ─── Data Resolution ─────────────────────────────────────────────────────
     const getLocalContent = () => ({
         hero: {
@@ -94,6 +110,18 @@ const ReferenceDetail = () => {
     const closeLightbox = () => setActiveImageIndex(null);
     
     const projectGallery = getSectionProps('ReferenceContentSection', getLocalContent().content).gallery || [];
+    const sidebarProps = getSectionProps('ReferenceSidebarSection', project?.sidebar || getLocalContent().sidebar);
+    const preselectedServiceKeys = [...new Set(
+        (sidebarProps.categories || [])
+            .map((category) => detectServiceKey(category))
+            .filter(Boolean)
+    )];
+    const ctaLink = preselectedServiceKeys.length
+        ? `${ROUTES[language].contact}?services=${preselectedServiceKeys.join(',')}`
+        : ROUTES[language].contact;
+    const ctaState = preselectedServiceKeys.length
+        ? { preselectedServices: preselectedServiceKeys }
+        : undefined;
     
     const nextImage = (e) => {
         if (e) e.stopPropagation();
@@ -285,7 +313,7 @@ const ReferenceDetail = () => {
 
     // ─── Success Layout ───────────────────────────────────────────────────────
     return (
-        <>
+        <div className="animate-in fade-in duration-500">
             <section className="max-w-7xl mx-auto px-6 pt-12 pb-8 mt-20">
                 <Link
                     to={ROUTES[language].references}
@@ -299,19 +327,25 @@ const ReferenceDetail = () => {
             {/* Page: ReferenceDetail → Section: ReferenceHeroSection */}
             <ReferenceHeroSection {...getSectionProps('ReferenceHeroSection', project.hero)} />
 
-            <section className="max-w-7xl mx-auto px-6 mb-32">
+            <section className="max-w-7xl mx-auto px-6 mb-24 md:mb-32">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-                    {/* Page: ReferenceDetail → Section: ReferenceSidebarSection */}
-                    <div className="lg:col-span-4 lg:sticky lg:top-32 h-fit reveal">
+                    <div className="hidden lg:block lg:col-span-4 lg:sticky lg:top-32 h-fit reveal">
                         <ReferenceSidebarSection 
-                            {...getSectionProps('ReferenceSidebarSection', project.sidebar)} 
-                            ctaLink={ROUTES[language].contact}
+                            {...sidebarProps} 
+                            ctaLink={ctaLink}
+                            ctaState={ctaState}
                         />
                     </div>
 
-                    {/* Page: ReferenceDetail → Section: ReferenceContentSection */}
                     <ReferenceContentSection 
                         {...getSectionProps('ReferenceContentSection', project.content)} 
+                        sidebar={
+                            <ReferenceSidebarSection 
+                                {...sidebarProps} 
+                                ctaLink={ctaLink}
+                                ctaState={ctaState}
+                            />
+                        }
                         onOpenLightbox={openLightbox}
                     />
                 </div>
@@ -361,7 +395,7 @@ const ReferenceDetail = () => {
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 };
 
