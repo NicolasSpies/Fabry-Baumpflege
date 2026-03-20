@@ -471,24 +471,30 @@ export async function getForm(slug, language = 'DE', signal = null) {
 
 /** Fetch all reference_category terms for the given language. */
 export async function getReferenceCategories(language = 'DE') {
-    const endpoints = ['/kategorie', '/reference_category'];
+    const endpoints = [
+        '/kategorie', 
+        '/reference_category', 
+        '/reference-category', 
+        '/referenzen_category',
+        '/content-core/v1/terms/reference_category'
+    ];
     for (const endpoint of endpoints) {
         try {
             const terms = await fetchFromCMS(`${endpoint}?per_page=100`, language);
             if (Array.isArray(terms) && terms.length > 0) {
                 return terms.map(cat => ({
                     id: cat.id,
-                    name: cat.name,
-                    slug: cat.slug,
-                    pll_lang: cat.pll_lang
+                    name: decodeHtmlEntities(cat.name || ''),
+                    slug: cat.slug || ''
                 }));
             }
         } catch (error) {
-            if (import.meta.env.DEV) console.warn(`[CMS] Failed to load categories from ${endpoint}:`, error?.message);
+            // Silently try next endpoint
         }
     }
     return [];
 }
+
 
 /** Returns an id→name map built from getReferenceCategories. */
 export async function getCategoryMap(language = 'DE') {
@@ -661,23 +667,27 @@ export function mapReferenceCard(item, catMap = {}) {
         '';
 
     let catNames = [];
-    const embeddedTerms = item._embedded?.['wp:term']?.[0];
-    if (Array.isArray(embeddedTerms) && embeddedTerms.length > 0) {
+    const embeddedTerms = item._embedded?.['wp:term']?.flat() || [];
+    if (embeddedTerms.length > 0) {
         catNames = embeddedTerms.map(t => t.name).filter(Boolean);
     } else {
-        const rawCatIds = item.kategorie || item.reference_category || [];
+        const rawCatIds = cf.kategorie || cf.reference_category || cf.categories || item.kategorie || item.reference_category || item.categories || item.referenzen_category || [];
         if (Array.isArray(rawCatIds) && rawCatIds.length > 0) {
             catNames = rawCatIds.map(id => catMap[id]).filter(Boolean);
         }
     }
+
+
 
     // Keep the original CMS id stable across languages. The API handles translation fallback.
     const id = item.id ? String(item.id) : (item.slug || '');
 
     // Category IDs: Support multiple field names and ensure we have both IDs and slugs for filtering.
     // This makes the filter robust against ID vs Slug mismatches.
-    const rawCatIds = (item.kategorie || item.reference_category || []).map(String);
-    const embeddedSlugs = item._embedded?.['wp:term']?.[0]?.map(t => t.slug).filter(Boolean) || [];
+    const rawCatIds = (cf.kategorie || cf.reference_category || cf.categories || item.kategorie || item.reference_category || item.categories || item.referenzen_category || []).map(String);
+    const embeddedSlugs = (item._embedded?.['wp:term']?.flat() || []).map(t => t.slug).filter(Boolean);
+
+
     
     const catIds = [...new Set([...rawCatIds, ...embeddedSlugs])];
 
