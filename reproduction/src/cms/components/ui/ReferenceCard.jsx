@@ -68,9 +68,20 @@ const ReferenceCard = ({ id, title, description, location, thumbnailImage, anima
                     loading="lazy"
                 />
                 <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-primary/70 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end text-white ${compactMobileOverlay ? 'p-4 md:p-8' : 'p-8'}`} style={{ willChange: 'opacity' }}>
-                    <span className={`uppercase tracking-widest mb-2 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-100 ${compactMobileOverlay ? 'text-[9px] md:text-[10px]' : 'text-[10px]'}`}>
-                        {props.location}
-                    </span>
+                    <div className={`mb-3 flex flex-wrap gap-x-3 gap-y-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-100`}>
+                        <span className={`uppercase tracking-widest font-bold text-white/90 ${compactMobileOverlay ? 'text-[8.5px] md:text-[9.5px]' : 'text-[9.5px]'}`}>
+                            {props.categories?.join(', ')}
+                        </span>
+                        {props.location && (
+                            <>
+                                <span className="w-1 h-1 rounded-full bg-white/40 self-center" />
+                                <span className={`uppercase tracking-widest font-normal text-white/70 ${compactMobileOverlay ? 'text-[8.5px] md:text-[9.5px]' : 'text-[9.5px]'}`}>
+                                    {props.location}
+                                </span>
+                            </>
+                        )}
+                    </div>
+
                     <h3 className={`font-serif mb-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-200 ${compactMobileOverlay ? 'text-lg md:text-2xl' : 'text-2xl'}`}>
                         {renderCmsInline(props.title)}
                     </h3>

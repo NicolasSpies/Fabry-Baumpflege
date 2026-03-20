@@ -158,6 +158,9 @@ export function getCmsImageProps(image, options = {}) {
     const normalized = normalizeCmsImage(image);
     if (!normalized?.src) return null;
 
+    // Use preferences as a hint for the initial fallback 'src' attribute.
+    // This is useful for pre-hydration or no-JS scenarios, but should NOT
+    // prevent the browser from using the full srcset.
     const preferredMediumSource =
         normalized.sources?.cc_medium ||
         normalized.sources?.cc_large ||
@@ -169,31 +172,35 @@ export function getCmsImageProps(image, options = {}) {
         normalized.fallback ||
         normalized.full ||
         null;
-    const lockToMediumMobile = Boolean(options.preferMedium && options.preferSmall && preferredMediumSource?.url);
-    const lockToSmallMobile = Boolean(options.preferSmall && preferredMobileSource?.url);
-    const activeSource = lockToMediumMobile
-        ? preferredMediumSource
-        : lockToSmallMobile
-            ? preferredMobileSource
-            : normalized;
+
+    const useMediumFallback = Boolean(options.preferMedium && preferredMediumSource?.url);
+    const useSmallFallback = Boolean(options.preferSmall && preferredMobileSource?.url);
+
+    const activeFallback = useSmallFallback 
+        ? preferredMobileSource 
+        : (useMediumFallback ? preferredMediumSource : normalized);
 
     const props = {
-        src: activeSource.url || activeSource.src || normalized.src,
+        src: activeFallback.url || activeFallback.src || normalized.src,
         alt: options.alt ?? normalized.alt ?? '',
     };
 
-    if (!lockToSmallMobile && !lockToMediumMobile && normalized.srcSet) props.srcSet = normalized.srcSet;
-    if (!lockToSmallMobile && !lockToMediumMobile && (options.sizes || normalized.sizes)) {
+    // ALWAYS provide srcset and sizes so the browser can make the most efficient choice.
+    if (normalized.srcSet) props.srcSet = normalized.srcSet;
+    if (options.sizes || normalized.sizes) {
         props.sizes = options.sizes || normalized.sizes;
     }
-    if (activeSource.width || normalized.width) props.width = activeSource.width || normalized.width;
-    if (activeSource.height || normalized.height) props.height = activeSource.height || normalized.height;
+
+    if (activeFallback.width || normalized.width) props.width = activeFallback.width || normalized.width;
+    if (activeFallback.height || normalized.height) props.height = activeFallback.height || normalized.height;
+    
     if (options.loading) props.loading = options.loading;
     if (options.decoding) props.decoding = options.decoding;
     if (options.fetchPriority) props.fetchPriority = options.fetchPriority;
 
     return props;
 }
+
 
 function getRootApiBase() {
     const base = String(CMS_API_BASE || '').replace(/\/+$/, '');
@@ -666,34 +673,53 @@ export function mapReferenceCard(item, catMap = {}) {
         item._embedded?.['wp:featuredmedia']?.[0]?.guid?.rendered ||
         '';
 
-    let catNames = [];
+    const tax = item.taxonomies || item.taxonomy || {};
     const embeddedTerms = item._embedded?.['wp:term']?.flat() || [];
-    if (embeddedTerms.length > 0) {
-        catNames = embeddedTerms.map(t => t.name).filter(Boolean);
-    } else {
-        const rawCatIds = cf.kategorie || cf.reference_category || cf.categories || item.kategorie || item.reference_category || item.categories || item.referenzen_category || [];
-        if (Array.isArray(rawCatIds) && rawCatIds.length > 0) {
-            catNames = rawCatIds.map(id => catMap[id]).filter(Boolean);
+    
+    // Primary source: Content Core 'taxonomies' object (standard in enhanced API)
+    // Fallback source: Embedded terms from standard WP REST
+    const categoryObjects = [];
+
+    // 1. Process Content Core Strings (Highest priority for enhanced API)
+    const ccCats = tax.kategorie || tax.reference_category || item.kategorie || item.reference_category || [];
+    const ccArray = Array.isArray(ccCats) ? ccCats : [ccCats].filter(Boolean);
+    ccArray.forEach(cat => {
+        if (typeof cat === 'string') {
+            categoryObjects.push({ id: cat, name: decodeHtmlEntities(cat), slug: cat });
+        } else if (typeof cat === 'object' && cat !== null) {
+            const name = decodeHtmlEntities(cat.name || '');
+            categoryObjects.push({ id: name, name, slug: cat.slug || name });
         }
+    });
+
+    // 2. Process Embedded Terms (Standard WP REST fallback)
+    if (categoryObjects.length === 0) {
+        embeddedTerms.forEach(t => {
+            if (!t) return;
+            categoryObjects.push({ 
+                id: t.name, 
+                name: decodeHtmlEntities(t.name || ''), 
+                slug: t.slug || t.name 
+            });
+        });
     }
 
+    // Deduplicate by Name (since we are now string-based)
+    const uniqueCats = [];
+    const seenNames = new Set();
+    categoryObjects.forEach(c => {
+        if (c.name && !seenNames.has(c.name)) {
+            seenNames.add(c.name);
+            uniqueCats.push(c);
+        }
+    });
 
-
-    // Keep the original CMS id stable across languages. The API handles translation fallback.
-    const id = item.id ? String(item.id) : (item.slug || '');
-
-    // Category IDs: Support multiple field names and ensure we have both IDs and slugs for filtering.
-    // This makes the filter robust against ID vs Slug mismatches.
-    const rawCatIds = (cf.kategorie || cf.reference_category || cf.categories || item.kategorie || item.reference_category || item.categories || item.referenzen_category || []).map(String);
-    const embeddedSlugs = (item._embedded?.['wp:term']?.flat() || []).map(t => t.slug).filter(Boolean);
-
-
-    
-    const catIds = [...new Set([...rawCatIds, ...embeddedSlugs])];
-
+    const catNames = uniqueCats.map(c => c.name);
+    // categoryIds now contains the string names for comparison in filtering
+    const catIds = uniqueCats.map(c => c.name);
 
     return {
-        id,
+        id: item.id ? String(item.id) : (item.slug || ''),
         slug: item.slug || (item.id ? String(item.id) : ''),
         title: decodeHtmlEntities(
             item.title?.rendered ||
@@ -702,18 +728,18 @@ export function mapReferenceCard(item, catMap = {}) {
             item.name ||
             ''
         ),
-        // Description: try customFields.beschreibung (CB-mapped field), then acf fallback
         description: decodeHtmlEntities(cf.beschreibung || item.acf?.short_description || ''),
-        // Location: try customFields.referenz_ort (CB-mapped field), then acf fallback
         location: cf.referenz_ort || item.acf?.location || '',
         thumbnailImage: thumbnail,
         categories: catNames,
         categoryIds: catIds,
-        // Polylang fields — used for language enforcement and slug resolution
+        categoryObjects: uniqueCats,
         pll_lang: item.pll_lang || null,
         pll_translations: item.pll_translations || null,
     };
 }
+
+
 
 /**
  * High-level helper for Pages to get their structured content.

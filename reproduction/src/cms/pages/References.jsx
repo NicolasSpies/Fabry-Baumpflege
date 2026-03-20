@@ -120,12 +120,41 @@ const References = () => {
                 // ─── Filter Categories by Language ──────────────────────────────────────
                 // The /kategorie endpoint often lacks language metadata.
                 // We derive the relevant categories from the references that passed the lang filter.
+                // ─── Extract Unique Categories from References ─────────────────────────
+                // This ensures we always have the categories that actually have items,
+                // even if the rawCats (taxonomy endpoint) is empty or not localized.
+                const derivedCatsMap = new Map();
                 const usedCategoryIds = new Set();
+                
                 mappedRefs.forEach(ref => {
+                    // Collect IDs for filtering
                     if (Array.isArray(ref.categoryIds)) {
                         ref.categoryIds.forEach(id => usedCategoryIds.add(String(id)));
                     }
+                    
+                    // Collect full objects for the filter bar
+                    if (Array.isArray(ref.categoryObjects)) {
+                        ref.categoryObjects.forEach(cat => {
+                            const key = String(cat.id || cat.slug || '');
+                            if (key && !derivedCatsMap.has(key)) {
+                                derivedCatsMap.set(key, cat);
+                            }
+                        });
+                    }
+
                 });
+
+                // Supplement with rawCats from taxonomy endpoint if they weren't found in items
+                if (Array.isArray(rawCats)) {
+                    rawCats.forEach(cat => {
+                        const idStr = String(cat.id);
+                        if (!derivedCatsMap.has(idStr)) {
+                            derivedCatsMap.set(idStr, cat);
+                        }
+                    });
+                }
+
+                const allAvailableCats = Array.from(derivedCatsMap.values());
                 const priorityTerms = language === 'FR' 
                     ? ['taille raisonnée', 'abattage', 'entretien de jardin', 'plantation']
                     : ['baumpflege', 'baumfällung', 'gartenpflege', 'bepflanzung'];
@@ -140,16 +169,19 @@ const References = () => {
                     return 999;
                 };
 
-                const filteredCats = Array.isArray(rawCats)
-                    ? rawCats.filter(cat => usedCategoryIds.has(String(cat.id)) || usedCategoryIds.has(String(cat.slug)))
-                    : [];
+                // Filter to ONLY show categories that have items in the current set
+                const filteredCats = allAvailableCats.filter(cat => 
+                    usedCategoryIds.has(String(cat.id)) || 
+                    usedCategoryIds.has(String(cat.slug))
+                );
 
                 setCategories([...filteredCats].sort((a, b) => {
                     const scoreA = getPriorityScore(a);
                     const scoreB = getPriorityScore(b);
                     if (scoreA !== scoreB) return scoreA - scoreB;
-                    return a.name.localeCompare(b.name);
+                    return (a.name || '').localeCompare(b.name || '');
                 }));
+
             } catch (err) {
                 if (cancelled) return;
                 setError(true);

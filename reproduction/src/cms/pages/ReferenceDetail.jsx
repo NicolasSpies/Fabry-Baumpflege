@@ -193,23 +193,33 @@ const ReferenceDetail = () => {
 
                 if (controller.signal.aborted) return;
 
+                // ─── Extract Robust Category Names ──────────────────────────────────
+                // Search across embedded terms, taxonomies, and custom fields
+                const tax = ref.taxonomies || ref.taxonomy || {};
+                const embeddedTerms = ref._embedded?.['wp:term']?.flat() || [];
+                
                 let catNames = [];
-                const embeddedTerms = ref._embedded?.['wp:term']?.[0];
-                if (Array.isArray(embeddedTerms) && embeddedTerms.length > 0) {
-                    catNames = embeddedTerms.map(term => term.name).filter(Boolean);
-                } else if (Array.isArray(ref.reference_category) && ref.reference_category.length > 0) {
-                    const termMap = await getTermsByIds(ref.reference_category, language, controller.signal);
-                    if (controller.signal.aborted) return;
-                    catNames = ref.reference_category.map(id => termMap[id]).filter(Boolean);
+                if (embeddedTerms.length > 0) {
+                    catNames = embeddedTerms.map(t => t.name).filter(Boolean);
+                } else {
+                    const rawCatData = cf.kategorie || cf.reference_category || cf.categories || tax.kategorie || tax.reference_category || ref.kategorie || ref.reference_category || ref.categories || ref.referenzen_category || [];
+                    const rawCatArray = Array.isArray(rawCatData) ? rawCatData : [rawCatData].filter(Boolean);
+                    catNames = rawCatArray.map(c => (typeof c === 'object' && c !== null ? c.name : c)).filter(Boolean);
                 }
 
+                // ─── Format Localized Date ───────────────────────────────────────────
                 let formattedDate = '';
-                if (ref.date) {
-                    formattedDate = new Date(ref.date).toLocaleDateString(
-                        language === 'DE' ? 'de-DE' : 'fr-FR',
-                        { year: 'numeric', month: 'long' }
-                    );
+                const rawDateStr = cf.referenz_datum || ref.acf?.referenz_datum || ref.date || ref.post_date || '';
+                if (rawDateStr) {
+                    const dateObj = new Date(rawDateStr);
+                    if (!isNaN(dateObj.getTime())) {
+                        formattedDate = dateObj.toLocaleDateString(
+                            language === 'DE' ? 'de-DE' : 'fr-FR',
+                            { year: 'numeric', month: 'long' }
+                        );
+                    }
                 }
+
 
                 setRawProject(ref);
                 
@@ -224,8 +234,10 @@ const ReferenceDetail = () => {
                             ref.name ||
                             ''
                         ),
-                        image: thumbnail
+                        image: thumbnail,
+                        categoryLabel: catNames[0] || ''
                     },
+
                     sidebar: { 
                         ...local.sidebar, 
                         dateValue: formattedDate, 

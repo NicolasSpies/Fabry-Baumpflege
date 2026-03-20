@@ -50,7 +50,6 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref }
                     image={image}
                     ref={heroRef}
                     alt=""
-                    preferMediumSource
                     className="w-full h-[120%] object-cover object-top md:filter md:brightness-[0.80] md:contrast-[1.05]"
                     sizes="100vw"
                     loading="eager"
@@ -58,6 +57,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref }
                     onLoad={() => setIsImageReady(true)}
                     onError={() => setIsImageReady(true)}
                 />
+
                 <div className={`absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent transition-opacity duration-500 ${isImageReady ? 'opacity-100' : 'opacity-0'}`} />
             </div>
             <div className={`relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-end md:items-center h-full pb-16 md:pb-0 transition-[opacity,transform] duration-500 ${isImageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'}`}>

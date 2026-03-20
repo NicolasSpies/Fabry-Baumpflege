@@ -90,6 +90,11 @@
               "fieldPath": "customFields.startseite_button_ueber_mich.label",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
+            },
+            "ctaHref": {
+              "fieldPath": "customFields.startseite_button_ueber_mich.url",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
             }
           }
         },
@@ -167,22 +172,22 @@
               "isUnstable": false
             },
             "s1_description": {
-              "fieldPath": "customFields.beschreibung_leistung_1",
+              "fieldPath": "customFields.zusammenfassung_baumpflege",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },
             "s2_description": {
-              "fieldPath": "customFields.beschreibung_leistung_2",
+              "fieldPath": "customFields.zusammenfassung_baumfllung",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },
             "s3_description": {
-              "fieldPath": "customFields.beschreibung_leistung_3",
+              "fieldPath": "customFields.zusammenfassung_gartenpflege",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },
             "s4_description": {
-              "fieldPath": "customFields.beschreibung_leistung_4",
+              "fieldPath": "customFields.zusammenfassung_bepflanzung",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },
@@ -304,6 +309,21 @@
     },
     "Services": {
       "instances": {
+        "ServicesIntroSection": {
+          "component": "ServicesIntroSection",
+          "props": {
+            "title": {
+              "fieldPath": "customFields.titel_leistung_h1",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "description": {
+              "fieldPath": "customFields.intro_leistungen",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
         "PageHeroSection": {
           "component": "PageHeroSection",
           "props": {
