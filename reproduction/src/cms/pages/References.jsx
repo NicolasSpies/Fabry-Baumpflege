@@ -98,9 +98,7 @@ const References = () => {
                 const catMap = rawCats.reduce((acc, c) => { acc[c.id] = c.name; return acc; }, {});
                 const refsForLanguage = Array.isArray(rawRefs) ? rawRefs : [];
 
-                if (import.meta.env.DEV) {
-                    console.log(`[References] ${refsForLanguage.length} items loaded for "${language}".`);
-                }
+
 
                 const mappedRefs = refsForLanguage.map(item => ({
                     ...mapReferenceCard(item, catMap),
@@ -155,19 +153,27 @@ const References = () => {
                 }
 
                 const allAvailableCats = Array.from(derivedCatsMap.values());
-                const priorityTerms = language === 'FR' 
-                    ? ['taille raisonnée', 'abattage', 'entretien de jardin', 'plantation']
-                    : ['baumpflege', 'baumfällung', 'gartenpflege', 'bepflanzung'];
-                
                 const getPriorityScore = (cat) => {
-                    const nameLower = (cat.name || '').toLowerCase();
-                    const slugLower = (cat.slug || '').toLowerCase();
-                    const idxName = priorityTerms.indexOf(nameLower);
-                    const idxSlug = priorityTerms.indexOf(slugLower.replace(/-/g, ' '));
-                    if (idxName !== -1) return idxName;
-                    if (idxSlug !== -1) return idxSlug;
+                    const n = (cat.name || '').toLowerCase();
+                    const s = (cat.slug || '').toLowerCase();
+                    
+                    if (language === 'FR') {
+                        if (n.includes('entretien') && (n.includes('arbre') || s.includes('arbre'))) return 0;
+                        if (n.includes('abattage') || s.includes('abattage')) return 1;
+                        if (n.includes('jardin')) return 2;
+                        if (n.includes('plant') || s.includes('plant')) return 3;
+                    } else {
+                        if (n.includes('baumpflege') || s.includes('baumpflege')) return 0;
+                        if (n.includes('baumfällung') || s.includes('baumfäll')) return 1;
+                        if (n.includes('gartenpflege') || s.includes('gartenpf')) return 2;
+                        if (n.includes('bepflanzung') || s.includes('bepflanz')) return 3;
+                    }
+                    
                     return 999;
                 };
+
+
+
 
                 // Filter to ONLY show categories that have items in the current set
                 const filteredCats = allAvailableCats.filter(cat => 
@@ -267,22 +273,17 @@ const References = () => {
                     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8">
                         {filteredRefs.map((project, index) => (
                             <ReferenceCard
-                                key={project.id}
-                                id={project.id}
-                                title={project.title}
-                                description={project.description}
-                                location={project.location}
-                                thumbnailImage={project.thumbnailImage}
-                                language={language}
+                                key={project.id || index}
+                                {...project}
                                 animateEntry={isInitialRender}
                                 staggerIndex={index}
                                 forceSquare={true}
                                 compactMobileOverlay={true}
-                                data={project.data}
                                 page="References"
                                 section="ReferencesGridSection"
                             />
                         ))}
+
                     </div>
                     <div className="mt-14 md:mt-20 text-center">
                         <button className="inline-flex items-center gap-3 px-8 md:px-12 py-3.5 md:py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-colors duration-300 text-xs md:text-base">

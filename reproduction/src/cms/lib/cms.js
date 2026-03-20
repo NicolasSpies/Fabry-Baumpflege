@@ -58,38 +58,61 @@ function buildResponsiveSourceList(image) {
 
     const collected = [];
     const pushSource = (entry, key) => {
-        if (!entry || typeof entry !== 'object' || !entry.url) return;
+        if (!entry || typeof entry !== 'object') return;
+        const entryUrl = entry.url || entry.source_url || (typeof entry === 'string' ? entry : '');
+        if (!entryUrl || typeof entryUrl !== 'string') return;
+        
+        // Skip if this URL is already collected
+        if (collected.some(e => e.url === entryUrl)) return;
+
         collected.push({
             key,
-            url: entry.url,
-            width: Number(entry.width) || undefined,
-            height: Number(entry.height) || undefined,
-            mime_type: entry.mime_type || '',
+            url: entryUrl,
+            width: Number(entry.width || entry.file_width) || undefined,
+            height: Number(entry.height || entry.file_height) || undefined,
+            mime_type: entry.mime_type || entry['mime-type'] || '',
         });
     };
 
+    // 1. Content Core 'sources' map
     if (image.sources && typeof image.sources === 'object') {
         Object.entries(image.sources).forEach(([key, entry]) => pushSource(entry, key));
     }
 
-    if (image.full?.url && !collected.some((entry) => entry.url === image.full.url)) {
-        pushSource(image.full, 'full');
+    // 2. Standard WP 'media_details.sizes'
+    const wpSizes = image.media_details?.sizes || image.media_details?.image_meta?.sizes;
+    if (wpSizes && typeof wpSizes === 'object') {
+        Object.entries(wpSizes).forEach(([key, entry]) => pushSource(entry, key));
     }
 
-    if (image.fallback?.url && !collected.some((entry) => entry.url === image.fallback.url)) {
-        pushSource(image.fallback, 'fallback');
+    // 3. Generic 'sizes' map (common in ACF / some REST payloads)
+    if (image.sizes && typeof image.sizes === 'object') {
+        Object.entries(image.sizes).forEach(([key, entry]) => {
+            // Some payloads have a 'sizes' string or other non-size objects inside 'sizes'
+            if (typeof entry === 'object' && entry !== null) {
+                pushSource(entry, key);
+            }
+        });
     }
 
-    if (image.src && !collected.some((entry) => entry.url === image.src)) {
-        pushSource(
-            { url: image.src, width: image.width, height: image.height, mime_type: image.mime_type },
-            'src'
-        );
+    // 4. Known variant buckets
+    if (image.full) pushSource(image.full, 'full');
+    if (image.fallback) pushSource(image.fallback, 'fallback');
+
+    // 5. Main asset source
+    const mainUrl = image.src || image.url || image.source_url || image.guid?.rendered || image.guid;
+    if (mainUrl && typeof mainUrl === 'string') {
+        pushSource({
+            url: mainUrl,
+            width: image.width || image.media_details?.width,
+            height: image.height || image.media_details?.height,
+            mime_type: image.mime_type || image.media_details?.mime_type
+        }, 'original');
     }
 
     return collected
-        .filter((entry) => entry.url)
-        .sort((a, b) => (a.width || Number.MAX_SAFE_INTEGER) - (b.width || Number.MAX_SAFE_INTEGER));
+        .filter((entry) => entry.url && entry.width)
+        .sort((a, b) => (a.width || 0) - (b.width || 0));
 }
 
 export function normalizeCmsImage(image) {
@@ -113,29 +136,33 @@ export function normalizeCmsImage(image) {
     if (typeof image !== 'object' || Array.isArray(image)) return null;
 
     const sourceList = buildResponsiveSourceList(image);
+    
+    // Preferred candidate for the 'src' attribute fallback
     const preferredSource =
         image.sources?.cc_medium ||
-        image.sources?.cc_large ||
         image.sources?.cc_small ||
+        image.media_details?.sizes?.medium ||
+        image.sizes?.medium ||
+        sourceList.find(s => s.width >= 600 && s.width <= 1200) ||
         image.full ||
         image.fallback ||
         sourceList[0] ||
         null;
 
     const src =
+        preferredSource?.url ||
         image.src ||
         image.url ||
         image.source_url ||
-        preferredSource?.url ||
         '';
 
-    const width = Number(image.width) || preferredSource?.width;
-    const height = Number(image.height) || preferredSource?.height;
+    const width = Number(image.width) || preferredSource?.width || undefined;
+    const height = Number(image.height) || preferredSource?.height || undefined;
+
     const srcSet =
         image.srcSet ||
         image.srcset ||
         sourceList
-            .filter((entry) => entry.width)
             .map((entry) => `${entry.url} ${entry.width}w`)
             .join(', ');
 
@@ -145,7 +172,7 @@ export function normalizeCmsImage(image) {
         url: image.url || src,
         srcSet,
         sizes: image.sizes || '',
-        alt: image.alt || '',
+        alt: image.alt || image.title?.rendered || '',
         width,
         height,
         full: image.full || (src ? { url: src, width, height } : null),
@@ -360,32 +387,9 @@ export async function submitForm(slug, values, language = 'DE', signal = null) {
 export async function getPage(pageId, language = 'DE', signal = null) {
     if (!pageId) return null;
     const page = await fetchFromCMS(`/content-core/v1/post/page/${pageId}`, language, signal);
-
-    // ── DEV DIAGNOSTIC: print the exact WP page object shape ─────────────────
-    // This tells us definitively which keys the WP REST API returns for this page,
-    // so we can confirm whether customFields, acf, meta, etc. actually exist.
-    if (import.meta.env.DEV && page) {
-        const shape = Object.keys(page).reduce((acc, key) => {
-            const val = page[key];
-            if (val && typeof val === 'object' && !Array.isArray(val)) {
-                acc[key] = `{${Object.keys(val).slice(0, 8).join(', ')}}`;
-            } else {
-                const str = JSON.stringify(val);
-                acc[key] = str ? str.slice(0, 60) : val;
-            }
-            return acc;
-        }, {});
-        console.group(`[CMS] getPage(${pageId}, "${language}") — raw page shape`);
-        console.table(shape);
-        // Also log the full customFields / acf / meta if they exist
-        if (page.customFields) console.log('  customFields:', page.customFields);
-        if (page.acf)          console.log('  acf:', page.acf);
-        if (page.meta)         console.log('  meta:', page.meta);
-        console.groupEnd();
-    }
-
     return page;
 }
+
 
 function isEmptyCmsValue(value) {
     if (value === undefined || value === null || value === '') return true;
@@ -607,27 +611,44 @@ export async function getReferenceBySlug(slug, language = 'DE', signal = null) {
     return null;
 }
 
-/** Fetch a single reference by numeric ID. */
-export async function getReferenceById(id, language = 'DE', signal = null) {
-    if (typeof id === 'number' || /^\d+$/.test(String(id))) {
-        const result = await fetchReferencesFromCMS(`/${id}?_embed=1`, language, signal, true);
+/** Fetch a single reference by slug or numeric ID. */
+export async function getReference(idOrSlug, language = 'DE', signal = null) {
+    if (typeof idOrSlug === 'number' || /^\d+$/.test(String(idOrSlug))) {
+        const result = await fetchReferencesFromCMS(`/${idOrSlug}?_embed=1`, language, signal, true);
         if (result && !Array.isArray(result)) return result;
     }
     // Slug fallback (still through Content Core)
-    return getReferenceBySlug(id, language, signal);
+    return getReferenceBySlug(idOrSlug, language, signal);
 }
 
-export async function prefetchReferenceDetail(id, language = 'DE') {
-    if (!id) return null;
+
+/** Helper to strip CMS origin from an absolute permalink or media URL. */
+export function stripCmsDomain(url) {
+    if (!url || typeof url !== 'string') return '';
+    if (url.startsWith('/')) return url;
     try {
-        return await getReferenceById(id, language);
+        const parsed = new URL(url);
+        // Ensure we remove trailing slashes to keep React Router consistency
+        return parsed.pathname.replace(/\/$/, '') || '/';
+    } catch {
+        // Fallback for non-standard or relative-looking absolute strings
+        return url.replace(/^https?:\/\/[^\/]+/, '').replace(/\/$/, '') || '/';
+    }
+}
+
+export async function prefetchReferenceDetail(idOrSlug, language = 'DE') {
+    if (!idOrSlug) return null;
+    try {
+        return await getReference(idOrSlug, language);
     } catch (error) {
+
         if (import.meta.env.DEV) {
             console.warn('[CMS] Reference detail prefetch failed:', error?.message);
         }
         return null;
     }
 }
+
 
 // ─── Media ────────────────────────────────────────────────────────────────────
 
@@ -718,9 +739,13 @@ export function mapReferenceCard(item, catMap = {}) {
     // categoryIds now contains the string names for comparison in filtering
     const catIds = uniqueCats.map(c => c.name);
 
+    const path = stripCmsDomain(item.resolved_path || item.permalink || item.link || '');
+    const slug = item.slug || (item.id ? String(item.id) : '');
+
     return {
-        id: item.id ? String(item.id) : (item.slug || ''),
-        slug: item.slug || (item.id ? String(item.id) : ''),
+        id: item.id ? String(item.id) : slug,
+        slug,
+        path,
         title: decodeHtmlEntities(
             item.title?.rendered ||
             (typeof item.title === 'string' ? item.title : '') ||
@@ -728,6 +753,7 @@ export function mapReferenceCard(item, catMap = {}) {
             item.name ||
             ''
         ),
+
         description: decodeHtmlEntities(cf.beschreibung || item.acf?.short_description || ''),
         location: cf.referenz_ort || item.acf?.location || '',
         thumbnailImage: thumbnail,

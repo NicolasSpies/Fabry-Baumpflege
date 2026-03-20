@@ -17,7 +17,8 @@ import { resolveMedia } from '@/cms/lib/cms';
 
 let _runtimeMappings: any = null;
 let _globalCmsData: any = null;
-let _language: string = 'DE';
+let _language: string = (typeof window !== 'undefined') ? (window.location.pathname.startsWith('/fr') ? 'FR' : 'DE') : 'DE';
+
 
 export function setGlobalCmsData(data: any) {
   _globalCmsData = data;
@@ -342,8 +343,9 @@ function unwrap(v: any): any {
 
   const url = v.url || v.source_url || v.full || v.src || v.imageUrl;
   const text = v.label || v.text || v.title || v.heading || v.caption || v.value;
-  const link = v.link || v.permalink || v.href;
+  const link = v.resolved_path || v.resolved_frontend_url || v.link || v.permalink || v.href;
   const icon = v.icon || v.glyph || v.svg;
+
 
   // A. Semantic structure (Text + Link/Icon) -> Keep cleaned
   if (text && (url || link || icon)) {

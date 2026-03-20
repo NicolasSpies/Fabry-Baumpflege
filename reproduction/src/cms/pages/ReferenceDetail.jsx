@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { ROUTES } from '@/cms/i18n/routes';
-import { getReferenceById, getTermsByIds, resolveMedia, decodeHtmlEntities } from '@/cms/lib/cms';
+import { getReference, getTermsByIds, resolveMedia, decodeHtmlEntities } from '@/cms/lib/cms';
+
 import { resolveInstanceProps, resolveInstancePropsAsync } from '@/cms/bridge-resolver';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
@@ -174,7 +175,8 @@ const ReferenceDetail = () => {
                 setProject(null);
                 setRawProject(null);
 
-                const ref = await getReferenceById(slug, language, controller.signal);
+                const ref = await getReference(slug, language, controller.signal);
+
                 if (controller.signal.aborted) return;
 
                 if (!ref) {

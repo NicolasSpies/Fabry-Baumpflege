@@ -13,14 +13,18 @@ const preloadReferenceDetailPage = () => import('@/cms/pages/ReferenceDetail');
 /**
  * Reusable Reference Card Component.
  */
-const ReferenceCard = ({ id, title, description, location, thumbnailImage, animateEntry, staggerIndex, forceSquare, compactMobileOverlay = false, language, data, page = 'Home', section = 'ReferencesSection' }) => {
+const ReferenceCard = ({ 
+    id, slug, path, title, description, location, thumbnailImage, 
+    animateEntry, staggerIndex, forceSquare, compactMobileOverlay = false, 
+    language, data, page = 'Home', section = 'ReferencesSection' 
+}) => {
     const props = resolveInstanceProps(page, `${section}/ReferenceCard`, {
-        id, title, description, location, thumbnailImage
+        id, slug, path, title, description, location, thumbnailImage
     }, data);
 
+
     const { t } = useLanguage();
-    const detailBase = ROUTES[language].referenceDetail.split('/:')[0];
-    const detailPath = `${detailBase}/${id}`; 
+    const detailPath = props.path || `${ROUTES[language].referenceDetail.split('/:')[0]}/${props.slug || props.id}`;
     const linkRef = useRef(null);
     const hasPrefetchedRef = useRef(false);
 
@@ -28,8 +32,9 @@ const ReferenceCard = ({ id, title, description, location, thumbnailImage, anima
         if (hasPrefetchedRef.current) return;
         hasPrefetchedRef.current = true;
         preloadReferenceDetailPage();
-        prefetchReferenceDetail(id, language);
+        prefetchReferenceDetail(props.slug || props.id, language);
     };
+
 
     useEffect(() => {
         const node = linkRef.current;
