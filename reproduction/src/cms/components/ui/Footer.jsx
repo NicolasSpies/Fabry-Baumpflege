@@ -4,6 +4,7 @@ import { useLanguage } from '@/cms/i18n/useLanguage';
 import { getLocalizedPath } from '@/cms/i18n/routes';
 import { definePreview } from '@/cms/lib/preview';
 import Icon from '@/cms/components/ui/Icon';
+import { renderCmsInline } from '@/cms/components/ui/CmsText';
 import logo from '@/assets/Baumpflege-Fabry-Logo.svg';
 
 /**
@@ -37,7 +38,7 @@ const Footer = ({
                         src={logo}
                     />
                     <p className="text-white/70 leading-relaxed text-xs">
-                        {actualDescription}
+                        {renderCmsInline(actualDescription)}
                     </p>
                     {actualInstaUrl && (
                         <div className="flex gap-4">
@@ -78,7 +79,7 @@ const Footer = ({
                                     rel="noopener noreferrer"
                                     className="hover:text-white transition-colors"
                                 >
-                                    {actualAddress}
+                                    {renderCmsInline(actualAddress)}
                                 </a>
                             )}
                         </li>

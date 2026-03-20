@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { getTestimonials } from '@/cms/lib/cms';
 import TestimonialCard from '@/cms/components/ui/TestimonialCard';
+import { renderCmsInline } from '@/cms/components/ui/CmsText';
 
 /**
  * Map a raw kundenstimmen CMS post to the shape used as fallback props.
@@ -126,8 +127,8 @@ const TestimonialsSection = ({
         <section ref={sectionRef} className="py-20 md:py-24 bg-background-light dark:bg-background-dark overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 md:px-6 mb-12 md:mb-16">
                 <div className="text-center space-y-4">
-                    <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">{label}</span>
-                    <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">{title}</h2>
+                    <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">{renderCmsInline(label)}</span>
+                    <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">{renderCmsInline(title)}</h2>
                 </div>
             </div>
             <div className="relative">

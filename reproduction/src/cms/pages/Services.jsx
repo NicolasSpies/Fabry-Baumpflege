@@ -9,6 +9,8 @@ import ServicesIntroSection from '@/cms/sections/ServicesIntroSection';
 import ServicesBlocksSection from '@/cms/sections/ServicesBlocksSection';
 import StatsSection from '@/cms/sections/StatsSection';
 import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
+import useCmsSeo from '@/cms/hooks/useCmsSeo';
+
 
 
 /**
@@ -44,7 +46,8 @@ export const previewData = definePreview({
 });
 
 const Services = () => {
-    const { language, t, globalCmsData } = useLanguage();
+    const { language, t, globalCmsData, globalSeo } = useLanguage();
+
     const [statsCmsData, setStatsCmsData] = useState(null);
 
     const mergeHomeStats = (servicesContent, homePage) => {
@@ -119,6 +122,10 @@ const Services = () => {
         loadContent();
         return () => { cancelled = true; };
     }, [language, t]);
+
+    useCmsSeo(rawPage?.seo || globalSeo);
+
+
 
     const getProps = (instanceName, localProps) => 
         resolveInstanceProps('Services', instanceName, localProps, rawPage || globalCmsData);

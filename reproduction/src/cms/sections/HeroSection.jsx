@@ -2,11 +2,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useParallax } from '@/cms/hooks/useParallax';
 import CmsImage from '@/cms/components/ui/CmsImage';
+import { isExternalHref } from '@/cms/bridge-resolver';
 
 function renderTextWithBreaks(text) {
     if (!text) return null;
     return String(text)
-        .split(/<br\s*\/?>/i)
+        .replace(/\r\n/g, '\n')
+        .replace(/<\/p>\s*<p>/gi, '\n\n')
+        .replace(/<p[^>]*>/gi, '')
+        .replace(/<\/p>/gi, '')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .split('\n')
         .map((part, index, arr) => (
             <React.Fragment key={`${part}-${index}`}>
                 {part}
@@ -34,6 +40,8 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref }
 
         return () => window.clearTimeout(timeoutId);
     }, [imageKey]);
+
+    const isExternalCta = isExternalHref(ctaHref);
 
     return (
         <section className="relative h-[82svh] min-h-[34rem] md:h-screen w-full overflow-hidden flex items-center">
@@ -66,12 +74,23 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref }
                         {renderTextWithBreaks(description)}
                     </p>
                     <div className="pt-2 md:pt-4 reveal stagger-2">
-                        <Link
-                            to={ctaHref}
-                            className="inline-block bg-[#3E5F25] text-white px-8 py-3.5 rounded-full font-semibold tracking-widest uppercase text-xs hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
-                        >
-                            {cta}
-                        </Link>
+                        {isExternalCta ? (
+                            <a
+                                href={ctaHref}
+                                className="inline-block bg-[#3E5F25] text-white px-8 py-3.5 rounded-full font-semibold tracking-widest uppercase text-xs hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                {cta}
+                            </a>
+                        ) : (
+                            <Link
+                                to={ctaHref}
+                                className="inline-block bg-[#3E5F25] text-white px-8 py-3.5 rounded-full font-semibold tracking-widest uppercase text-xs hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
+                            >
+                                {cta}
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>

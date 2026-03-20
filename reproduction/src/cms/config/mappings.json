@@ -90,6 +90,11 @@
               "fieldPath": "customFields.startseite_button_ueber_mich.label",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
+            },
+            "ctaHref": {
+              "fieldPath": "customFields.startseite_button_ueber_mich.url",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
             }
           }
         },

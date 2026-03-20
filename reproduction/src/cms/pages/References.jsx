@@ -4,7 +4,10 @@ import { getReferences, getReferenceCategories, mapReferenceCard, getPage, PAGE_
 import { definePreview } from '@/cms/lib/preview';
 import ReferenceCard from '@/cms/components/ui/ReferenceCard';
 import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
+import useCmsSeo from '@/cms/hooks/useCmsSeo';
+
 import Icon from '@/cms/components/ui/Icon';
+import CmsText from '@/cms/components/ui/CmsText';
 
 /**
  * Preview Metadata for ContentBridge scanning.
@@ -31,7 +34,8 @@ export const previewData = definePreview({
 });
 
 const References = () => {
-    const { language, t } = useLanguage();
+    const { language, t, globalSeo } = useLanguage();
+
 
     const [allRefs, setAllRefs] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -157,6 +161,10 @@ const References = () => {
         return () => { cancelled = true; };
     }, [language]);
 
+    useCmsSeo(rawPage?.seo || globalSeo);
+
+
+
     const filteredRefs = activeCatId === null
         ? allRefs
         : allRefs.filter(ref => {
@@ -190,7 +198,11 @@ const References = () => {
             {/* Page: References → Section: ReferencesHeaderSection */}
             <section className="pt-6 md:pt-8 pb-6 md:pb-8 px-4 md:px-6 text-center">
                 <div className="max-w-7xl mx-auto space-y-6">
-                    <p className="text-base opacity-90 max-w-2xl mx-auto leading-relaxed">{headerProps.intro}</p>
+                    <CmsText
+                        text={headerProps.intro}
+                        className="max-w-2xl mx-auto text-base opacity-90"
+                        paragraphClassName="leading-relaxed"
+                    />
                 </div>
             </section>
 

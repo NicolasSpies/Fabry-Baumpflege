@@ -1,6 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import ReferenceCard from '@/cms/components/ui/ReferenceCard';
 import Icon from '@/cms/components/ui/Icon';
+import { renderCmsInline } from '@/cms/components/ui/CmsText';
+import { isExternalHref } from '@/cms/bridge-resolver';
 
 
 const ReferencesSection = ({ 
@@ -14,13 +17,14 @@ const ReferencesSection = ({
     page = 'Home', 
     section = 'ReferencesSection'
 }) => {
+    const isExternalViewAll = isExternalHref(allRefsHref);
 
     return (
         <section className="py-24 px-6 bg-primary/[0.035] dark:bg-surface-dark/50" id="references-preview">
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-20 space-y-4">
-                    <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">{label}</span>
-                    <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">{title}</h2>
+                    <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">{renderCmsInline(label)}</span>
+                    <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">{renderCmsInline(title)}</h2>
                 </div>
                 <div className={`md:hidden -mx-6 px-6 overflow-x-auto scrollbar-hide ${isLoading ? 'min-h-[24rem]' : ''}`}>
                     <div className="flex gap-4 w-max snap-x snap-mandatory pb-2">
@@ -53,13 +57,25 @@ const ReferencesSection = ({
                 </div>
                 {view_all && allRefsHref && (
                     <div className="text-center mt-16">
-                        <a
-                            href={allRefsHref}
-                            className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm uppercase tracking-widest"
-                        >
-                            {view_all}
-                            <Icon name="arrow_forward" className="text-sm" />
-                        </a>
+                        {isExternalViewAll ? (
+                            <a
+                                href={allRefsHref}
+                                className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm uppercase tracking-widest"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                {renderCmsInline(view_all)}
+                                <Icon name="arrow_forward" className="text-sm" />
+                            </a>
+                        ) : (
+                            <Link
+                                to={allRefsHref}
+                                className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm uppercase tracking-widest"
+                            >
+                                {renderCmsInline(view_all)}
+                                <Icon name="arrow_forward" className="text-sm" />
+                            </Link>
+                        )}
                     </div>
                 )}
             </div>

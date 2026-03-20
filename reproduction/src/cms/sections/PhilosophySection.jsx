@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { useParallax } from '@/cms/hooks/useParallax';
 import { useSoftEntrance } from '@/cms/hooks/useSoftEntrance';
 import CmsImage from '@/cms/components/ui/CmsImage';
+import CmsText, { renderCmsInline } from '@/cms/components/ui/CmsText';
 
 
 const PhilosophySection = ({ 
@@ -33,14 +34,16 @@ const PhilosophySection = ({
                 </div>
                 <div className="text-left order-1 lg:order-2 soft-entrance-item">
                     <span className="text-[#9bb221] font-bold tracking-widest uppercase text-[11px] md:text-xs mb-3 md:mb-8 block">
-                        {label}
+                        {renderCmsInline(label)}
                     </span>
-                    <h2 className="text-[2.1rem] sm:text-5xl lg:text-6xl font-serif text-primary mb-5 md:mb-12 leading-[1.02] italic">
-                        {quote}
-                    </h2>
-                    <p className="max-w-[34rem] text-base leading-[1.7] text-slate-600 dark:text-slate-400 font-light">
-                        {text}
-                    </p>
+                    <div className="text-[2.1rem] sm:text-5xl lg:text-6xl font-serif text-primary mb-5 md:mb-12 leading-[1.02] italic">
+                        <CmsText text={quote} className="space-y-2" paragraphClassName="leading-[1.02]" />
+                    </div>
+                    <CmsText
+                        text={text}
+                        className="max-w-[34rem] space-y-4 text-slate-600 dark:text-slate-400 font-light"
+                        paragraphClassName="text-base leading-[1.7]"
+                    />
                 </div>
             </div>
         </section>

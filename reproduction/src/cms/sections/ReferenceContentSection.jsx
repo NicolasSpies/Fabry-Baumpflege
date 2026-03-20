@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Icon from '@/cms/components/ui/Icon';
 import CmsImage from '@/cms/components/ui/CmsImage';
+import CmsText, { renderCmsInline } from '@/cms/components/ui/CmsText';
 
 const ReferenceContentSection = ({ 
     challengeTitle, 
@@ -20,8 +21,14 @@ const ReferenceContentSection = ({
     return (
         <div className="lg:col-span-8 reveal stagger-1">
             <div className="prose prose-slate prose-lg dark:prose-invert max-w-none">
-                <h2 className="font-display text-3xl text-primary mb-8">{challengeTitle}</h2>
-                {description && <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6 whitespace-pre-wrap">{description}</p>}
+                <h2 className="font-display text-3xl text-primary mb-8">{renderCmsInline(challengeTitle)}</h2>
+                {description && (
+                    <CmsText
+                        text={description}
+                        className="text-slate-600 dark:text-slate-400 mb-6"
+                        paragraphClassName="leading-relaxed"
+                    />
+                )}
             </div>
 
             {hasBeforeAfter && (
@@ -54,7 +61,7 @@ const ReferenceContentSection = ({
             {/* Gallery part within the same column/section */}
             {gallery && gallery.length > 0 && (
                 <div className="mt-24">
-                   <h3 className="font-display text-2xl text-primary mb-8">{galleryTitle}</h3>
+                   <h3 className="font-display text-2xl text-primary mb-8">{renderCmsInline(galleryTitle)}</h3>
                    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
                        {gallery.map((img, idx) => (
                            <button 

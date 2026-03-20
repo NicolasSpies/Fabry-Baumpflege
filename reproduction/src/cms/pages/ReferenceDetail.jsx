@@ -5,6 +5,8 @@ import { ROUTES } from '@/cms/i18n/routes';
 import { getReferenceById, getTermsByIds, resolveMedia, decodeHtmlEntities } from '@/cms/lib/cms';
 import { resolveInstanceProps, resolveInstancePropsAsync } from '@/cms/bridge-resolver';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
+import useCmsSeo from '@/cms/hooks/useCmsSeo';
+
 import { definePreview } from '@/cms/lib/preview';
 import { ReferenceDetailSkeleton } from '@/cms/components/ui/PageSkeleton';
 import Icon from '@/cms/components/ui/Icon';
@@ -40,7 +42,8 @@ export const previewData = definePreview({
 
 const ReferenceDetail = () => {
     const { slug } = useParams();
-    const { language, t } = useLanguage();
+    const { language, t, globalSeo } = useLanguage();
+
 
     // ─── State ───────────────────────────────────────────────────────────────
     const [status, setStatus] = useState('loading');  // 'loading' | 'ready' | 'error' | 'notfound'
@@ -250,6 +253,10 @@ const ReferenceDetail = () => {
         loadData();
         return () => controller.abort();
     }, [slug, language]);
+
+    useCmsSeo(rawProject?.seo || globalSeo);
+
+
 
     // ─── Bridge Hydration Effect ──────────────────────────────────────────────
     useEffect(() => {

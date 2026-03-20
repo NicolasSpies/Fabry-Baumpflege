@@ -8,6 +8,8 @@ import GartenpflegeIcon from '@/cms/components/icons/GartenpflegeIcon';
 import BepflanzungIcon from '@/cms/components/icons/BepflanzungIcon';
 import CmsImage from '@/cms/components/ui/CmsImage';
 import Icon from '@/cms/components/ui/Icon';
+import CmsText, { renderCmsInline } from '@/cms/components/ui/CmsText';
+import { isExternalHref } from '@/cms/bridge-resolver';
 
 function renderServiceIcon(icon, iconVariant) {
     switch (icon) {
@@ -20,6 +22,7 @@ function renderServiceIcon(icon, iconVariant) {
 }
 
 const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, iconVariant = 'outline', isActive = false, cardRef = null }) => {
+    const isExternal = isExternalHref(href);
     const activeState = isActive
         ? 'shadow-xl shadow-slate-200/60 -translate-y-2'
         : '';
@@ -33,12 +36,10 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
         ? 'bg-[#3E5F25] text-white'
         : 'bg-slate-100 dark:bg-slate-800/50 text-[#3E5F25]';
 
-    return (
-        <div ref={cardRef} className="expert-card-anim h-full">
-            <Link
-                to={href || '#'}
-                className={`group relative bg-white dark:bg-surface-dark rounded-[2rem] p-8 md:p-10 transition-[transform,box-shadow] duration-500 shadow-lg md:shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full md:hover:-translate-y-2 md:hover:shadow-xl md:hover:shadow-slate-200/60 ${activeState}`}
-            >
+    const cardClassName = `group relative bg-white dark:bg-surface-dark rounded-[2rem] p-8 md:p-10 transition-[transform,box-shadow] duration-500 shadow-lg md:shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full md:hover:-translate-y-2 md:hover:shadow-xl md:hover:shadow-slate-200/60 ${activeState}`;
+
+    const cardInner = (
+        <>
                 {/* Visual enhancement: Show service image if available, else show gradient blob */}
                 {image ? (
                     <div className={`absolute inset-x-0 bottom-0 top-1/2 transition-opacity duration-700 ${imageState} md:opacity-0 md:group-hover:opacity-10`}>
@@ -53,12 +54,14 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
                         {renderServiceIcon(icon, iconVariant)}
                     </div>
                     <h3 className={`text-2xl font-serif text-primary mb-4 transition-colors ${titleState} md:group-hover:text-[#3E5F25]`}>
-                        {title}
+                        {renderCmsInline(title)}
                     </h3>
                     {description && (
-                        <p className="text-slate-600 dark:text-slate-400 text-[0.9375rem] leading-relaxed font-sans mb-8 flex-grow">
-                            {description}
-                        </p>
+                        <CmsText
+                            text={description}
+                            className="mb-8 flex-grow space-y-3 text-slate-600 dark:text-slate-400 font-sans"
+                            paragraphClassName="text-[0.9375rem] leading-relaxed"
+                        />
                     )}
                     <div className="flex items-center text-primary font-bold text-xs tracking-[0.15em] uppercase mt-auto">
                         <span>
@@ -66,7 +69,28 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
                         </span>
                     </div>
                 </div>
-            </Link>
+        </>
+    );
+
+    return (
+        <div ref={cardRef} className="expert-card-anim h-full">
+            {isExternal ? (
+                <a
+                    href={href || '#'}
+                    className={cardClassName}
+                    target={href?.startsWith('http') ? '_blank' : undefined}
+                    rel={href?.startsWith('http') ? 'noreferrer' : undefined}
+                >
+                    {cardInner}
+                </a>
+            ) : (
+                <Link
+                    to={href || '#'}
+                    className={cardClassName}
+                >
+                    {cardInner}
+                </Link>
+            )}
         </div>
     );
 };
@@ -155,8 +179,8 @@ const ServicesSection = ({
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-16 md:mb-24 space-y-4 soft-entrance-item">
-                    <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">{label}</span>
-                    <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight">{title}</h2>
+                    <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">{renderCmsInline(label)}</span>
+                    <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight">{renderCmsInline(title)}</h2>
                 </div>
                 <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-6">
                     <div className="soft-entrance-item">
@@ -214,13 +238,25 @@ const ServicesSection = ({
                 </div>
                 {viewAllLabel && allServicesHref ? (
                     <div className="text-center mt-16">
-                        <Link
-                            to={allServicesHref}
-                            className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm uppercase tracking-widest"
-                        >
-                            {viewAllLabel}
-                            <Icon name="arrow_forward" className="text-sm" />
-                        </Link>
+                        {isExternalHref(allServicesHref) ? (
+                            <a
+                                href={allServicesHref}
+                                className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm uppercase tracking-widest"
+                                target={allServicesHref.startsWith('http') ? '_blank' : undefined}
+                                rel={allServicesHref.startsWith('http') ? 'noreferrer' : undefined}
+                            >
+                                {renderCmsInline(viewAllLabel)}
+                                <Icon name="arrow_forward" className="text-sm" />
+                            </a>
+                        ) : (
+                            <Link
+                                to={allServicesHref}
+                                className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm uppercase tracking-widest"
+                            >
+                                {renderCmsInline(viewAllLabel)}
+                                <Icon name="arrow_forward" className="text-sm" />
+                            </Link>
+                        )}
                     </div>
                 ) : null}
             </div>

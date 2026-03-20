@@ -6,6 +6,7 @@ import BepflanzungIcon from '@/cms/components/icons/BepflanzungIcon';
 import { useParallax } from '@/cms/hooks/useParallax';
 import Icon from '@/cms/components/ui/Icon';
 import CmsImage from '@/cms/components/ui/CmsImage';
+import CmsText from '@/cms/components/ui/CmsText';
 
 const ServiceImage = ({ src, alt }) => {
     const ref = useRef(null);
@@ -61,9 +62,11 @@ const ServiceBlockInternal = ({ id, title, description, list, image, reverse, to
                             </div>
                         </div>
                         {description && (
-                            <p className="max-w-[34rem] text-base leading-relaxed text-slate-600 dark:text-slate-400">
-                                {description}
-                            </p>
+                            <CmsText
+                                text={description}
+                                className="max-w-[34rem] space-y-3 text-slate-600 dark:text-slate-400"
+                                paragraphClassName="text-base leading-relaxed"
+                            />
                         )}
                         <ul className="space-y-1.5 md:space-y-2.5 lg:space-y-3 pt-5 md:pt-4 border-t border-primary/10">
                             {(list || []).map((feature, fIdx) => {

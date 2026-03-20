@@ -50,6 +50,8 @@ export function LanguageProvider({ children }) {
 
     // Global CMS data (e.g., Site Options, Startseite data) shared across pages
     const [globalCmsData, setGlobalCmsData] = useState(null);
+    const [globalSeo, setGlobalSeo] = useState(null);
+
 
     // Sync state whenever the URL changes (e.g., browser back/fwd, external navigate)
     useEffect(() => {
@@ -80,8 +82,11 @@ export function LanguageProvider({ children }) {
             setLanguage, 
             t, 
             globalCmsData,
-            setGlobalCmsData
+            setGlobalCmsData,
+            globalSeo,
+            setGlobalSeo
         }}>
+
             {children}
         </LanguageContext.Provider>
     );

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { isExternalHref } from '@/cms/bridge-resolver';
 
 const ReferenceSidebarSection = ({ 
     title = '',
@@ -13,6 +14,8 @@ const ReferenceSidebarSection = ({
     ctaLink = '/kontakt',
     ctaState = undefined
 }) => {
+    const isExternalCta = isExternalHref(ctaLink);
+
     return (
         <div className="bg-surface-light dark:bg-surface-dark p-6 md:p-8 lg:p-10 rounded-3xl space-y-5 md:space-y-6">
             <h2 className="text-[1.55rem] md:text-2xl font-display text-primary">
@@ -51,9 +54,20 @@ const ReferenceSidebarSection = ({
                     </>
                 )}
             </div>
-            <Link to={ctaLink} state={ctaState} className="block w-full text-center py-4 md:py-5 mt-2 md:mt-4 border border-primary text-primary hover:bg-primary hover:text-white rounded-full transition-all uppercase text-[11px] md:text-xs font-bold tracking-widest">
-                {ctaLabel}
-            </Link>
+            {isExternalCta ? (
+                <a
+                    href={ctaLink}
+                    className="block w-full text-center py-4 md:py-5 mt-2 md:mt-4 border border-primary text-primary hover:bg-primary hover:text-white rounded-full transition-all uppercase text-[11px] md:text-xs font-bold tracking-widest"
+                    target={ctaLink?.startsWith('http') ? '_blank' : undefined}
+                    rel={ctaLink?.startsWith('http') ? 'noreferrer' : undefined}
+                >
+                    {ctaLabel}
+                </a>
+            ) : (
+                <Link to={ctaLink} state={ctaState} className="block w-full text-center py-4 md:py-5 mt-2 md:mt-4 border border-primary text-primary hover:bg-primary hover:text-white rounded-full transition-all uppercase text-[11px] md:text-xs font-bold tracking-widest">
+                    {ctaLabel}
+                </Link>
+            )}
         </div>
     );
 };

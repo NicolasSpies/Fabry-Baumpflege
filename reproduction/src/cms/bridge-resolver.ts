@@ -166,19 +166,100 @@ const PAGE_ID_MAP: Record<number, string> = {
   22: 'contact'
 };
 
+const FRONTEND_ROUTES: Record<string, Record<string, string>> = {
+  DE: { home: '/', services: '/leistungen', about: '/über-mich', references: '/referenzen', contact: '/kontakt' },
+  FR: { home: '/fr', services: '/fr/services', about: '/fr/uber-moi', references: '/fr/references', contact: '/fr/contact' }
+};
+
+const ROUTE_ALIASES: Record<string, string[]> = {
+  home: ['', 'home', 'startseite', 'accueil'],
+  services: ['leistungen', 'services', 'service'],
+  about: ['ueber-mich', 'über-mich', 'uber-moi', 'a-propos', 'apropos', 'about'],
+  references: ['referenzen', 'referenz', 'references', 'reference'],
+  contact: ['kontakt', 'contact']
+};
+
+function normalizeRouteSegment(value: string): string {
+  return decodeURIComponent(value || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9/-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function resolvePageUrlByKey(routeKey: string, lang: string = 'DE'): string {
+  const set = FRONTEND_ROUTES[lang] || FRONTEND_ROUTES.DE;
+  return set[routeKey] || FRONTEND_ROUTES.DE.contact;
+}
+
 function resolvePageUrl(id: any, lang: string = 'DE'): string {
   const numId = typeof id === 'number' ? id : parseInt(id, 10);
   const routeKey = PAGE_ID_MAP[numId];
-  
-  // Minimal internal routes logic to avoid circular imports if possible,
-  // or use a simplified version.
-  const routes: any = {
-    DE: { home: '/', services: '/leistungen', about: '/über-mich', references: '/referenzen', contact: '/kontakt' },
-    FR: { home: '/fr', services: '/fr/services', about: '/fr/uber-moi', references: '/fr/references', contact: '/fr/contact' }
-  };
+  return resolvePageUrlByKey(routeKey, lang);
+}
 
-  const set = routes[lang] || routes['DE'];
-  return set[routeKey] || '/kontakt'; // contact is the safest fallback
+function getRouteKeyFromPath(pathname: string = ''): string | null {
+  const segments = pathname
+    .split('/')
+    .map(segment => normalizeRouteSegment(segment))
+    .filter(Boolean);
+
+  if (segments[0] === 'fr' || segments[0] === 'de') {
+    segments.shift();
+  }
+
+  if (segments.length === 0) return 'home';
+
+  const first = segments[0];
+
+  for (const [routeKey, aliases] of Object.entries(ROUTE_ALIASES)) {
+    if (aliases.includes(first)) return routeKey;
+  }
+
+  return null;
+}
+
+export function isExternalHref(href: string = ''): boolean {
+  return /^(https?:)?\/\//i.test(href) || /^(mailto:|tel:)/i.test(href);
+}
+
+export function resolveFrontendHref(value: string, lang: string = _language): string {
+  if (!value || typeof value !== 'string') return value;
+
+  const href = value.trim();
+  if (!href) return href;
+  if (/^(mailto:|tel:|#)/i.test(href)) return href;
+  if (!/^(https?:)?\/\//i.test(href) && href.startsWith('/')) {
+    const routeKey = getRouteKeyFromPath(href);
+    return routeKey ? resolvePageUrlByKey(routeKey, lang) : href;
+  }
+
+  if (!/^(https?:)?\/\//i.test(href)) return href;
+
+  try {
+    const urlObj = new URL(href);
+    const queryId = urlObj.searchParams.get('page_id') || urlObj.searchParams.get('p');
+    if (queryId && PAGE_ID_MAP[parseInt(queryId, 10)]) {
+      return resolvePageUrl(queryId, lang);
+    }
+
+    const routeKey = getRouteKeyFromPath(urlObj.pathname);
+    if (routeKey) {
+      return resolvePageUrlByKey(routeKey, lang);
+    }
+
+    const localPath = urlObj.pathname + urlObj.search + urlObj.hash;
+    if (typeof window !== 'undefined' && window.location?.origin) {
+      return `${window.location.origin}${localPath}`;
+    }
+
+    return localPath;
+  } catch {
+    return href;
+  }
 }
 
 /**
@@ -201,18 +282,7 @@ function normalizeUrl(v: string): string {
   if (assetExtensions.test(v)) return v;
 
   try {
-    const urlObj = new URL(v);
-    // Return relative path + search + hash
-    // Example: https://cms.fabry-baumpflege.be/referenzen/test -> /referenzen/test
-    let path = urlObj.pathname + urlObj.search + urlObj.hash;
-    
-    // Construct local origin if available to provide the full frontend URL
-    if (typeof window !== 'undefined') {
-        const origin = window.location.origin;
-        return origin + path;
-    }
-    
-    return path;
+    return resolveFrontendHref(v, _language);
   } catch (e) {
     return v;
   }
@@ -266,7 +336,7 @@ function unwrap(v: any): any {
       return resolvePageUrl(v.page_id || v.id, _language);
     }
     if (v.link_mode === 'external') {
-      return normalizeUrl(v.url || v.href || '#');
+      return resolveFrontendHref(v.url || v.href || '#', _language);
     }
   }
 
@@ -278,7 +348,7 @@ function unwrap(v: any): any {
   // A. Semantic structure (Text + Link/Icon) -> Keep cleaned
   if (text && (url || link || icon)) {
     const cleaned: any = { text: unwrap(text) };
-    if (link || url) cleaned.link = normalizeUrl(link || url);
+    if (link || url) cleaned.link = resolveFrontendHref(link || url, _language);
     if (icon) cleaned.icon = icon;
     return cleaned;
   }

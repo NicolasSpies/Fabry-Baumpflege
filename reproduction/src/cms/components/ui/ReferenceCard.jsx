@@ -6,6 +6,7 @@ import { resolveInstanceProps } from '@/cms/bridge-resolver';
 import { prefetchReferenceDetail } from '@/cms/lib/cms';
 import Icon from '@/cms/components/ui/Icon';
 import CmsImage from '@/cms/components/ui/CmsImage';
+import { renderCmsInline } from '@/cms/components/ui/CmsText';
 
 const preloadReferenceDetailPage = () => import('@/cms/pages/ReferenceDetail');
 
@@ -71,10 +72,10 @@ const ReferenceCard = ({ id, title, description, location, thumbnailImage, anima
                         {props.location}
                     </span>
                     <h3 className={`font-serif mb-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-200 ${compactMobileOverlay ? 'text-lg md:text-2xl' : 'text-2xl'}`}>
-                        {props.title}
+                        {renderCmsInline(props.title)}
                     </h3>
                     <p className={`text-xs opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-300 line-clamp-2 ${compactMobileOverlay ? 'hidden md:block' : ''}`}>
-                        {props.description}
+                        {renderCmsInline(props.description)}
                     </p>
 
                     <div className={`mt-4 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-2 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-400 ${compactMobileOverlay ? 'hidden md:block' : ''}`}>

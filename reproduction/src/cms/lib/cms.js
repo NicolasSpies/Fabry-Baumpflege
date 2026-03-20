@@ -432,6 +432,24 @@ export async function getOptions(language = 'DE', signal = null) {
 }
 
 /**
+ * Fetch global SEO fallbacks.
+ */
+export async function getGlobalSeo(language = 'DE', signal = null) {
+    try {
+        const seo = await fetchFromCMS('/content-core/v1/seo', language, signal);
+        if (import.meta.env.DEV && seo) {
+            console.log(`[CMS] Loaded global SEO fallback.`, seo);
+        }
+        return seo;
+    } catch (error) {
+        if (error?.name === 'AbortError') throw error;
+        console.warn('[CMS] getGlobalSeo failed:', error?.message);
+        return null;
+    }
+}
+
+
+/**
  * Fetch a specific form schema by slug.
  */
 export async function getForm(slug, language = 'DE', signal = null) {
@@ -511,10 +529,9 @@ export async function getTermsByIds(ids, language = 'DE', signal = null) {
  */
 export async function getTestimonials(language = 'DE') {
     try {
-        const testimonials = await fetchFromCMS('/kundenstimmen?_embed=1&per_page=50', language);
+        const testimonials = await fetchFromCMS('/content-core/v1/posts/kundenstimmen?_embed=1&per_page=50', language);
         if (Array.isArray(testimonials) && testimonials.length > 0) {
             if (import.meta.env.DEV) console.log(`[CMS] Loaded ${testimonials.length} testimonials from CMS.`);
-            // Transform WP shape to include a safe customFields object if it doesn't exist
             return testimonials.map(t => ({
                 ...t,
                 customFields: t.customFields || t.acf || t.meta || {}
@@ -527,55 +544,43 @@ export async function getTestimonials(language = 'DE') {
 }
 
 /**
- * Try multiple known WordPress post type slugs for references.
- * WP custom post types can be registered with different REST slugs;
- * this function tries each in order and returns the first non-empty result.
- * Slugs tried: referenzen (German plural), referenz (German singular), references (English).
+ * Modern Content Core based reference fetcher.
+ * Uses /content-core/v1/posts and /content-core/v1/post endpoints to ensure
+ * trashed translations and multilingual status are correctly handled.
  */
-async function fetchReferencesFromCMS(queryParams, language, signal = null) {
-    const slugs = ['referenzen', 'referenz', 'references'];
-    for (const slug of slugs) {
-        try {
-            const data = await fetchFromCMS(`/${slug}${queryParams}`, language, signal);
-            if (Array.isArray(data) && data.length > 0) {
-                if (import.meta.env.DEV) console.log(`[CMS] References found at /${slug} (${data.length} items).`);
-                return data;
-            }
-            if (data && typeof data === 'object' && !Array.isArray(data) && data.id) {
-                // Single item endpoint (e.g. /referenzen/123)
-                if (import.meta.env.DEV) console.log(`[CMS] Reference item found at /${slug}.`);
-                return data;
-            }
-        } catch (error) {
-            if (error?.name === 'AbortError') throw error;
-            if (import.meta.env.DEV) console.warn(`[CMS] /${slug}${queryParams} failed:`, error?.message);
-        }
+async function fetchReferencesFromCMS(queryParams, language, signal = null, isSingle = false) {
+    const base = isSingle ? '/content-core/v1/post/referenzen' : '/content-core/v1/posts/referenzen';
+    try {
+        const data = await fetchFromCMS(`${base}${queryParams}`, language, signal);
+        return data || null;
+    } catch (error) {
+        if (error?.name === 'AbortError') throw error;
+        if (import.meta.env.DEV) console.warn(`[CMS] ${base}${queryParams} failed:`, error?.message);
+        return null;
     }
-    return null;
 }
 
 /** Fetch ALL references for the given language, newest first. */
 export async function getReferences(language = 'DE') {
     const result = await fetchReferencesFromCMS('?_embed=1&per_page=100', language);
-    if (result) {
+    if (result && Array.isArray(result)) {
         if (import.meta.env.DEV) console.log(`[CMS] Loaded ${result.length} references from CMS.`);
         return result;
     }
-    console.warn('[CMS] getReferences — all endpoints failed.');
     return [];
 }
 
 /** Fetch the newest `limit` references for the given language (homepage preview). */
 export async function getLatestReferences(limit = 3, language = 'DE') {
     const result = await fetchReferencesFromCMS(`?_embed=1&per_page=${limit}`, language);
-    if (result) return result;
+    if (result && Array.isArray(result)) return result;
     return [];
 }
 
 /** Fetch references filtered to a single category term id, newest first. */
 export async function getReferencesByCategory(categoryId, language = 'DE') {
     const result = await fetchReferencesFromCMS(`?_embed=1&per_page=100&reference_category=${categoryId}`, language);
-    if (result) return result;
+    if (result && Array.isArray(result)) return result;
     return [];
 }
 
@@ -591,15 +596,12 @@ export async function getReferenceBySlug(slug, language = 'DE', signal = null) {
 
 /** Fetch a single reference by numeric ID. */
 export async function getReferenceById(id, language = 'DE', signal = null) {
-    // Numeric ID: try direct endpoint
     if (typeof id === 'number' || /^\d+$/.test(String(id))) {
-        const result = await fetchReferencesFromCMS(`/${id}?_embed=1`, language, signal);
+        const result = await fetchReferencesFromCMS(`/${id}?_embed=1`, language, signal, true);
         if (result && !Array.isArray(result)) return result;
     }
-    // Slug fallback
-    const result = await fetchReferencesFromCMS(`?slug=${encodeURIComponent(id)}&_embed=1`, language, signal);
-    if (Array.isArray(result) && result.length > 0) return result[0];
-    return null;
+    // Slug fallback (still through Content Core)
+    return getReferenceBySlug(id, language, signal);
 }
 
 export async function prefetchReferenceDetail(id, language = 'DE') {

@@ -1,51 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSoftEntrance } from '@/cms/hooks/useSoftEntrance';
-
-function normalizeParagraphs(text) {
-    if (!text) return [];
-
-    const normalized = String(text)
-        .replace(/<\/p>\s*<p>/gi, '\n\n')
-        .replace(/<p[^>]*>/gi, '')
-        .replace(/<\/p>/gi, '')
-        .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '\n\n')
-        .replace(/<br\s*\/?>/gi, '\n')
-        .trim();
-
-    const splitByParagraphBreaks = normalized
-        .split(/\n\s*\n/)
-        .map((paragraph) => paragraph.trim())
-        .filter(Boolean);
-
-    if (splitByParagraphBreaks.length > 1) {
-        return splitByParagraphBreaks;
-    }
-
-    return normalized
-        .split('\n')
-        .map((paragraph) => paragraph.trim())
-        .filter(Boolean);
-}
-
-function renderInlineBreaks(text) {
-    return String(text)
-        .split('\n')
-        .map((part, index, arr) => (
-            <React.Fragment key={`${part}-${index}`}>
-                {part}
-                {index < arr.length - 1 ? <br /> : null}
-            </React.Fragment>
-        ));
-}
-
-function normalizeSingleLine(text) {
-    if (!text) return '';
-
-    return String(text)
-        .replace(/<br\s*\/?>/gi, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-}
+import { normalizeCmsParagraphs, renderCmsInline } from '@/cms/components/ui/CmsText';
 
 const HomeIntroSection = ({
     title = '',
@@ -55,7 +10,7 @@ const HomeIntroSection = ({
     const timelineRef = useRef(null);
     const dotRefs = useRef([]);
     useSoftEntrance(sectionRef);
-    const paragraphs = normalizeParagraphs(description);
+    const paragraphs = normalizeCmsParagraphs(description);
     const [lineProgress, setLineProgress] = useState(0);
     const [lineMetrics, setLineMetrics] = useState({ top: 0, height: 0 });
     const safeParagraphs = useMemo(() => paragraphs.slice(0, 4), [paragraphs]);
@@ -126,7 +81,7 @@ const HomeIntroSection = ({
                         <div className="soft-entrance-item mb-10 md:mb-12 grid grid-cols-[2rem_minmax(0,1fr)] gap-5 md:gap-6 max-w-[56rem] mx-auto">
                             <div aria-hidden="true" />
                             <h2 className="text-[1.8rem] leading-[1.08] text-primary md:text-[2rem] lg:text-[2.15rem] font-serif text-left">
-                                {normalizeSingleLine(title)}
+                                {renderCmsInline(title)}
                             </h2>
                         </div>
                     ) : null}
@@ -171,7 +126,7 @@ const HomeIntroSection = ({
                                                 ? 'max-w-[48rem] text-[1rem] leading-[1.72] font-semibold text-slate-700 dark:text-slate-200'
                                                 : 'max-w-[48rem] text-[1rem] leading-[1.72] text-slate-600 dark:text-slate-300'}
                                         >
-                                            {renderInlineBreaks(paragraph)}
+                                            {renderCmsInline(paragraph)}
                                         </p>
                                     </div>
                                 ))}

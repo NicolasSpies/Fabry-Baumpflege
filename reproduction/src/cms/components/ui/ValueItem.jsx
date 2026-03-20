@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { useParallax } from '@/cms/hooks/useParallax';
 import CmsImage from '@/cms/components/ui/CmsImage';
+import CmsText, { renderCmsInline } from '@/cms/components/ui/CmsText';
 
 import { resolveInstanceProps } from '@/cms/bridge-resolver';
  
@@ -28,11 +29,13 @@ import { resolveInstanceProps } from '@/cms/bridge-resolver';
                 </div>
                 <div className="min-w-0 space-y-1.5">
                     <h3 className="text-[1.1rem] font-serif text-primary">
-                        {props.title}
+                        {renderCmsInline(props.title)}
                     </h3>
-                    <p className="text-[0.95rem] leading-[1.6] text-slate-500 dark:text-slate-400">
-                        {props.text}
-                    </p>
+                    <CmsText
+                        text={props.text}
+                        className="text-[0.95rem] text-slate-500 dark:text-slate-400"
+                        paragraphClassName="leading-[1.6]"
+                    />
                 </div>
             </div>
 
@@ -47,11 +50,13 @@ import { resolveInstanceProps } from '@/cms/bridge-resolver';
                 </div>
                 <div className="space-y-2">
                     <h3 className="text-xl font-serif text-primary">
-                        {props.title}
+                        {renderCmsInline(props.title)}
                     </h3>
-                    <p className="text-sm leading-[1.65] text-slate-500 dark:text-slate-400">
-                        {props.text}
-                    </p>
+                    <CmsText
+                        text={props.text}
+                        className="text-sm text-slate-500 dark:text-slate-400"
+                        paragraphClassName="leading-[1.65]"
+                    />
                 </div>
             </div>
         </div>

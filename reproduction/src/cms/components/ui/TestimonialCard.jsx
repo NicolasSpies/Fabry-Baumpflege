@@ -1,6 +1,7 @@
 import React from 'react';
 import { resolveInstanceProps } from '@/cms/bridge-resolver';
 import Icon from '@/cms/components/ui/Icon';
+import { renderCmsInline } from '@/cms/components/ui/CmsText';
 
 /**
  * Preview Metadata for ContentBridge scanning.
@@ -23,11 +24,11 @@ const TestimonialCard = ({ author, rating_raw, text, data, page = 'Home', sectio
                 ))}
             </div>
             <p className="text-slate-700 dark:text-slate-300 italic mb-7 md:mb-8 leading-relaxed font-sans text-[0.95rem] md:text-base">
-                "{props.text}"
+                "{renderCmsInline(props.text)}"
             </p>
             <div className="flex items-center justify-between border-t border-slate-50 dark:border-slate-800 pt-6 mt-auto">
                 <div>
-                    <h4 className="font-serif text-primary text-lg">{props.author}</h4>
+                    <h4 className="font-serif text-primary text-lg">{renderCmsInline(props.author)}</h4>
                 </div>
             </div>
         </div>

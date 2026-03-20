@@ -8,6 +8,8 @@ import { definePreview } from '@/cms/lib/preview';
 import ContactSidebarSection from '@/cms/sections/ContactSidebarSection';
 import ContactFormSection from '@/cms/sections/ContactFormSection';
 import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
+import useCmsSeo from '@/cms/hooks/useCmsSeo';
+
 
 
 /**
@@ -29,7 +31,8 @@ export const previewData = definePreview({
 });
 
 const Contact = () => {
-    const { language, t, globalCmsData } = useLanguage();
+    const { language, t, globalCmsData, globalSeo } = useLanguage();
+
     const getInitialContent = () => ({
         hero: {
             title: '',
@@ -102,6 +105,10 @@ const Contact = () => {
         loadContent();
         return () => { cancelled = true; };
     }, [language, t]);
+
+    useCmsSeo(rawPage?.seo || globalSeo);
+
+
 
     const getProps = (instanceName, localProps) => {
         return resolveInstanceProps('Contact', instanceName, localProps, rawPage);

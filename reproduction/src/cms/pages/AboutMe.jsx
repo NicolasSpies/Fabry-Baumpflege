@@ -10,6 +10,8 @@ import PhilosophySection from '@/cms/sections/PhilosophySection';
 import ValuesSection from '@/cms/sections/ValuesSection';
 import SignatureSection from '@/cms/sections/SignatureSection';
 import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
+import useCmsSeo from '@/cms/hooks/useCmsSeo';
+
 
 
 /**
@@ -35,7 +37,8 @@ export const previewData = definePreview({
 });
 
 const AboutMe = () => {
-    const { language, t, globalCmsData } = useLanguage();
+    const { language, t, globalCmsData, globalSeo } = useLanguage();
+
     const getInitialContent = () => ({
         philosophy: {
             label: '',
@@ -93,6 +96,10 @@ const AboutMe = () => {
         loadContent();
         return () => { cancelled = true; };
     }, [language, t]);
+
+    useCmsSeo(rawPage?.seo || globalSeo);
+
+
 
     const getProps = (instanceName, localProps) => {
         return resolveInstanceProps('AboutMe', instanceName, localProps, rawPage);

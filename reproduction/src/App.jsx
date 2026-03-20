@@ -6,7 +6,8 @@ import PageSkeleton from '@/cms/components/ui/PageSkeleton';
 import ScrollToTop from '@/cms/components/ui/ScrollToTop';
 import { ROUTES } from '@/cms/i18n/routes';
 import { useLanguage } from '@/cms/i18n/useLanguage';
-import { getOptions } from '@/cms/lib/cms';
+import { getOptions, getGlobalSeo } from '@/cms/lib/cms';
+
 import { definePreview } from '@/cms/lib/preview';
 import { resolveInstanceProps, awaitMappings, setGlobalCmsData as setBridgeGlobalData, setBridgeLanguage } from '@/cms/bridge-resolver';
 
@@ -43,11 +44,12 @@ export const previewData = definePreview({
 });
 
 function App() {
-  const { language, setGlobalCmsData } = useLanguage();
+  const { language, setGlobalCmsData, setGlobalSeo } = useLanguage();
   const [globalData, setGlobalData] = useState({
     navbar: {},
     footer: {}
   });
+
   const [rawGlobal, setRawGlobal] = useState(null);
 
   // Fetch only true global CMS data for shell components.
@@ -59,11 +61,15 @@ function App() {
         if (cancelled) return;
         setBridgeLanguage(language);
 
-        const options = await getOptions(language);
+        const [options, seo] = await Promise.all([
+          getOptions(language),
+          getGlobalSeo(language)
+        ]);
         if (cancelled) return;
 
         setRawGlobal(options);
         setGlobalCmsData(options);
+        setGlobalSeo(seo);
         setBridgeGlobalData(options);
       } catch (err) {
         console.error('[App] Global load failed:', err);
@@ -71,7 +77,8 @@ function App() {
     }
     loadGlobal();
     return () => { cancelled = true; };
-  }, [language, setGlobalCmsData]);
+  }, [language, setGlobalCmsData, setGlobalSeo]);
+
 
   const getShellProps = (instanceName, localProps) => 
     resolveInstanceProps('Global', instanceName, localProps, rawGlobal);

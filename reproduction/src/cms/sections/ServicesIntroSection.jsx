@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { useSoftEntrance } from '@/cms/hooks/useSoftEntrance';
+import CmsText, { renderCmsInline } from '@/cms/components/ui/CmsText';
 
 const ServicesIntroSection = ({
     title,
@@ -14,12 +15,14 @@ const ServicesIntroSection = ({
                 <div className="space-y-6 soft-entrance-item">
                     {title ? (
                         <h1 className="font-serif text-primary leading-[0.95] md:leading-[0.95] text-[2.75rem] md:text-[5rem] lg:text-[6.5rem] font-bold tracking-tight">
-                            {title}
+                            {renderCmsInline(title)}
                         </h1>
                     ) : null}
-                    <p className="text-base opacity-90 max-w-2xl mx-auto leading-relaxed text-slate-600">
-                        {description}
-                    </p>
+                    <CmsText
+                        text={description}
+                        className="max-w-2xl mx-auto space-y-3 text-slate-600"
+                        paragraphClassName="text-base opacity-90 leading-relaxed"
+                    />
                 </div>
             </div>
         </section>

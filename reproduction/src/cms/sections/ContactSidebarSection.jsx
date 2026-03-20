@@ -1,4 +1,5 @@
 import React from 'react';
+import CmsText from '@/cms/components/ui/CmsText';
 
 
 const ContactSidebarSection = ({ contact_person, phone, email, office_label, address, address_link, area_label, area_text }) => {
@@ -44,7 +45,13 @@ return (
                 {hasAreaBox && (
                     <section className="bg-primary/5 dark:bg-primary/10 p-6 rounded-xl border border-primary/10">
                         {area_label && <h3 className="text-[10px] uppercase tracking-[0.3em] text-[#9bb221] font-bold mb-3">{area_label}</h3>}
-                        {area_text && <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">{area_text}</p>}
+                        {area_text && (
+                            <CmsText
+                                text={area_text}
+                                className="space-y-2 text-slate-600 dark:text-slate-400"
+                                paragraphClassName="leading-relaxed text-sm"
+                            />
+                        )}
                     </section>
                 )}
             </div>

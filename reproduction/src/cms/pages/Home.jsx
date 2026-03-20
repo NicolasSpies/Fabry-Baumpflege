@@ -14,6 +14,8 @@ import ReferencesSection from '@/cms/sections/ReferencesSection';
 import TestimonialsSection from '@/cms/sections/TestimonialsSection';
 import AboutSection from '@/cms/sections/AboutSection';
 import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
+import useCmsSeo from '@/cms/hooks/useCmsSeo';
+
 
 
 /**
@@ -79,7 +81,8 @@ export const previewData = definePreview({
 // ─────────────────────────────────────────────────────────────────────────────
 
 const Home = () => {
-    const { language, t, globalCmsData } = useLanguage();
+    const { language, t, globalCmsData, globalSeo } = useLanguage();
+
     const mergeServicePreviewContent = (content, servicesPage) => {
         if (!servicesPage) return content;
 
@@ -204,6 +207,10 @@ const Home = () => {
         loadPageContent();
         return () => { cancelled = true; };
     }, [language, t]);
+
+    useCmsSeo(rawPage?.seo || globalSeo);
+
+
 
     useEffect(() => {
         let cancelled = false;
