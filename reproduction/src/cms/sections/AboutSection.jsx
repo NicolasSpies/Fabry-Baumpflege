@@ -18,7 +18,12 @@ const AboutSection = ({
 }) => {
 
 const expertiseImgRef = useRef(null);
-    useParallax(expertiseImgRef, { speed: 0.04, maxTravel: 20, scale: 1.1 });
+    useParallax(expertiseImgRef, { 
+        speed: 0.12, 
+        maxTravel: 60, 
+        scale: 1.25,
+        desktopOnly: true 
+    });
     const isExternalCta = isExternalHref(ctaHref);
 
     return (

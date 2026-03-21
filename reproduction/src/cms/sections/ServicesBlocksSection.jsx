@@ -10,7 +10,12 @@ import CmsText from '@/cms/components/ui/CmsText';
 
 const ServiceImage = ({ src, alt, priority = false }) => {
     const ref = useRef(null);
-    useParallax(ref, { speed: 0.08, maxTravel: 40, scale: 1.1 });
+    useParallax(ref, { 
+        speed: 0.1, 
+        maxTravel: 55, 
+        scale: 1.18,
+        desktopOnly: true 
+    });
     return (
         <CmsImage
             image={src}
@@ -35,8 +40,8 @@ const ServiceBlockInternal = ({ id, title, description, list, image, reverse, to
         }
     };
 
-    const toneClass = tone === 'soft' ? 'md:bg-surface-light/50 md:dark:bg-surface-dark/20' : '';
-    const mobilePanelClass = 'bg-surface-light/75 border border-primary/10 shadow-sm';
+    const toneClass = tone === 'soft' ? 'md:bg-surface-light md:dark:bg-surface-dark/20 md:border-y md:border-slate-100 md:dark:border-slate-800' : '';
+    const mobilePanelClass = 'bg-surface-light border border-slate-100 dark:border-slate-800 shadow-sm';
 
     return (
         <section

@@ -10,31 +10,32 @@ import { resolveInstanceProps } from '@/cms/bridge-resolver';
     const blockRef = useRef(null);
     const parallaxConfig =
         idx === 1
-            ? { speed: 0.05, maxTravel: 32 }
+            ? { speed: 0.07, maxTravel: 45 }
             : idx === 2
-                ? { speed: 0.08, maxTravel: 46 }
-                : { speed: 0.025, maxTravel: 18 };
-    useParallax(blockRef, { ...parallaxConfig, scale: 1 });
+                ? { speed: 0.10, maxTravel: 65 }
+                : { speed: 0.04, maxTravel: 25 };
+    useParallax(blockRef, { ...parallaxConfig, scale: 1, desktopOnly: true });
  
     return (
         <div ref={blockRef} className={`group ${offset ? 'md:mt-24 reveal stagger-1' : ''}`}>
-            <div className="flex items-center gap-4 md:hidden">
-                <div className="w-28 shrink-0 overflow-hidden rounded-xl bg-slate-100 shadow-sm aspect-square">
+            <div className="md:hidden space-y-4 rounded-[1.75rem] px-4 py-4 bg-surface-light border border-slate-100 dark:border-slate-800 shadow-sm">
+                <div className="relative rounded-[1.35rem] overflow-hidden shadow-md h-[17.5rem] sm:h-[21.5rem]">
                     <CmsImage
                         image={props.image}
                         alt={props.title}
                         className="w-full h-full object-cover"
-                        sizes="112px"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        loading="lazy"
                     />
                 </div>
-                <div className="min-w-0 space-y-1.5">
-                    <h2 className="text-[1.1rem] font-serif text-primary">
+                <div className="space-y-3 px-1 pb-1">
+                    <h2 className="text-[1.8rem] sm:text-[2.2rem] font-serif text-primary leading-[1.05]">
                         {renderCmsInline(props.title)}
                     </h2>
                     <CmsText
                         text={props.text}
-                        className="text-[0.95rem] text-muted-accessible"
-                        paragraphClassName="leading-[1.6]"
+                        className="text-[1.02rem] sm:text-[1.1rem] text-muted-accessible text-slate-600 dark:text-slate-400 font-light"
+                        paragraphClassName="leading-[1.62]"
                     />
                 </div>
             </div>

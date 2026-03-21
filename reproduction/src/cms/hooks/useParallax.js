@@ -21,21 +21,28 @@ const updateLayouts = () => {
 const runLoop = () => {
     const scrollY = window.pageYOffset;
     const vh = window.innerHeight;
-    const isMobile = window.innerWidth < 768;
+    const vw = window.innerWidth;
+    const isMobile = vw < 768; // Standard breakpoint for mobile disable
 
-    // Only update if we've actually scrolled or are in a small buffer
     registry.forEach(item => {
         const el = item.ref.current;
         if (!el || !item.layout) return;
 
-        const { speed, maxTravel, scale } = item.options;
+        const { speed, maxTravel, scale, desktopOnly } = item.options;
+        
+        // Strictly honor desktop-only rule if requested (strictly mobile phones < 768)
+        if (desktopOnly && isMobile) {
+            el.style.setProperty('transform', 'none', 'important');
+            return;
+        }
+
         const top = item.layout.top - scrollY;
         const bottom = top + item.layout.height;
 
-        if (bottom > -100 && top < vh + 100) {
+        if (bottom > -150 && top < vh + 150) {
             const centerOffset = (top + item.layout.height / 2) - (vh / 2);
             
-            // Reduced motion on mobile (50%)
+            // Reduced motion on smaller screens (50%) if not explicitly disabled
             const finalTravel = isMobile ? maxTravel * 0.5 : maxTravel;
             
             const travel = centerOffset * -speed;
@@ -79,7 +86,7 @@ if (typeof window !== 'undefined') {
     }, { passive: true });
 }
 
-export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, disabled = false } = {}) => {
+export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, disabled = false, desktopOnly = false } = {}) => {
     useEffect(() => {
         const el = ref.current;
         if (!el || disabled) return;
@@ -93,7 +100,7 @@ export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, di
 
         const item = {
             ref,
-            options: { speed, maxTravel, scale },
+            options: { speed, maxTravel, scale, desktopOnly },
             layout: null
         };
 
@@ -108,9 +115,10 @@ export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, di
         updateItem();
         registry.add(item);
 
-        // Re-calculate after a short delay for lazy-loaded images
+        // Re-calculate after short delays for lazy-loaded images or reveals
         const t1 = setTimeout(updateItem, 500);
         const t2 = setTimeout(updateItem, 1500);
+        const t3 = setTimeout(updateItem, 2500);
 
         // Ensure loop starts on first use
         startLoop();
@@ -118,10 +126,11 @@ export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, di
         return () => {
             clearTimeout(t1);
             clearTimeout(t2);
+            clearTimeout(t3);
             registry.delete(item);
             if (registry.size === 0) {
                 stopLoop();
             }
         };
-    }, [ref, speed, maxTravel, scale, disabled]);
+    }, [ref, speed, maxTravel, scale, disabled, desktopOnly]);
 };

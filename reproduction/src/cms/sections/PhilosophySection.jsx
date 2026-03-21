@@ -14,7 +14,12 @@ const PhilosophySection = ({
     const sectionRef = useRef(null);
     const heroPortraitRef = useRef(null);
     useSoftEntrance(sectionRef, { staggerDelayMs: 110, durationMs: 720 });
-    useParallax(heroPortraitRef, { speed: 0.08, maxTravel: 40, scale: 1.12 });
+    useParallax(heroPortraitRef, { 
+        speed: 0.12, 
+        maxTravel: 60, 
+        scale: 1.25,
+        desktopOnly: true 
+    });
 
     return (
         <section className="relative lg:min-h-[calc(100vh-80px)] flex items-center py-10 md:py-20 lg:py-0 px-6 overflow-hidden bg-background-light dark:bg-background-dark">

@@ -23,7 +23,6 @@ const HomeIntroSection = ({
         let rafId = null;
 
         const updateLine = () => {
-            rafId = null;
             const timelineRect = timelineNode.getBoundingClientRect();
             const validDots = dotRefs.current.filter(Boolean);
             if (validDots.length < 2) return;
@@ -40,29 +39,44 @@ const HomeIntroSection = ({
         const updateProgress = () => {
             const rect = sectionNode.getBoundingClientRect();
             const viewportHeight = window.innerHeight || 1;
-            const start = viewportHeight * 0.72;
-            const distance = rect.height + viewportHeight * 0.08;
-            const raw = (start - rect.top) / distance;
-            setLineProgress(Math.max(0, Math.min(1, raw)));
+            
+            // Refined thresholds for smoother entrance/exit
+            const startThreshold = viewportHeight * 0.8;
+            const endThreshold = viewportHeight * 0.2;
+            const scrollDistance = rect.height + (viewportHeight * 0.1);
+            
+            const raw = (startThreshold - rect.top) / scrollDistance;
+            const smoothed = Math.max(0, Math.min(1, raw));
+            
+            setLineProgress(Number(smoothed.toFixed(4)));
         };
 
-        const schedule = () => {
-            if (rafId !== null) return;
-            rafId = window.requestAnimationFrame(() => {
-                updateLine();
-                updateProgress();
-                rafId = null;
-            });
+        const handleScroll = () => {
+            updateProgress();
         };
 
-        schedule();
-        window.addEventListener('scroll', schedule, { passive: true });
-        window.addEventListener('resize', schedule);
+        const handleResize = () => {
+            updateLine();
+            updateProgress();
+        };
+
+        // Initial measurement
+        updateLine();
+        updateProgress();
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('resize', handleResize, { passive: true });
+
+        // Backup re-calculation for late layout shifts
+        const t1 = setTimeout(updateLine, 500);
+        const t2 = setTimeout(updateLine, 1500);
 
         return () => {
             if (rafId !== null) window.cancelAnimationFrame(rafId);
-            window.removeEventListener('scroll', schedule);
-            window.removeEventListener('resize', schedule);
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleResize);
+            clearTimeout(t1);
+            clearTimeout(t2);
         };
     }, [safeParagraphs.length]);
 
@@ -73,7 +87,7 @@ const HomeIntroSection = ({
     return (
         <section
             ref={sectionRef}
-            className="bg-primary/[0.035] border-y border-primary/10 px-6 py-16 md:py-20 overflow-hidden"
+            className="bg-surface-light dark:bg-surface-dark/40 border-y border-slate-100 dark:border-slate-800 px-6 py-16 md:py-20 overflow-hidden"
         >
             <div className="max-w-7xl mx-auto">
                 <div className="max-w-[72rem] mx-auto">
@@ -96,7 +110,7 @@ const HomeIntroSection = ({
                                 }}
                             />
                             <div
-                                className="absolute w-[3px] rounded-full bg-primary origin-top transition-transform duration-200 ease-out"
+                                className="absolute w-[3px] rounded-full bg-primary origin-top transition-transform duration-100 linear will-change-transform"
                                 style={{
                                     top: `${lineMetrics.top}px`,
                                     height: `${lineMetrics.height}px`,
@@ -115,7 +129,7 @@ const HomeIntroSection = ({
                                                 ref={(node) => {
                                                     dotRefs.current[index] = node;
                                                 }}
-                                                className="h-3.5 w-3.5 rounded-full bg-primary transition-opacity duration-200"
+                                                className="h-3.5 w-3.5 rounded-full bg-primary transition-opacity duration-500 ease-in-out"
                                                 style={{
                                                     opacity: index === 0 ? 1 : (lineProgress >= (safeParagraphs.length === 1 ? 1 : index / (safeParagraphs.length - 1)) ? 1 : 0.28),
                                                 }}
