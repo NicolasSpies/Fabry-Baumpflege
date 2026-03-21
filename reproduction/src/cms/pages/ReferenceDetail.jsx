@@ -331,6 +331,11 @@ const ReferenceDetail = () => {
     }, [rawProject, project]);
 
     // ─── Render States ────────────────────────────────────────────────────────
+    if (status === 'ready' && !project && !rawProject) {
+        // Still waiting for initial shell data
+        return <ReferenceDetailSkeleton />;
+    }
+
     if (status === 'notfound') {
         return (
             <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
@@ -357,10 +362,12 @@ const ReferenceDetail = () => {
         );
     }
 
-    // We no longer block on full project loading to avoid blank/skeleton only screens
-    const isFetching = !project;
-
     // ─── Success Layout ───────────────────────────────────────────────────────
+    // We render the shell even if the project is partially hydrated
+    const heroContent = project?.hero || getLocalContent().hero;
+    const sidebarContent = sidebarProps || getLocalContent().sidebar;
+    const projectContent = project?.content || getLocalContent().content;
+
     return (
         <div className="animate-in fade-in duration-500">
             <section className="max-w-7xl mx-auto px-6 pt-12 pb-8 mt-20">
@@ -374,13 +381,13 @@ const ReferenceDetail = () => {
             </section>
 
             {/* Page: ReferenceDetail → Section: ReferenceHeroSection */}
-            <ReferenceHeroSection {...getSectionProps('ReferenceHeroSection', project?.hero || getLocalContent().hero)} />
+            <ReferenceHeroSection {...getSectionProps('ReferenceHeroSection', heroContent)} />
             
             <section className="max-w-7xl mx-auto px-6 mb-24 md:mb-32 min-h-[50vh]">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
                     <div className="hidden lg:block lg:col-span-4 lg:sticky lg:top-32 h-fit reveal">
                         <ReferenceSidebarSection 
-                            {...sidebarProps} 
+                            {...sidebarContent} 
                             ctaLink={ctaLink}
                             ctaState={ctaState}
                             language={language}
@@ -389,10 +396,10 @@ const ReferenceDetail = () => {
 
             {/* Content Section with sidebar slot */}
             <ReferenceContentSection 
-                {...getSectionProps('ReferenceContentSection', project?.content || getLocalContent().content)} 
+                {...getSectionProps('ReferenceContentSection', projectContent)} 
                 sidebar={
                     <ReferenceSidebarSection 
-                        {...sidebarProps} 
+                        {...sidebarContent} 
                         ctaLink={ctaLink}
                         ctaState={ctaState}
                         language={language}
@@ -434,13 +441,15 @@ const ReferenceDetail = () => {
                     )}
 
                     <div className="relative max-w-5xl w-full h-full flex items-center justify-center">
-                        <CmsImage
-                            image={projectGallery[activeImageIndex]}
-                            alt="Project Gallery"
-                            className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-500"
-                            sizes="100vw"
-                            onClick={(e) => e.stopPropagation()}
-                        />
+                        {projectGallery[activeImageIndex] && (
+                            <CmsImage
+                                image={projectGallery[activeImageIndex]}
+                                alt="Project Gallery"
+                                className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-500"
+                                sizes="100vw"
+                                onClick={(e) => e.stopPropagation()}
+                            />
+                        )}
                         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 text-xs tracking-widest uppercase font-medium">
                             {activeImageIndex + 1} / {projectGallery.length}
                         </div>

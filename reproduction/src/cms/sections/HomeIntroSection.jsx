@@ -131,7 +131,7 @@ const HomeIntroSection = ({
                                                         dotRefs.current[index] = node;
                                                     }}
                                                     className={`relative z-10 h-3.5 w-3.5 rounded-full bg-primary transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1) ${
-                                                        isActive ? 'opacity-100 scale-100 shadow-[0_0_8px_rgba(62,95,37,0.5)]' : 'opacity-20 scale-75'
+                                                        isActive ? 'opacity-100 scale-100 shadow-[0_0_8px_rgba(62,95,37,0.5)]' : 'opacity-50 scale-75'
                                                     }`}
                                                 />
                                             </div>
@@ -139,7 +139,7 @@ const HomeIntroSection = ({
                                                 className={`max-w-[48rem] text-[1.05rem] md:text-[1.1rem] leading-[1.72] transition-all duration-700 ease-out font-normal ${
                                                     isActive 
                                                         ? 'text-slate-800 dark:text-slate-100 opacity-100 translate-x-1' 
-                                                        : 'text-slate-400 dark:text-slate-500 opacity-25 translate-x-0'
+                                                        : 'text-slate-500 dark:text-slate-400 opacity-65 translate-x-0'
                                                 }`}
                                             >
                                                 {renderCmsInline(paragraph)}

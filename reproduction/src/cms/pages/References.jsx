@@ -299,17 +299,12 @@ const References = () => {
                     {/* Key on grid container re-triggers entrance animation for the set on category change */}
                     <div 
                         key={activeCatId || 'all'}
-                        className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8 animate-filter-in"
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 animate-filter-in"
                     >
                         {isLoading && filteredRefs.length === 0 ? (
-                            // Stable Skeleton Grid
-                            [...Array(6)].map((_, i) => (
-                                <div key={`skeleton-${i}`} className="aspect-square rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse relative overflow-hidden">
-                                    <div className="absolute inset-x-4 bottom-4 space-y-2">
-                                        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/3" />
-                                        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/3" />
-                                    </div>
-                                </div>
+                            // Stable Skeleton Grid - Updated for overlay style
+                            [...Array(4)].map((_, i) => (
+                                <div key={`skeleton-${i}`} className="aspect-square rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
                             ))
                         ) : (
                             visibleRefs.map((project, index) => (
@@ -318,7 +313,7 @@ const References = () => {
                                     {...project}
                                     animateEntry={isInitialRender}
                                     staggerIndex={index}
-                                    forceSquare={true}
+                                    forceSquare={false} // Use the new aspect-ratio responsive logic
                                     compactMobileOverlay={true}
                                     loading={index < 2 ? 'eager' : 'lazy'}
                                     page="References"
@@ -328,7 +323,7 @@ const References = () => {
                         )}
                     </div>
                     {filteredRefs.length > visibleRefs.length && (
-                        <div className="mt-14 md:mt-20 text-center">
+                        <div className="mt-14 md:mt-24 text-center">
                             <button 
                                 onClick={handleLoadMore}
                                 className="inline-flex items-center gap-3 px-8 md:px-12 py-3.5 md:py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-colors duration-300 text-xs md:text-base active:scale-95 transition-transform"

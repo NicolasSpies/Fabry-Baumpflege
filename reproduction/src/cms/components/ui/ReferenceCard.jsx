@@ -40,50 +40,62 @@ const ReferenceCard = ({
     // Removed visibility-based prefetch to save mobile bandwidth.
     // Prefetch now only happens on explicit intent (hover/focus).
 
+    // ... hydration logic ...
+
     return (
         <Link
             ref={linkRef}
             to={detailPath}
             onMouseEnter={prefetchDetail}
             onFocus={prefetchDetail}
-            className={`group relative rounded-2xl bg-white dark:bg-slate-800 block shadow-sm md:shadow-md md:hover:shadow-xl transition-[box-shadow] duration-500 overflow-hidden ${animateEntry ? 'animate-entrance' : ''}`}
+            className={`group relative rounded-2xl block shadow-md md:shadow-lg md:hover:shadow-xl transition-[box-shadow,transform] duration-500 overflow-hidden ${animateEntry ? 'animate-entrance' : ''}`}
             style={animateEntry ? { animationDelay: `${staggerIndex * 0.1}s` } : {}}
         >
-            <div className={`relative w-full overflow-hidden ${forceSquare ? 'aspect-square' : 'aspect-[4/5] sm:aspect-square'}`}>
+            <div className={`relative w-full overflow-hidden aspect-square md:aspect-[4/5] lg:aspect-square bg-slate-100 dark:bg-slate-900`}>
                 <CmsImage
                     image={props.thumbnailImage}
                     alt={props.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                    className="w-full h-full object-cover transition-transform duration-700 md:group-hover:scale-110"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     loading={props.loading || 'lazy'}
                 />
-                <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-primary/70 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end text-white ${compactMobileOverlay ? 'p-4 md:p-8' : 'p-8'}`} style={{ willChange: 'opacity' }}>
-                    <div className={`mb-3 flex flex-wrap gap-x-3 gap-y-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-100`}>
+                
+                {/* Unified Overlay System */}
+                <div 
+                    className={`absolute inset-0 flex flex-col justify-end p-6 md:p-8 text-white transition-all duration-500
+                        /* Subtle dark gradient overlay used for both mobile default and desktop hover */
+                        bg-gradient-to-t from-black/90 via-black/20 to-transparent
+                        /* Mobile: Static visible */
+                        opacity-100
+                        /* Desktop: Hidden by default, Visible on hover */
+                        md:opacity-0 md:group-hover:opacity-100
+                    `}
+                >
+                    <div className="mb-2 md:mb-3 flex flex-wrap gap-x-3 gap-y-1 transform translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-500 delay-100">
                         {props.categories && props.categories.length > 0 && (
-                            <span className={`uppercase tracking-widest font-bold text-white/90 ${compactMobileOverlay ? 'text-[8.5px] md:text-[9.5px]' : 'text-[9.5px]'}`}>
+                            <span className="uppercase tracking-widest font-bold text-[9px] md:text-[9.5px] text-white/90">
                                 {props.categories.join(', ')}
                             </span>
                         )}
                         {props.location && (
                             <>
-                                {props.categories && props.categories.length > 0 && (
-                                    <span className="w-0.5 h-2.5 bg-white/20 self-center hidden md:block" />
-                                )}
-                                <span className={`uppercase tracking-widest font-normal text-white/70 ${compactMobileOverlay ? 'text-[8.5px] md:text-[9.5px]' : 'text-[9.5px]'}`}>
+                                <span className="w-0.5 h-2.5 bg-white/20 self-center" />
+                                <span className="uppercase tracking-widest font-normal text-[9px] md:text-[9.5px] text-white/70">
                                     {props.location}
                                 </span>
                             </>
                         )}
                     </div>
-
-                    <h3 className={`font-serif mb-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-200 ${compactMobileOverlay ? 'text-lg md:text-2xl' : 'text-2xl'}`}>
+                    
+                    <h3 className="font-serif text-xl md:text-2xl mb-1 transform translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-500 delay-200 leading-tight">
                         {renderCmsInline(props.title)}
                     </h3>
-                    <p className={`text-xs opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-300 line-clamp-2 ${compactMobileOverlay ? 'hidden md:line-clamp-2' : ''}`}>
+                    
+                    <p className="text-[12px] md:text-xs line-clamp-2 opacity-90 md:opacity-0 md:group-hover:opacity-100 transform translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-all duration-500 delay-300 mb-4 md:mb-0">
                         {renderCmsInline(props.description)}
                     </p>
-
-                    <div className={`mt-4 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-2 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-400 ${compactMobileOverlay ? 'hidden md:block' : ''}`}>
+                    
+                    <div className="mt-2 md:mt-4 transform translate-y-0 md:translate-y-2 md:group-hover:translate-y-0 transition-transform duration-500 delay-400">
                         <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest border-b border-white/40 pb-1">
                             {t('expertise.learn_more')}
                             <Icon name="arrow_forward" className="text-sm" />

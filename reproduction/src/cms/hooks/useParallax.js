@@ -86,10 +86,13 @@ if (typeof window !== 'undefined') {
     }, { passive: true });
 }
 
-export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, disabled = false, desktopOnly = false } = {}) => {
+export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, disabled = false, desktopOnly = true } = {}) => {
     useEffect(() => {
         const el = ref.current;
         if (!el || disabled) return;
+
+        const isMobile = window.innerWidth < 768;
+        if (isMobile && desktopOnly) return;
 
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (prefersReducedMotion) return;

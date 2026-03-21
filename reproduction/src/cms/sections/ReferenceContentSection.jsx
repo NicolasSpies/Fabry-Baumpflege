@@ -33,16 +33,37 @@ const ReferenceContentSection = ({
 
             {hasBeforeAfter && (
                 <div className="mt-16">
-                    <div className="relative w-full aspect-square md:aspect-[16/10] overflow-hidden rounded-3xl no-select group shadow-2xl bg-slate-100">
-                        {afterImage && <CmsImage image={afterImage} alt={afterLabel} className="absolute inset-0 w-full h-full object-cover" sizes="(max-width: 1280px) 100vw, 1200px" />}
+                    <div className="relative w-full aspect-square md:aspect-[16/10] overflow-hidden rounded-3xl no-select group shadow-2xl bg-slate-100 dark:bg-slate-800">
+                        {/* Placeholder/Skeleton while images load */}
+                        {(!beforeImage && !afterImage) && (
+                            <div className="absolute inset-0 flex items-center justify-center animate-pulse">
+                                <Icon name="image" className="text-4xl text-slate-200 dark:text-slate-700" />
+                            </div>
+                        )}
+                        
+                        {afterImage && (
+                            <CmsImage 
+                                image={afterImage} 
+                                alt={afterLabel} 
+                                className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500" 
+                                sizes="(max-width: 1280px) 100vw, 1200px" 
+                                loading="lazy"
+                            />
+                        )}
                         <span className="absolute top-6 right-6 font-sans text-[10px] text-white/90 uppercase tracking-[0.2em] z-10 bg-black/20 backdrop-blur-sm px-3 py-1 rounded">{afterLabel}</span>
 
                         {beforeImage && (
                             <div
-                                className="absolute inset-0 overflow-hidden border-r-2 border-primary/30"
+                                className="absolute inset-0 overflow-hidden border-r-2 border-primary/30 z-10"
                                 style={{ clipPath: `inset(0 ${100 - sliderValue}% 0 0)` }}
                             >
-                                <CmsImage image={beforeImage} alt={beforeLabel} className="absolute inset-0 w-full h-full object-cover" sizes="(max-width: 1280px) 100vw, 1200px" />
+                                <CmsImage 
+                                    image={beforeImage} 
+                                    alt={beforeLabel} 
+                                    className="absolute inset-0 w-full h-full object-cover" 
+                                    sizes="(max-width: 1280px) 100vw, 1200px" 
+                                    loading="lazy"
+                                />
                                 <span className="absolute top-6 left-6 font-sans text-[10px] text-white/90 uppercase tracking-[0.2em] z-10 bg-black/20 backdrop-blur-sm px-3 py-1 rounded">{beforeLabel}</span>
                             </div>
                         )}
