@@ -46,11 +46,26 @@ export const previewData = definePreview({
 function App() {
   const { language, setGlobalCmsData, setGlobalSeo } = useLanguage();
   const [globalData, setGlobalData] = useState({
-    navbar: {},
+    navbar: {
+      ctaLabel: language === 'FR' ? 'Contact' : 'Kontakt'
+    },
     footer: {}
   });
 
   const [rawGlobal, setRawGlobal] = useState(null);
+
+  // Sync default labels if language changes while loading
+  useEffect(() => {
+    if (!rawGlobal) {
+      setGlobalData(prev => ({
+        ...prev,
+        navbar: {
+          ...prev.navbar,
+          ctaLabel: language === 'FR' ? 'Contact' : 'Kontakt'
+        }
+      }));
+    }
+  }, [language, rawGlobal]);
 
   // Fetch only true global CMS data for shell components.
   useEffect(() => {

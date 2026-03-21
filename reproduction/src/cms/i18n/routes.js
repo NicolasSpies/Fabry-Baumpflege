@@ -2,7 +2,7 @@ export const ROUTES = {
     DE: {
         home: '/',
         services: '/leistungen',
-        about: '/über-mich',
+        about: '/ueber-mich',
         references: '/referenzen',
         referenceDetail: '/referenzen/:slug',
         contact: '/kontakt'
@@ -10,7 +10,7 @@ export const ROUTES = {
     FR: {
         home: '/fr',
         services: '/fr/services',
-        about: '/fr/uber-moi',
+        about: '/fr/a-propos',
         references: '/fr/references',
         referenceDetail: '/fr/references/:slug',
         contact: '/fr/contact'

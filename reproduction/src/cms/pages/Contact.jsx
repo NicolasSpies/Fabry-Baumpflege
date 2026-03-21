@@ -31,42 +31,30 @@ export const previewData = definePreview({
 });
 
 const Contact = () => {
-    const { language, t, globalCmsData, globalSeo } = useLanguage();
+    const { language, t, globalCmsData, globalSeo, setAlternates } = useLanguage();
 
     const getInitialContent = () => ({
         hero: {
-            title: '',
+            title: t('contact.title'),
             image: '',
         },
         sidebar: {
-            contact_person: '',
-            phone: '',
-            email: '',
-            office_label: '',
-            address: '',
-            address_link: '',
-            area_label: '',
-            area_text: '',
-        },
-        form: {
-            heading: '',
-            button: '',
-        },
-    });
-
-    const getFallbackContent = () => ({
-        ...getInitialContent(),
-        sidebar: {
-            ...getInitialContent().sidebar,
+            contact_person: globalCmsData?.options?.contact_person || 'Vincent Fabry',
+            phone: globalCmsData?.options?.phone || '+32 (0) 470 12 65 72',
+            email: globalCmsData?.options?.email || 'info@fabry-baumpflege.be',
             office_label: t('contact.office'),
+            address: globalCmsData?.options?.address || 'EUPEN, BELGIEN',
+            address_link: globalCmsData?.options?.address_link || '#',
             area_label: t('contact.area'),
+            area_text: t('contact.area_text'),
         },
         form: {
-            ...getInitialContent().form,
             heading: t('contact.help_heading'),
             button: t('contact.send'),
         },
     });
+
+    const getFallbackContent = () => getInitialContent();
 
     const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);
@@ -93,7 +81,13 @@ const Contact = () => {
 
                 if (page) {
                     setRawPage(page);
-                    setPageData(mapPageContent(page, getFallbackContent(), 'Contact'));
+                    const mappedContact = mapPageContent(page, getFallbackContent(), 'Contact');
+                    setPageData(prev => ({ ...prev, ...mappedContact }));
+
+                    // Register alternates for API-driven routing
+                    if (page.cc_alternates || page.pll_translations) {
+                        setAlternates(page.cc_alternates || page.pll_translations);
+                    }
                 }
                 if (form) {
                     setFormSchema(form);
@@ -114,9 +108,8 @@ const Contact = () => {
         return resolveInstanceProps('Contact', instanceName, localProps, rawPage);
     };
 
-    if (!rawPage || !formSchema) {
-        return <main className="min-h-screen bg-[#F9FBF7] dark:bg-background-dark" />;
-    }
+    // No longer blocking on rawPage or formSchema
+    // We render the sidebar and form shell immediately.
 
     return (
         <main className="bg-[#F9FBF7] dark:bg-background-dark">

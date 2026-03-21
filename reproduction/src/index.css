@@ -206,10 +206,25 @@
     /* Firefox */
   }
 
-  /* Testimonial marquee — layout + GPU compositing only; motion driven by rAF in JS */
   .marquee-track {
     display: flex;
     will-change: transform;
+  }
+
+  /* Smooth Filter Transition — lightweight GPU-only animation */
+  @keyframes filterReveal {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-filter-in {
+    animation: filterReveal 0.4s cubic-bezier(0, 0, 0.2, 1) forwards;
   }
 }
 

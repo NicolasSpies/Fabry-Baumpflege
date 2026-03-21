@@ -37,7 +37,7 @@ const Footer = ({
                         className="h-8 brightness-0 invert"
                         src={logo}
                     />
-                    <p className="text-white/85 leading-relaxed text-xs">
+                    <p className="text-white leading-relaxed text-xs">
                         {renderCmsInline(actualDescription)}
                     </p>
                     {actualInstaUrl && (
@@ -58,8 +58,8 @@ const Footer = ({
                 </div>
 
                 <div className="hidden md:block">
-                    <h3 className="font-bold text-[10px] mb-4 tracking-widest uppercase text-white/90">{t('footer.nav')}</h3>
-                    <ul className="space-y-2 text-white/85 text-xs text-center md:text-left">
+                    <h3 className="font-bold text-[10px] mb-4 tracking-widest uppercase text-white">{t('footer.nav')}</h3>
+                    <ul className="space-y-2 text-white/95 text-xs text-center md:text-left">
                         <li><Link className="hover:text-white transition-colors" to={getLocalizedPath('home', language)}>{t('nav.home')}</Link></li>
                         <li><Link className="hover:text-white transition-colors" to={getLocalizedPath('services', language)}>{t('nav.services')}</Link></li>
                         <li><Link className="hover:text-white transition-colors" to={getLocalizedPath('about', language)}>{t('nav.about')}</Link></li>
@@ -68,10 +68,10 @@ const Footer = ({
                 </div>
 
                 <div className="space-y-4">
-                    <h3 className="font-bold text-[10px] mb-4 tracking-widest uppercase text-white/90">{t('footer.contact')}</h3>
-                    <ul className="space-y-2 text-white/85 text-xs flex flex-col items-center md:items-start text-center md:text-left">
+                    <h3 className="font-bold text-[10px] mb-4 tracking-widest uppercase text-white">{t('footer.contact')}</h3>
+                    <ul className="space-y-2 text-white/95 text-xs flex flex-col items-center md:items-start text-center md:text-left">
                         <li className="flex items-start gap-3 justify-center md:justify-start">
-                            <Icon name="location_on" className="text-white/80 text-sm shrink-0" />
+                            <Icon name="location_on" className="text-white text-sm shrink-0" />
                             {actualAddress && (
                                 <a
                                     href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(actualAddress)}`}
@@ -94,7 +94,7 @@ const Footer = ({
                     </ul>
                 </div>
             </div>
-            <div className="max-w-7xl mx-auto mt-10 pt-4 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] text-white/60 uppercase tracking-[0.3em]">
+            <div className="max-w-7xl mx-auto mt-10 pt-4 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] text-white/90 uppercase tracking-[0.3em]">
                 <p>© {new Date().getFullYear()} Fabry Baumpflege. {t('footer.rights')}</p>
                 <div className="flex gap-8">
                     <Link className="hover:text-white transition-colors" to="/impressum">{t('footer.imprint')}</Link>

@@ -168,14 +168,14 @@ const PAGE_ID_MAP: Record<number, string> = {
 };
 
 const FRONTEND_ROUTES: Record<string, Record<string, string>> = {
-  DE: { home: '/', services: '/leistungen', about: '/über-mich', references: '/referenzen', contact: '/kontakt' },
-  FR: { home: '/fr', services: '/fr/services', about: '/fr/uber-moi', references: '/fr/references', contact: '/fr/contact' }
+  DE: { home: '/', services: '/leistungen', about: '/ueber-mich', references: '/referenzen', contact: '/kontakt' },
+  FR: { home: '/fr', services: '/fr/services', about: '/fr/a-propos', references: '/fr/references', contact: '/fr/contact' }
 };
 
 const ROUTE_ALIASES: Record<string, string[]> = {
   home: ['', 'home', 'startseite', 'accueil'],
   services: ['leistungen', 'services', 'service'],
-  about: ['ueber-mich', 'über-mich', 'uber-moi', 'a-propos', 'apropos', 'about'],
+  about: ['ueber-mich', 'über-mich', 'uber-moi', 'a-propos', 'apropos', 'about', 'a-propos-de-moi'],
   references: ['referenzen', 'referenz', 'references', 'reference'],
   contact: ['kontakt', 'contact']
 };
@@ -235,7 +235,24 @@ export function resolveFrontendHref(value: string, lang: string = _language): st
   if (/^(mailto:|tel:|#)/i.test(href)) return href;
   if (!/^(https?:)?\/\//i.test(href) && href.startsWith('/')) {
     const routeKey = getRouteKeyFromPath(href);
-    return routeKey ? resolvePageUrlByKey(routeKey, lang) : href;
+    if (!routeKey) return href;
+    
+    // If it's a simple page match (no trailing segments), resolve it.
+    // If it has a trail (like /referenzen/slug), we need to localize the BASE but keep the SLUG.
+    const baseRoute = resolvePageUrlByKey(routeKey, lang);
+    const aliases = ROUTE_ALIASES[routeKey] || [];
+    
+    // Find which alias matched
+    const segments = href.split('/').filter(Boolean);
+    if (segments[0] === 'fr' || segments[0] === 'de') segments.shift();
+    
+    if (segments.length > 1) {
+      // It's a detail page. Keep the trail.
+      const trail = segments.slice(1).join('/');
+      return `${baseRoute.replace(/\/$/, '')}/${trail}`;
+    }
+    
+    return baseRoute;
   }
 
   if (!/^(https?:)?\/\//i.test(href)) return href;
@@ -343,6 +360,14 @@ function unwrap(v: any): any {
 
   const url = v.url || v.source_url || v.full || v.src || v.imageUrl;
   const text = v.label || v.text || v.title || v.heading || v.caption || v.value;
+
+  // 3. Handle API Alternates (for localized slugs)
+  const alternates = v.cc_alternates || v.pll_translations;
+  if (alternates && alternates[_language]) {
+    // Return the localized path directly from API data if available
+    return resolveFrontendHref(alternates[_language], _language);
+  }
+
   const link = v.resolved_path || v.resolved_frontend_url || v.link || v.permalink || v.href;
   const icon = v.icon || v.glyph || v.svg;
 

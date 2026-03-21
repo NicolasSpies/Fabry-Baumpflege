@@ -566,14 +566,42 @@ export async function getTestimonials(language = 'DE') {
  * trashed translations and multilingual status are correctly handled.
  */
 async function fetchReferencesFromCMS(queryParams, language, signal = null, isSingle = false) {
-    const base = isSingle ? '/content-core/v1/post/referenzen' : '/content-core/v1/posts/referenzen';
+    const isCore = !queryParams.includes('wp/v2');
+    const base = isSingle 
+        ? (isCore ? '/content-core/v1/post/referenzen' : '/wp/v2/referenzen') 
+        : (isCore ? '/content-core/v1/posts/referenzen' : '/wp/v2/referenzen');
+    
     try {
-        const data = await fetchFromCMS(`${base}${queryParams}`, language, signal);
-        return data || null;
+        const url = `${base}${queryParams}`;
+        const data = await fetchFromCMS(url, language, signal);
+        
+        if (data && (!Array.isArray(data) || data.length > 0)) {
+            return data;
+        }
+
+        // Second attempt: if core returned nothing, try standard references
+        if (isCore) {
+            const fallbackUrl = `/references${queryParams}`;
+            const fallback = await fetchFromCMS(fallbackUrl, language, signal);
+            return fallback || (isSingle ? null : []);
+        }
+
+        return isSingle ? null : [];
     } catch (error) {
         if (error?.name === 'AbortError') throw error;
-        if (import.meta.env.DEV) console.warn(`[CMS] ${base}${queryParams} failed:`, error?.message);
-        return null;
+        
+        console.warn(`[CMS] Primary fetch failed: ${base}${queryParams}. Error:`, error?.message);
+
+        // Fallback to standard WP REST on hard failure
+        try {
+            const fallbackPath = isSingle ? `/references${queryParams}` : `/references${queryParams}`;
+            const fallback = await fetchFromCMS(fallbackPath, language, signal);
+            return fallback || (isSingle ? null : []);
+        } catch (fallbackError) {
+            console.error('[CMS] All reference endpoints failed:', error?.message, fallbackError?.message);
+        }
+        
+        return isSingle ? null : [];
     }
 }
 

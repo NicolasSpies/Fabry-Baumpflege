@@ -46,7 +46,7 @@ export const previewData = definePreview({
 });
 
 const Services = () => {
-    const { language, t, globalCmsData, globalSeo } = useLanguage();
+    const { language, t, globalCmsData, globalSeo, setAlternates } = useLanguage();
 
     const [statsCmsData, setStatsCmsData] = useState(null);
 
@@ -72,20 +72,20 @@ const Services = () => {
 
     const getInitialContent = () => ({
         intro: {
-            title: '',
-            description: '',
+            title: t('expertise.title'),
+            description: t('services.page_intro'),
         },
         blocks: {
-            s1_title: '', s1_description: '', s1_list: [], s1_image: '',
-            s2_title: '', s2_description: '', s2_list: [], s2_image: '',
-            s3_title: '', s3_description: '', s3_list: [], s3_image: '',
-            s4_title: '', s4_description: '', s4_list: [], s4_image: '',
+            s1_title: t('services.baumpflege.title'), s1_description: t('services.baumpflege.desc'), s1_list: t('services.baumpflege.features') || [], s1_image: '',
+            s2_title: t('services.baumfaellung.title'), s2_description: t('services.baumfaellung.desc'), s2_list: t('services.baumfaellung.features') || [], s2_image: '',
+            s3_title: t('services.gartenpflege.title'), s3_description: t('services.gartenpflege.desc'), s3_list: t('services.gartenpflege.features') || [], s3_image: '',
+            s4_title: t('services.bepflanzung.title'), s4_description: t('services.bepflanzung.desc'), s4_list: t('services.bepflanzung.features') || [], s4_image: '',
         },
         stats: {
-            stat1_value: '', stat1_label: '',
-            stat2_value: '', stat2_label: '',
-            stat3_value: '', stat3_label: '',
-            stat4_value: '', stat4_label: '',
+            stat1_value: '250', stat1_label: t('stats.projects') || 'Projekte',
+            stat2_value: '1200', stat2_label: t('stats.trees'),
+            stat3_value: '8', stat3_label: t('stats.experience'),
+            stat4_value: '0', stat4_label: t('stats.accidents'),
         },
     });
 
@@ -102,24 +102,42 @@ const Services = () => {
         let cancelled = false;
         async function loadContent() {
             try {
-                await awaitMappings();
-                if (cancelled) return;
-                const [page, homePage] = await Promise.all([
-                    getPage(PAGE_IDS.services, language),
-                    getPage(PAGE_IDS.home, language),
-                ]);
+                const page = await getPage(PAGE_IDS.services, language);
                 if (cancelled) return;
                 if (page) {
                     setRawPage(page);
-                    setStatsCmsData(homePage || page);
                     const mappedServices = mapPageContent(page, getInitialContent(), 'Services');
-                    setPageData(mergeHomeStats(mappedServices, homePage));
+                    setPageData(prev => ({ ...prev, ...mappedServices }));
+
+                    // Register alternates for API-driven routing
+                    if (page.cc_alternates || page.pll_translations) {
+                        setAlternates(page.cc_alternates || page.pll_translations);
+                    }
                 }
             } catch (err) {
                 console.error('[Services] CMS load failed:', err);
             }
         }
         loadContent();
+
+        async function loadHomeStats() {
+            try {
+                const homePage = await getPage(PAGE_IDS.home, language);
+                if (cancelled) return;
+                if (homePage) {
+                    setStatsCmsData(homePage);
+                    setPageData(prev => mergeHomeStats(prev, homePage));
+                }
+            } catch (err) {
+                console.warn('[Services] Home stats fetch failed, using fallbacks');
+            }
+        }
+
+        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+            window.requestIdleCallback(() => loadHomeStats());
+        } else {
+            loadHomeStats();
+        }
         return () => { cancelled = true; };
     }, [language, t]);
 
@@ -130,9 +148,8 @@ const Services = () => {
     const getProps = (instanceName, localProps) => 
         resolveInstanceProps('Services', instanceName, localProps, rawPage || globalCmsData);
 
-    if (!rawPage || !statsCmsData) {
-        return <main className="min-h-screen" />;
-    }
+    // No longer blocking on full rawPage or statsCmsData
+    // We render immediately with localized fallbacks.
 
     return (
         <main className="pt-28">

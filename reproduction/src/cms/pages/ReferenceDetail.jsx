@@ -43,11 +43,11 @@ export const previewData = definePreview({
 
 const ReferenceDetail = () => {
     const { slug } = useParams();
-    const { language, t, globalSeo } = useLanguage();
+    const { language, t, globalSeo, setAlternates } = useLanguage();
 
 
     // ─── State ───────────────────────────────────────────────────────────────
-    const [status, setStatus] = useState('loading');  // 'loading' | 'ready' | 'error' | 'notfound'
+    const [status, setStatus] = useState('ready');  // Initialized to 'ready' to show shell
     const [project, setProject] = useState(null);
     const [rawProject, setRawProject] = useState(null);
     const [hydratedProps, setHydratedProps] = useState(null);
@@ -72,7 +72,7 @@ const ReferenceDetail = () => {
     // ─── Data Resolution ─────────────────────────────────────────────────────
     const getLocalContent = () => ({
         hero: {
-            title: '',
+            title: slug ? slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : '',
             categoryLabel: t('refs.reference_project'),
             image: ''
         },
@@ -225,6 +225,11 @@ const ReferenceDetail = () => {
 
                 setRawProject(ref);
                 
+                // Register alternates for API-driven routing
+                if (ref.cc_alternates || ref.pll_translations) {
+                    setAlternates(ref.cc_alternates || ref.pll_translations);
+                }
+
                 const local = getLocalContent();
                 setProject({
                     hero: {
@@ -328,9 +333,8 @@ const ReferenceDetail = () => {
         );
     }
 
-    if (status === 'loading' || !project) {
-        return <ReferenceDetailSkeleton />;
-    }
+    // We no longer block on full project loading to avoid blank/skeleton only screens
+    const isFetching = !project;
 
     // ─── Success Layout ───────────────────────────────────────────────────────
     return (
@@ -346,9 +350,9 @@ const ReferenceDetail = () => {
             </section>
 
             {/* Page: ReferenceDetail → Section: ReferenceHeroSection */}
-            <ReferenceHeroSection {...getSectionProps('ReferenceHeroSection', project.hero)} />
-
-            <section className="max-w-7xl mx-auto px-6 mb-24 md:mb-32">
+            <ReferenceHeroSection {...getSectionProps('ReferenceHeroSection', project?.hero || getLocalContent().hero)} />
+            
+            <section className="max-w-7xl mx-auto px-6 mb-24 md:mb-32 min-h-[50vh]">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
                     <div className="hidden lg:block lg:col-span-4 lg:sticky lg:top-32 h-fit reveal">
                         <ReferenceSidebarSection 
@@ -358,17 +362,18 @@ const ReferenceDetail = () => {
                         />
                     </div>
 
-                    <ReferenceContentSection 
-                        {...getSectionProps('ReferenceContentSection', project.content)} 
-                        sidebar={
-                            <ReferenceSidebarSection 
-                                {...sidebarProps} 
-                                ctaLink={ctaLink}
-                                ctaState={ctaState}
-                            />
-                        }
-                        onOpenLightbox={openLightbox}
+            {/* Content Section with sidebar slot */}
+            <ReferenceContentSection 
+                {...getSectionProps('ReferenceContentSection', project?.content || getLocalContent().content)} 
+                sidebar={
+                    <ReferenceSidebarSection 
+                        {...sidebarProps} 
+                        ctaLink={ctaLink}
+                        ctaState={ctaState}
                     />
+                }
+                onOpenLightbox={openLightbox}
+            />
                 </div>
             </section>
 

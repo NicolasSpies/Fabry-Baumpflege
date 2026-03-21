@@ -81,7 +81,7 @@ export const previewData = definePreview({
 // ─────────────────────────────────────────────────────────────────────────────
 
 const Home = () => {
-    const { language, t, globalCmsData, globalSeo } = useLanguage();
+    const { language, t, globalCmsData, globalSeo, setAlternates } = useLanguage();
 
     const mergeServicePreviewContent = (content, servicesPage) => {
         if (!servicesPage) return content;
@@ -106,65 +106,54 @@ const Home = () => {
 
     const getInitialContent = () => ({
         hero: {
-            title_top: '',
-            title_main: '',
-            description: '',
-            cta: '',
+            title_top: t('hero.precision'),
+            title_main: t('hero.meets'),
+            description: t('hero.description'),
+            cta: t('hero.cta'),
             ctaHref: getLocalizedPath('contact', language),
             image: '',
         },
         stats: {
-            stat1_value: '', stat1_label: '',
-            stat2_value: '', stat2_label: '',
-            stat3_value: '', stat3_label: '',
-            stat4_value: '', stat4_label: '',
+            stat1_value: '250', stat1_label: t('stats.projects') || 'Projekte',
+            stat2_value: '1200', stat2_label: t('stats.trees'),
+            stat3_value: '8', stat3_label: t('stats.experience'),
+            stat4_value: '0', stat4_label: t('stats.accidents'),
         },
         intro: {
             title: '',
             description: '',
         },
         services: {
-            label: '',
-            title: '',
-            s1_title: '', s1_description: '', s1_icon: 'BaumpflegeIcon', s1_id: 'baumpflege',
-            s2_title: '', s2_description: '', s2_icon: 'BaumfaellungIcon', s2_id: 'baumfaellung',
-            s3_title: '', s3_description: '', s3_icon: 'GartenpflegeIcon', s3_id: 'gartenpflege',
-            s4_title: '', s4_description: '', s4_icon: 'BepflanzungIcon', s4_id: 'bepflanzung',
+            label: t('expertise.title'),
+            title: t('expertise.subtitle'),
+            s1_title: t('services.baumpflege.title'), s1_description: t('services.baumpflege.desc'), s1_icon: 'BaumpflegeIcon', s1_id: 'baumpflege',
+            s2_title: t('services.baumfaellung.title'), s2_description: t('services.baumfaellung.desc'), s2_icon: 'BaumfaellungIcon', s2_id: 'baumfaellung',
+            s3_title: t('services.gartenpflege.title'), s3_description: t('services.gartenpflege.desc'), s3_icon: 'GartenpflegeIcon', s3_id: 'gartenpflege',
+            s4_title: t('services.bepflanzung.title'), s4_description: t('services.bepflanzung.desc'), s4_icon: 'BepflanzungIcon', s4_id: 'bepflanzung',
         },
         references: {
-            label: '',
-            title: '',
-            view_all: '',
+            label: t('refs.preview_label') || 'REFERENZEN',
+            title: t('refs.preview_title'),
+            view_all: t('nav.references'),
             items: [],
         },
         testimonials: {
-            label: '',
-            title: '',
+            label: t('testimonials.title'),
+            title: t('testimonials.subtitle'),
             items: [],
         },
         about: {
-            label: '',
-            title: '',
-            description: '',
-            quote: '',
-            cta: '',
+            label: t('about.teaser_label'),
+            title: t('about.teaser_title'),
+            description: t('about.teaser_text'),
+            quote: t('about.quote'),
+            cta: t('about.teaser_cta'),
             ctaHref: getLocalizedPath('contact', language),
             image: '',
         },
     });
 
-    const getFallbackContent = () => ({
-        ...getInitialContent(),
-        references: {
-            ...getInitialContent().references,
-            view_all: t('nav.references'),
-        },
-        testimonials: {
-            ...getInitialContent().testimonials,
-            label: t('testimonials.title'),
-            title: t('testimonials.subtitle'),
-        },
-    });
+    const getFallbackContent = () => getInitialContent();
 
     const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);
@@ -189,15 +178,17 @@ const Home = () => {
                 if (cancelled) return;
                 setMappingsReady(true);
 
-                const [page, servicesPage] = await Promise.all([
-                    getPage(PAGE_IDS.home, language),
-                    getPage(PAGE_IDS.services, language),
-                ]);
+                const page = await getPage(PAGE_IDS.home, language);
                 if (cancelled) return;
                 if (page) {
                     setRawPage(page);
                     const mappedHome = mapPageContent(page, getFallbackContent(), 'Home');
-                    setPageData(mergeServicePreviewContent(mappedHome, servicesPage));
+                    setPageData(prev => ({ ...prev, ...mappedHome }));
+
+                    // Register alternates for API-driven routing
+                    if (page.cc_alternates || page.pll_translations) {
+                        setAlternates(page.cc_alternates || page.pll_translations);
+                    }
                 }
             } catch (err) {
                 console.error('[Home] CMS load failed:', err);
@@ -220,9 +211,10 @@ const Home = () => {
         async function loadDeferredContent() {
             try {
                 setRefsLoading(true);
-                const [rawRefs, rawTestimonials] = await Promise.all([
+                const [rawRefs, rawTestimonials, servicesPage] = await Promise.all([
                     getLatestReferences(3, language),
-                    getTestimonials(language)
+                    getTestimonials(language),
+                    getPage(PAGE_IDS.services, language)
                 ]);
                 if (cancelled) return;
 
@@ -239,17 +231,17 @@ const Home = () => {
                 }));
 
                 startTransition(() => {
-                    setPageData(prev => ({
-                        ...prev,
-                        references: {
-                            ...prev.references,
-                            items: mappedRefs
-                        },
-                        testimonials: {
-                            ...prev.testimonials,
-                            items: mappedTestimonials
+                    setPageData(prev => {
+                        let next = {
+                            ...prev,
+                            references: { ...prev.references, items: mappedRefs },
+                            testimonials: { ...prev.testimonials, items: mappedTestimonials }
+                        };
+                        if (servicesPage) {
+                            next = mergeServicePreviewContent(next, servicesPage);
                         }
-                    }));
+                        return next;
+                    });
                 });
             } catch (err) {
                 if (!cancelled) {
@@ -291,9 +283,8 @@ const Home = () => {
     const getProps = (instanceName, localProps) => 
         resolveInstanceProps('Home', instanceName, localProps, rawPage || globalCmsData);
 
-    if (!rawPage) {
-        return <main className="min-h-screen" />;
-    }
+    // No longer blocking the entire page render on rawPage.
+    // We render the shell and core sections immediately with localized fallbacks.
 
     return (
         <main>

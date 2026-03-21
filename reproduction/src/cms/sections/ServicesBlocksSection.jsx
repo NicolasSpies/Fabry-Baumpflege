@@ -8,7 +8,7 @@ import Icon from '@/cms/components/ui/Icon';
 import CmsImage from '@/cms/components/ui/CmsImage';
 import CmsText from '@/cms/components/ui/CmsText';
 
-const ServiceImage = ({ src, alt }) => {
+const ServiceImage = ({ src, alt, priority = false }) => {
     const ref = useRef(null);
     useParallax(ref, { speed: 0.04, maxTravel: 20, scale: 1.1 });
     return (
@@ -18,6 +18,8 @@ const ServiceImage = ({ src, alt }) => {
             alt={alt}
             className="w-full h-full object-cover"
             sizes="(max-width: 1024px) 100vw, 50vw"
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "low"}
         />
     );
 };
@@ -47,7 +49,7 @@ const ServiceBlockInternal = ({ id, title, description, list, image, reverse, to
                 >
                     <div className="w-full lg:w-1/2">
                         <div className="relative rounded-[1.35rem] md:rounded-xl overflow-hidden shadow-md md:shadow-2xl reveal h-[17.5rem] sm:h-[21rem] md:h-[500px]">
-                            <ServiceImage src={image} alt={title} />
+                            <ServiceImage src={image} alt={title} priority={isFirst} />
                         </div>
                     </div>
                     <div className="w-full lg:w-1/2 space-y-4 md:space-y-8 lg:space-y-10 reveal stagger-1">

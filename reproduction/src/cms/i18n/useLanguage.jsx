@@ -13,7 +13,26 @@ export function getLangFromPath(path) {
 }
 
 /** Map a pathname + source language + target language to the corresponding target path. */
-function mapPathToTargetLang(currentPath, currentLang, targetLang) {
+function mapPathToTargetLang(currentPath, currentLang, targetLang, alternates = null) {
+    if (alternates && alternates[targetLang]) {
+        // CONTENT CORE / API DRIVEN: 
+        // If the current page has already provided its official translated slugs, use them.
+        const slug = alternates[targetLang].slug || alternates[targetLang];
+        
+        // If it's the home page, it might just be / or /fr
+        if (slug === '/' || slug === '/fr') return slug;
+
+        // Otherwise, construct the path. 
+        // For subpages, we usually prefix /fr for French if it's not already there.
+        if (targetLang === 'FR' && !slug.startsWith('/fr')) {
+            return `/fr/${slug.replace(/^\//, '')}`;
+        }
+        if (targetLang === 'DE') {
+            return `/${slug.replace(/^\/fr\//, '').replace(/^\//, '')}`;
+        }
+        return slug.startsWith('/') ? slug : `/${slug}`;
+    }
+
     const targetRoutes = ROUTES[targetLang];
     const currentRoutes = ROUTES[currentLang];
 
@@ -52,6 +71,8 @@ export function LanguageProvider({ children }) {
     const [globalCmsData, setGlobalCmsData] = useState(null);
     const [globalSeo, setGlobalSeo] = useState(null);
 
+    // Context-aware alternates (populated by the active page component)
+    const [alternates, setAlternates] = useState(null);
 
     // Sync state whenever the URL changes (e.g., browser back/fwd, external navigate)
     useEffect(() => {
@@ -59,6 +80,8 @@ export function LanguageProvider({ children }) {
         if (newLang !== language) {
             setLanguageState(newLang);
         }
+        // Clear alternates on route change so a new page doesn't inherit old redirects
+        setAlternates(null);
     }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // t(key) — look up a string in the active locale, fall back to DE
@@ -72,9 +95,9 @@ export function LanguageProvider({ children }) {
         if (newLang === language) return;
 
         // Static routes — map to the corresponding target language path
-        const targetPath = mapPathToTargetLang(location.pathname, language, newLang);
+        const targetPath = mapPathToTargetLang(location.pathname, language, newLang, alternates);
         navigate(targetPath);
-    }, [language, location.pathname, navigate]);
+    }, [language, location.pathname, navigate, alternates]);
 
     return (
         <LanguageContext.Provider value={{ 
@@ -84,7 +107,9 @@ export function LanguageProvider({ children }) {
             globalCmsData,
             setGlobalCmsData,
             globalSeo,
-            setGlobalSeo
+            setGlobalSeo,
+            alternates,
+            setAlternates
         }}>
 
             {children}

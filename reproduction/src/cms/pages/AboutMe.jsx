@@ -37,45 +37,34 @@ export const previewData = definePreview({
 });
 
 const AboutMe = () => {
-    const { language, t, globalCmsData, globalSeo } = useLanguage();
+    const { language, t, globalCmsData, globalSeo, setAlternates } = useLanguage();
 
     const getInitialContent = () => ({
         philosophy: {
-            label: '',
-            quote: '',
-            text: '',
+            label: t('aboutme.philosophy.label'),
+            quote: t('aboutme.philosophy.quote'),
+            text: t('aboutme.philosophy.text'),
             image: '',
         },
         values: {
-            val1_title: '', val1_text: '', val1_image: '',
-            val2_title: '', val2_text: '', val2_image: '',
-            val3_title: '', val3_text: '', val3_image: '',
+            val1_title: t('aboutme.values.precision.title'), val1_text: t('aboutme.values.precision.text'), val1_image: '',
+            val2_title: t('aboutme.values.sustainability.title'), val2_text: t('aboutme.values.sustainability.text'), val2_image: '',
+            val3_title: t('aboutme.values.expertise.title'), val3_text: t('aboutme.values.expertise.text'), val3_image: '',
         },
         signature: {
-            title: '',
-            name: '',
-            label: '',
-            cta: '',
+            title: t('aboutme.signature.title'),
+            name: 'Vincent Fabry',
+            label: t('aboutme.signature.label'),
+            cta: t('aboutme.signature.cta'),
             ctaHref: ROUTES[language].contact,
         },
     });
 
-    const getFallbackContent = () => ({
-        ...getInitialContent(),
-        signature: {
-            ...getInitialContent().signature,
-            label: t('aboutme.signature.label'),
-            cta: t('aboutme.signature.cta'),
-        },
-    });
+    const getFallbackContent = () => getInitialContent();
 
     const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);
     useScrollReveal([rawPage]);
-
-    useEffect(() => {
-        setPageData(getInitialContent());
-    }, [language, t]);
 
     useEffect(() => {
         let cancelled = false;
@@ -87,7 +76,13 @@ const AboutMe = () => {
                 if (cancelled) return;
                 if (page) {
                     setRawPage(page);
-                    setPageData(mapPageContent(page, getFallbackContent(), 'AboutMe'));
+                    const mappedAbout = mapPageContent(page, getInitialContent(), 'AboutMe');
+                    setPageData(prev => ({ ...prev, ...mappedAbout }));
+
+                    // Register alternates for API-driven routing
+                    if (page.cc_alternates || page.pll_translations) {
+                        setAlternates(page.cc_alternates || page.pll_translations);
+                    }
                 }
             } catch (err) {
                 console.error('[AboutMe] CMS load failed:', err);
@@ -95,7 +90,7 @@ const AboutMe = () => {
         }
         loadContent();
         return () => { cancelled = true; };
-    }, [language, t]);
+    }, [language, t, setAlternates]);
 
     useCmsSeo(rawPage?.seo || globalSeo);
 

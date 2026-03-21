@@ -60,7 +60,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref }
 
                 <div className={`absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent transition-opacity duration-500 ${isImageReady ? 'opacity-100' : 'opacity-0'}`} />
             </div>
-            <div className={`relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-end md:items-center h-full pb-16 md:pb-0 transition-[opacity,transform] duration-500 ${isImageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'}`}>
+            <div className={`relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-end md:items-center h-full pb-16 md:pb-0 transition-[opacity,transform] duration-700 opacity-100 translate-y-0`}>
                 <div className="w-full md:max-w-2xl space-y-6 md:space-y-7 text-left flex flex-col items-start">
                     <h1 className="font-serif text-white leading-[0.95] md:leading-[0.95] reveal">
                         <div className="text-[1.5rem] md:text-[2.25rem] lg:text-[2.5rem] mb-[0.125rem] md:mb-1 text-white/75 font-light tracking-wide">
