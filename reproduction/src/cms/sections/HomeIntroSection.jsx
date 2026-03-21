@@ -87,7 +87,7 @@ const HomeIntroSection = ({
     return (
         <section
             ref={sectionRef}
-            className="bg-surface-light dark:bg-surface-dark/40 border-y border-slate-100 dark:border-slate-800 px-6 py-16 md:py-20 overflow-hidden"
+            className="bg-primary/[0.035] dark:bg-surface-dark/40 border-y border-slate-100 dark:border-slate-800 px-6 py-16 md:py-20 overflow-hidden"
         >
             <div className="max-w-7xl mx-auto">
                 <div className="max-w-[72rem] mx-auto">

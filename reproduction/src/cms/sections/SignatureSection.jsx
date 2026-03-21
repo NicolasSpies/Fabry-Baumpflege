@@ -15,7 +15,7 @@ const SignatureSection = ({
 const isExternalCta = isExternalHref(ctaHref);
 
 return (
-        <section className="py-14 md:py-32 bg-surface-light dark:bg-surface-dark/30 border-t border-slate-100 dark:border-slate-800">
+        <section className="py-14 md:py-32 bg-primary/[0.035] dark:bg-surface-dark/30 border-y border-slate-100 dark:border-slate-800">
             <div className="max-w-4xl mx-auto px-6 text-center reveal">
                 <h2 className="text-[2rem] md:text-5xl font-serif text-primary mb-6 md:mb-12">
                     {renderCmsInline(title)}

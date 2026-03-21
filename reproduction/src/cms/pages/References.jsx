@@ -76,80 +76,67 @@ const References = () => {
                 await awaitMappings();
                 if (cancelled) return;
 
-                setIsLoading(true);
                 setError(null);
                 
-                // 1. Fetch Page, Refs, and Categories concurrently
-                const [pageRes, refsRes, catsRes] = await Promise.allSettled([
-                    getPage(PAGE_IDS.references, language),
-                    getReferences(language),
-                    getReferenceCategories(language),
-                ]);
+                // 1. Kick off all fetches
+                const pagePromise = getPage(PAGE_IDS.references, language);
+                const refsPromise = getReferences(language);
+                const catsPromise = getReferenceCategories(language);
 
+                // 2. Hydrate Page Header as quickly as possible
+                const page = await pagePromise;
                 if (cancelled) return;
-
-                const page = pageRes.status === 'fulfilled' ? pageRes.value : null;
-                const rawRefs = refsRes.status === 'fulfilled' ? refsRes.value : [];
-                const rawCats = catsRes.status === 'fulfilled' ? catsRes.value : [];
-                
-                if (import.meta.env.DEV) {
-                    console.log('[DEBUG-References] Status:', { page: pageRes.status, refs: refsRes.status, cats: catsRes.status });
-                    console.log('[DEBUG-References] Count:', Array.isArray(rawRefs) ? rawRefs.length : 'not an array');
-                }
-
-                // If the primary list failed significantly (rejected or null/empty)
-                // we ONLY set error if rawRefs is actually empty/unreachable
-                if (refsRes.status === 'rejected' && (!rawRefs || rawRefs.length === 0)) {
-                    console.error('[References] Primary list fetch failed:', refsRes.reason);
-                    setError(true);
-                    setIsLoading(false);
-                    return;
-                }
-
-                const initial = getInitialContent();
-                const pageIntro = decodeHtmlEntities(page?.customFields?.referenzen_field_intro || '');
-                const catMap = rawCats.reduce((acc, c) => { if (c?.id) acc[String(c.id)] = c.name; return acc; }, {});
-                
-                const refsForLanguage = Array.isArray(rawRefs) ? rawRefs : [];
-                const mappedRefs = refsForLanguage.map(item => {
-                    if (!item) return null;
-                    try {
-                        return {
-                            ...mapReferenceCard(item, catMap),
-                            data: item
-                        };
-                    } catch (e) {
-                        console.warn('[References] Card mapping failed for item:', item.id, e);
-                        return null;
-                    }
-                }).filter(Boolean);
 
                 if (page) {
                     setRawPage(page);
+                    const initial = getInitialContent();
+                    const pageIntro = decodeHtmlEntities(page?.customFields?.referenzen_field_intro || '');
                     const mappedPageContent = mapPageContent(page, initial, 'References');
-                    setPageData(prev => ({ ...prev, ...mappedPageContent }));
+                    setPageData(prev => ({ 
+                        ...prev, 
+                        ...mappedPageContent,
+                        header: {
+                            ...prev.header,
+                            ...mappedPageContent.header,
+                            intro: pageIntro || mappedPageContent.header?.intro || initial.header.intro
+                        }
+                    }));
 
                     if (page.cc_alternates || page.pll_translations) {
                         setAlternates(page.cc_alternates || page.pll_translations);
                     }
                 }
-                
-                setAllRefs(mappedRefs);
-                setPageData(prev => ({
-                    ...prev,
-                    header: {
-                        ...initial.header,
-                        ...prev.header,
-                        intro: pageIntro || prev.header?.intro || initial.header.intro,
-                    },
-                    items: mappedRefs,
-                }));
 
-                // ─── Extract Unique Categories Safely ─────────────────────────────────
+                // 3. Hydrate Refs and Categories
+                const [refsRes, catsRes] = await Promise.allSettled([refsPromise, catsPromise]);
+                if (cancelled) return;
+
+                const rawRefs = refsRes.status === 'fulfilled' ? refsRes.value : [];
+                const rawCats = catsRes.status === 'fulfilled' ? catsRes.value : [];
+
+                if (refsRes.status === 'rejected' && (!rawRefs || rawRefs.length === 0)) {
+                    setError(true);
+                    setIsLoading(false);
+                    return;
+                }
+
+                const catMap = rawCats.reduce((acc, c) => { if (c?.id) acc[String(c.id)] = c.name; return acc; }, {});
+                const mappedRefs = (Array.isArray(rawRefs) ? rawRefs : []).map(item => {
+                    if (!item) return null;
+                    try {
+                        return { ...mapReferenceCard(item, catMap), data: item };
+                    } catch (e) {
+                        return null;
+                    }
+                }).filter(Boolean);
+
+                setAllRefs(mappedRefs);
+                setPageData(prev => ({ ...prev, items: mappedRefs }));
+
+                // 4. Process Categories (Memoized logic)
                 const derivedCatsMap = new Map();
                 const usedCategoryIds = new Set();
                 
-                // 1. Process all mapped references to find used categories
                 mappedRefs.forEach(ref => {
                     if (Array.isArray(ref.categoryIds)) {
                         ref.categoryIds.forEach(id => { if (id) usedCategoryIds.add(String(id)); });
@@ -157,17 +144,10 @@ const References = () => {
                     if (Array.isArray(ref.categoryObjects)) {
                         ref.categoryObjects.forEach(cat => {
                             if (!cat || !cat.name) return;
-                            // Deduplicate by Name to prevent label repetition in UI
                             const cleanName = decodeHtmlEntities(cat.name).trim();
                             const key = cleanName.toLowerCase();
-                            
                             if (key && !derivedCatsMap.has(key)) {
-                                derivedCatsMap.set(key, {
-                                    ...cat,
-                                    name: cleanName,
-                                    // Ensure we store all IDs/slugs that might match this name for filtering
-                                    altIds: new Set([String(cat.id), String(cat.slug)]) 
-                                });
+                                derivedCatsMap.set(key, { ...cat, name: cleanName, altIds: new Set([String(cat.id), String(cat.slug)]) });
                             } else if (key) {
                                 const existing = derivedCatsMap.get(key);
                                 existing.altIds.add(String(cat.id));
@@ -177,76 +157,35 @@ const References = () => {
                     }
                 });
 
-                // 2. Supplement with rawCats from taxonomy endpoint, but ONLY if they match existing names or are relevant
-                if (Array.isArray(rawCats)) {
-                    rawCats.forEach(cat => {
-                        if (!cat || !cat.name) return;
-                        const cleanName = decodeHtmlEntities(cat.name).trim();
-                        const key = cleanName.toLowerCase();
-                        if (derivedCatsMap.has(key)) {
-                            const existing = derivedCatsMap.get(key);
-                            existing.altIds.add(String(cat.id));
-                            if (cat.slug) existing.altIds.add(String(cat.slug));
-                        } else {
-                            // Only add if it's actually used in the refs (cross-reference by ID)
-                            const isUsed = usedCategoryIds.has(String(cat.id)) || (cat.slug && usedCategoryIds.has(String(cat.slug)));
-                            if (isUsed) {
-                                derivedCatsMap.set(key, {
-                                    ...cat,
-                                    name: cleanName,
-                                    altIds: new Set([String(cat.id), String(cat.slug)])
-                                });
-                            }
-                        }
-                    });
-                }
-
-                // 3. Final Filter: Only categories that actually have matching items in the current set
                 const allAvailableCats = Array.from(derivedCatsMap.values());
-                const filteredCats = allAvailableCats.filter(cat => {
-                    if (!cat) return false;
-                    // Check if any of the IDs/slugs associated with this name are in usedCategoryIds
-                    return Array.from(cat.altIds).some(id => usedCategoryIds.has(id));
-                });
+                const filteredCats = allAvailableCats.filter(cat => 
+                    Array.from(cat.altIds).some(id => usedCategoryIds.has(id))
+                );
 
                 const getPriorityScore = (cat) => {
                     const n = (cat?.name || '').toLowerCase();
-                    const s = (cat?.slug || '').toLowerCase();
                     if (language === 'FR') {
-                        if (n.includes('entretien') && (n.includes('arbre') || s.includes('arbre'))) return 0;
-                        if (n.includes('abattage') || s.includes('abattage')) return 1;
+                        if (n.includes('entretien')) return 0;
+                        if (n.includes('abattage')) return 1;
                         if (n.includes('jardin')) return 2;
-                        if (n.includes('plant') || s.includes('plant')) return 3;
+                        if (n.includes('plant')) return 3;
                     } else {
-                        if (n.includes('baumpflege') || s.includes('baumpflege')) return 0;
-                        if (n.includes('baumfällung') || s.includes('baumfäll')) return 1;
-                        if (n.includes('gartenpflege') || s.includes('gartenpf')) return 2;
-                        if (n.includes('bepflanzung') || s.includes('bepflanz')) return 3;
+                        if (n.includes('baumpflege')) return 0;
+                        if (n.includes('baumfällung')) return 1;
+                        if (n.includes('gartenpflege')) return 2;
+                        if (n.includes('bepflanzung')) return 3;
                     }
                     return 999;
                 };
 
-                // 4. Sort and Set Categories
-                const sortedCats = [...filteredCats].sort((a, b) => {
-                    const scoreA = getPriorityScore(a);
-                    const scoreB = getPriorityScore(b);
-                    if (scoreA !== scoreB) return scoreA - scoreB;
-                    return (a?.name || '').localeCompare(b?.name || '');
-                });
-
-                // Final safety check: if multiple objects with different master IDs ended up in sortedCats,
-                // we must ensure setActiveCatId works correctly. 
-                // We'll use the FIRST ID in altIds as the primary filter key for that button.
-                const finalCats = sortedCats.map(cat => ({
-                    ...cat,
-                    id: Array.from(cat.altIds).find(id => id !== 'undefined' && id !== 'null') || cat.id
-                }));
+                const finalCats = [...filteredCats]
+                    .sort((a, b) => getPriorityScore(a) - getPriorityScore(b) || (a?.name || '').localeCompare(b?.name || ''))
+                    .map(cat => ({ ...cat, id: Array.from(cat.altIds).find(id => id !== 'undefined' && id !== 'null') || cat.id }));
 
                 setCategories(finalCats);
 
             } catch (err) {
                 if (cancelled) return;
-                console.error('[References] Fatal logic error:', err);
                 setError(true);
             } finally {
                 if (!cancelled) setIsLoading(false);
@@ -260,18 +199,33 @@ const References = () => {
 
 
 
+    const [displayCount, setDisplayCount] = useState(4);
+
+    // Progressive loading in second phase
+    useEffect(() => {
+        if (!isLoading && allRefs.length > 0) {
+            const timer = setTimeout(() => {
+                setDisplayCount(prev => Math.max(prev, 12));
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [isLoading, allRefs.length]);
+
     const filteredRefs = (allRefs || []).filter(ref => {
         if (!activeCatId) return true;
         const ids = Array.isArray(ref.categoryIds) ? ref.categoryIds : [];
-        
-        // Find the full category object to check its associated altIds
         const selectedCat = categories.find(c => String(c.id) === String(activeCatId));
         if (selectedCat?.altIds) {
             return ids.some(id => selectedCat.altIds.has(String(id)));
         }
-
         return ids.some(id => String(id) === String(activeCatId));
     });
+
+    const visibleRefs = filteredRefs.slice(0, displayCount);
+
+    const handleLoadMore = () => {
+        setDisplayCount(prev => prev + 12);
+    };
 
 
     const getProps = (instanceName, localProps) => 
@@ -341,26 +295,43 @@ const References = () => {
                         key={activeCatId || 'all'}
                         className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8 animate-filter-in"
                     >
-                        {filteredRefs.map((project, index) => (
-                            <ReferenceCard
-                                key={`${project.id || index}-${activeCatId}`}
-                                {...project}
-                                animateEntry={isInitialRender}
-                                staggerIndex={index}
-                                forceSquare={true}
-                                compactMobileOverlay={true}
-                                loading={index < 2 ? 'eager' : 'lazy'}
-                                page="References"
-                                section="ReferencesGridSection"
-                            />
-                        ))}
+                        {isLoading && filteredRefs.length === 0 ? (
+                            // Stable Skeleton Grid
+                            [...Array(6)].map((_, i) => (
+                                <div key={`skeleton-${i}`} className="aspect-square rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse relative overflow-hidden">
+                                    <div className="absolute inset-x-4 bottom-4 space-y-2">
+                                        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/3" />
+                                        <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/3" />
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            visibleRefs.map((project, index) => (
+                                <ReferenceCard
+                                    key={`${project.id || index}-${activeCatId}`}
+                                    {...project}
+                                    animateEntry={isInitialRender}
+                                    staggerIndex={index}
+                                    forceSquare={true}
+                                    compactMobileOverlay={true}
+                                    loading={index < 2 ? 'eager' : 'lazy'}
+                                    page="References"
+                                    section="ReferencesGridSection"
+                                />
+                            ))
+                        )}
                     </div>
-                    <div className="mt-14 md:mt-20 text-center">
-                        <button className="inline-flex items-center gap-3 px-8 md:px-12 py-3.5 md:py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-colors duration-300 text-xs md:text-base">
-                            {headerProps.load_more}
-                            <Icon name="refresh" className="text-base" />
-                        </button>
-                    </div>
+                    {filteredRefs.length > visibleRefs.length && (
+                        <div className="mt-14 md:mt-20 text-center">
+                            <button 
+                                onClick={handleLoadMore}
+                                className="inline-flex items-center gap-3 px-8 md:px-12 py-3.5 md:py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-colors duration-300 text-xs md:text-base active:scale-95 transition-transform"
+                            >
+                                {headerProps.load_more || t('refs.load_more')}
+                                <Icon name="refresh" className={`text-base ${isLoading ? 'animate-spin' : ''}`} />
+                            </button>
+                        </div>
+                    )}
                 </div>
             </section>
         </main>

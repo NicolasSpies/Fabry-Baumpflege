@@ -18,7 +18,7 @@ import { resolveInstanceProps } from '@/cms/bridge-resolver';
  
     return (
         <div ref={blockRef} className={`group ${offset ? 'md:mt-24 reveal stagger-1' : ''}`}>
-            <div className="md:hidden space-y-4 rounded-[1.75rem] px-4 py-4 bg-surface-light border border-slate-100 dark:border-slate-800 shadow-sm">
+            <div className="md:hidden space-y-4 rounded-[1.75rem] px-4 py-4 bg-white border border-slate-100 dark:border-slate-800 shadow-sm">
                 <div className="relative rounded-[1.35rem] overflow-hidden shadow-md h-[17.5rem] sm:h-[21.5rem]">
                     <CmsImage
                         image={props.image}

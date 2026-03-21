@@ -30,29 +30,15 @@ const ReferenceCard = ({
 
     const prefetchDetail = () => {
         if (hasPrefetchedRef.current) return;
+        // Skip prefetch on low-end or touch-primary devices if needed, 
+        // but for now we'll just keep it manual (focus/hover)
         hasPrefetchedRef.current = true;
         preloadReferenceDetailPage();
         prefetchReferenceDetail(props.slug || props.id, language);
     };
 
-
-    useEffect(() => {
-        const node = linkRef.current;
-        if (!node || typeof IntersectionObserver === 'undefined') return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries.some((entry) => entry.isIntersecting)) {
-                    prefetchDetail();
-                    observer.disconnect();
-                }
-            },
-            { rootMargin: '240px' }
-        );
-
-        observer.observe(node);
-        return () => observer.disconnect();
-    }, [id, language]);
+    // Removed visibility-based prefetch to save mobile bandwidth.
+    // Prefetch now only happens on explicit intent (hover/focus).
 
     return (
         <Link
@@ -60,7 +46,6 @@ const ReferenceCard = ({
             to={detailPath}
             onMouseEnter={prefetchDetail}
             onFocus={prefetchDetail}
-            onTouchStart={prefetchDetail}
             className={`group relative rounded-2xl bg-white dark:bg-slate-800 block shadow-sm md:shadow-md md:hover:shadow-xl transition-[box-shadow] duration-500 overflow-hidden ${animateEntry ? 'animate-entrance' : ''}`}
             style={animateEntry ? { animationDelay: `${staggerIndex * 0.1}s` } : {}}
         >
@@ -69,17 +54,21 @@ const ReferenceCard = ({
                     image={props.thumbnailImage}
                     alt={props.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 50vw, 33vw"
                     loading={props.loading || 'lazy'}
                 />
                 <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-primary/70 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end text-white ${compactMobileOverlay ? 'p-4 md:p-8' : 'p-8'}`} style={{ willChange: 'opacity' }}>
                     <div className={`mb-3 flex flex-wrap gap-x-3 gap-y-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-100`}>
-                        <span className={`uppercase tracking-widest font-bold text-white/90 ${compactMobileOverlay ? 'text-[8.5px] md:text-[9.5px]' : 'text-[9.5px]'}`}>
-                            {props.categories?.join(', ')}
-                        </span>
+                        {props.categories && props.categories.length > 0 && (
+                            <span className={`uppercase tracking-widest font-bold text-white/90 ${compactMobileOverlay ? 'text-[8.5px] md:text-[9.5px]' : 'text-[9.5px]'}`}>
+                                {props.categories.join(', ')}
+                            </span>
+                        )}
                         {props.location && (
                             <>
-                                <span className="w-1 h-1 rounded-full bg-white/40 self-center" />
+                                {props.categories && props.categories.length > 0 && (
+                                    <span className="w-0.5 h-2.5 bg-white/20 self-center hidden md:block" />
+                                )}
                                 <span className={`uppercase tracking-widest font-normal text-white/70 ${compactMobileOverlay ? 'text-[8.5px] md:text-[9.5px]' : 'text-[9.5px]'}`}>
                                     {props.location}
                                 </span>

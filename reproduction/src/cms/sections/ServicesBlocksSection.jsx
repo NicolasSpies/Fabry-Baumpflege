@@ -40,8 +40,8 @@ const ServiceBlockInternal = ({ id, title, description, list, image, reverse, to
         }
     };
 
-    const toneClass = tone === 'soft' ? 'md:bg-surface-light md:dark:bg-surface-dark/20 md:border-y md:border-slate-100 md:dark:border-slate-800' : '';
-    const mobilePanelClass = 'bg-surface-light border border-slate-100 dark:border-slate-800 shadow-sm';
+    const toneClass = tone === 'soft' ? 'md:bg-primary/[0.035] md:dark:bg-surface-dark/20 md:border-y md:border-slate-100 md:dark:border-slate-800' : '';
+    const mobilePanelClass = 'bg-primary/[0.035] border border-slate-100 dark:border-slate-800 shadow-sm';
 
     return (
         <section

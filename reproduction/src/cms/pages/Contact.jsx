@@ -112,7 +112,7 @@ const Contact = () => {
     // We render the sidebar and form shell immediately.
 
     return (
-        <main className="bg-surface-light dark:bg-background-dark">
+        <main className="bg-primary/[0.035] dark:bg-background-dark">
             <div className="max-w-7xl mx-auto px-6 pt-32 pb-24">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
                     {/* Page: Contact → Section: ContactSidebarSection */}
