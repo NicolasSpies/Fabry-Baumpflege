@@ -32,7 +32,8 @@ const PhilosophySection = ({
                             alt=""
                             className="w-full h-full object-cover"
                             sizes="(max-width: 1024px) 100vw, 50vw"
-                            loading="lazy"
+                            loading="eager"
+                            fetchPriority="high"
                             style={{ transition: 'none' }}
                         />
                     </div>
@@ -44,8 +45,8 @@ const PhilosophySection = ({
                     </h1>
                     <CmsText
                         text={text}
-                        className="max-w-[34rem] space-y-4 text-slate-600 dark:text-slate-400 font-light"
-                        paragraphClassName="text-base leading-[1.7]"
+                        className="max-w-[34rem] space-y-4 text-slate-600 font-light"
+                        paragraphClassName="text-base md:text-[1.05rem] leading-[1.7]"
                     />
                 </div>
             </div>

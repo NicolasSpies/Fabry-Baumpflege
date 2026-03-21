@@ -20,8 +20,8 @@ const ServicesIntroSection = ({
                     ) : null}
                     <CmsText
                         text={description}
-                        className="max-w-xl mx-auto space-y-4 text-slate-600 dark:text-slate-400 font-light"
-                        paragraphClassName="text-[1.05rem] md:text-lg opacity-90 leading-[1.75]"
+                        className="max-w-xl mx-auto space-y-4 text-slate-700 font-light"
+                        paragraphClassName="text-[1.05rem] md:text-lg leading-[1.75]"
                     />
                 </div>
             </div>

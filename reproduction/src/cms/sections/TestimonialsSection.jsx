@@ -229,9 +229,8 @@ const TestimonialsSection = ({
                         {items.map((_, idx) => (
                             <button
                                 key={idx}
-                                className={`h-1.5 transition-all duration-300 rounded-full ${
-                                    idx === activeIndex ? 'bg-primary w-6' : 'bg-primary/20 w-1.5'
-                                }`}
+                                aria-label={`${t('common.testimonial') || 'Testimonial'} ${idx + 1}`}
+                                className="group h-11 flex items-center justify-center transition-all duration-300 px-1.5"
                                 onClick={() => {
                                     const container = scrollRef.current;
                                     const card = container.querySelector('[data-testimonial-card]');
@@ -244,7 +243,13 @@ const TestimonialsSection = ({
                                     });
                                     setActiveIndex(idx);
                                 }}
-                            />
+                            >
+                                <div 
+                                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                                        idx === activeIndex ? 'bg-primary w-6' : 'bg-primary/20 w-1.5'
+                                    }`}
+                                />
+                            </button>
                         ))}
                     </div>
                 )}

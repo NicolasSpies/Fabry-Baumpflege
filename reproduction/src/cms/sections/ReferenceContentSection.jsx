@@ -20,13 +20,13 @@ const ReferenceContentSection = ({
 
     return (
         <div className="lg:col-span-8 reveal stagger-1">
-            <div className="prose prose-slate prose-lg dark:prose-invert max-w-none">
+            <div className="prose prose-slate max-w-none text-slate-600 leading-[1.7] md:text-[1.05rem]">
                 <h2 className="font-display text-3xl text-primary mb-8">{renderCmsInline(challengeTitle)}</h2>
                 {description && (
                     <CmsText
                         text={description}
-                        className="text-muted-accessible mb-6"
-                        paragraphClassName="leading-relaxed"
+                        className="text-slate-600 mb-8"
+                        paragraphClassName="text-base md:text-[1.05rem] leading-[1.7]"
                     />
                 )}
             </div>

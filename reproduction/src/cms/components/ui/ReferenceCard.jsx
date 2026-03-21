@@ -46,6 +46,13 @@ const ReferenceCard = ({
         <Link
             ref={linkRef}
             to={detailPath}
+            state={{ 
+                preview: {
+                    title: props.title,
+                    categoryLabel: props.categories && props.categories.length > 0 ? props.categories[0] : '',
+                    image: props.thumbnailImage
+                }
+            }}
             onMouseEnter={prefetchDetail}
             onFocus={prefetchDetail}
             className={`group relative rounded-2xl block shadow-md md:shadow-lg md:hover:shadow-xl transition-[box-shadow,transform] duration-500 overflow-hidden ${animateEntry ? 'animate-entrance' : ''}`}

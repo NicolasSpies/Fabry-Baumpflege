@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, mapPageContent, PAGE_IDS } from '@/cms/lib/cms';
+import { getPage, getHomeStats, mapPageContent, PAGE_IDS } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
@@ -122,11 +122,11 @@ const Services = () => {
 
         async function loadHomeStats() {
             try {
-                const homePage = await getPage(PAGE_IDS.home, language);
+                const statsData = await getHomeStats(language);
                 if (cancelled) return;
-                if (homePage) {
-                    setStatsCmsData(homePage);
-                    setPageData(prev => mergeHomeStats(prev, homePage));
+                if (statsData) {
+                    setStatsCmsData(statsData);
+                    setPageData(prev => mergeHomeStats(prev, statsData));
                 }
             } catch (err) {
                 console.warn('[Services] Home stats fetch failed, using fallbacks');

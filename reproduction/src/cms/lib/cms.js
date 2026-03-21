@@ -390,6 +390,20 @@ export async function getPage(pageId, language = 'DE', signal = null) {
     return page;
 }
 
+/**
+ * Fetch only the specific stat fields from the Home page.
+ */
+export async function getHomeStats(language = 'DE', signal = null) {
+    const fields = 'customFields.stat1_value,customFields.stat1_label,customFields.stat2_value,customFields.stat2_label,customFields.stat3_value,customFields.stat3_label,customFields.stat4_value,customFields.stat4_label';
+    try {
+        const stats = await fetchFromCMS(`/content-core/v1/post/page/${PAGE_IDS.home}?fields=${fields}`, language, signal);
+        return stats;
+    } catch (err) {
+        console.warn('[CMS] getHomeStats failed:', err);
+        return null;
+    }
+}
+
 
 function isEmptyCmsValue(value) {
     if (value === undefined || value === null || value === '') return true;

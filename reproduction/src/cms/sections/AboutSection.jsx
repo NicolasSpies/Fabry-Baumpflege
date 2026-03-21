@@ -54,8 +54,8 @@ const expertiseImgRef = useRef(null);
                         </div>
                         <CmsText
                             text={description}
-                            className="space-y-4 text-slate-700 dark:text-slate-300 font-sans"
-                            paragraphClassName="text-base leading-[1.8]"
+                            className="space-y-4 text-slate-600 font-sans"
+                            paragraphClassName="text-base md:text-[1.05rem] leading-[1.7]"
                         />
                         <div className="pt-4">
                             {isExternalCta ? (

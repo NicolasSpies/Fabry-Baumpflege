@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { ROUTES } from '@/cms/i18n/routes';
 import { getReference, getReferenceCore, getTermsByIds, resolveMedia, decodeHtmlEntities } from '@/cms/lib/cms';
@@ -43,6 +43,7 @@ export const previewData = definePreview({
 
 const ReferenceDetail = () => {
     const { slug } = useParams();
+    const location = useLocation();
     const { language, t, globalSeo, setAlternates } = useLanguage();
 
 
@@ -56,9 +57,9 @@ const ReferenceDetail = () => {
     // ─── Data Resolution ─────────────────────────────────────────────────────
     const getLocalContent = () => ({
         hero: {
-            title: '',
-            categoryLabel: '',
-            image: ''
+            title: location.state?.preview?.title || '',
+            categoryLabel: location.state?.preview?.categoryLabel || '',
+            image: location.state?.preview?.image || ''
         },
         sidebar: {
             title: t('detail.project_details') || 'Projekt Details',
@@ -157,7 +158,22 @@ const ReferenceDetail = () => {
         async function loadData() {
             try {
                 setStatus('loading');
-                setProject(null);
+                
+                // Phase 0: Check if we have preview state to show a shell immediately
+                if (location.state?.preview) {
+                    setProject({
+                        hero: {
+                            ...getLocalContent().hero,
+                            title: location.state.preview.title,
+                            categoryLabel: location.state.preview.categoryLabel,
+                            image: location.state.preview.image
+                        },
+                        sidebar: getLocalContent().sidebar,
+                        content: getLocalContent().content
+                    });
+                } else {
+                    setProject(null);
+                }
                 setRawProject(null);
 
                 // Phase 1: Core Fetch (Hero, Title, Meta) - no expensive _embed=1 yet

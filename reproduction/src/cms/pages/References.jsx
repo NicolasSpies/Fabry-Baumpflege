@@ -206,16 +206,28 @@ const References = () => {
 
 
     const [displayCount, setDisplayCount] = useState(4);
+    const loadMoreTriggerRef = React.useRef(null);
 
-    // Progressive loading in second phase
+    // Intersection Observer for scroll-based loading
     useEffect(() => {
-        if (!isLoading && allRefs.length > 0) {
-            const timer = setTimeout(() => {
-                setDisplayCount(prev => Math.max(prev, 12));
-            }, 1000);
-            return () => clearTimeout(timer);
+        if (isLoading || filteredRefs.length <= displayCount) return;
+
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                // Debounced/Guarded increment
+                setDisplayCount(prev => Math.min(prev + 12, filteredRefs.length));
+            }
+        }, { rootMargin: '400px', threshold: 0.1 });
+
+        const currentTrigger = loadMoreTriggerRef.current;
+        if (currentTrigger) {
+            observer.observe(currentTrigger);
         }
-    }, [isLoading, allRefs.length]);
+
+        return () => {
+            if (currentTrigger) observer.unobserve(currentTrigger);
+        };
+    }, [isLoading, filteredRefs.length, displayCount]);
 
     // Memoized filtering and list slicing
     const filteredRefs = React.useMemo(() => {
@@ -269,8 +281,8 @@ const References = () => {
                     </h1>
                     <CmsText
                         text={headerProps.intro}
-                        className="max-w-2xl mx-auto text-base opacity-90"
-                        paragraphClassName="leading-relaxed"
+                        className="max-w-2xl mx-auto text-slate-700"
+                        paragraphClassName="text-[1.05rem] md:text-lg leading-[1.75]"
                     />
                 </div>
             </section>
@@ -318,9 +330,10 @@ const References = () => {
                                     {...project}
                                     animateEntry={isInitialRender}
                                     staggerIndex={index}
-                                    forceSquare={false} // Use the new aspect-ratio responsive logic
+                                    forceSquare={false} 
                                     compactMobileOverlay={true}
-                                    loading={index < 1 ? 'eager' : 'lazy'}
+                                    loading={index < 2 ? 'eager' : 'lazy'}
+                                    fetchPriority={index < 2 ? 'high' : 'low'}
                                     sizes="(max-width: 768px) 95vw, (max-width: 1200px) 45vw, 30vw"
                                     page="References"
                                     section="ReferencesGridSection"
@@ -328,15 +341,9 @@ const References = () => {
                             ))
                         )}
                     </div>
-                    {filteredRefs.length > visibleRefs.length && (
-                        <div className="mt-14 md:mt-24 text-center">
-                            <button 
-                                onClick={handleLoadMore}
-                                className="inline-flex items-center gap-3 px-8 md:px-12 py-3.5 md:py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-colors duration-300 text-xs md:text-base active:scale-95 transition-transform"
-                            >
-                                {headerProps.load_more || t('refs.load_more')}
-                                <Icon name="refresh" className={`text-base ${isLoading ? 'animate-spin' : ''}`} />
-                            </button>
+                    {filteredRefs.length > displayCount && (
+                        <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center mt-12">
+                            {isLoading && <Icon name="refresh" className="animate-spin text-primary text-2xl" />}
                         </div>
                     )}
                 </div>
