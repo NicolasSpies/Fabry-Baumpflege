@@ -277,10 +277,11 @@ const ReferenceDetail = () => {
                         const fullCf = fullRef.customFields || fullRef.acf || fullRef.meta || {};
 
                         // 2. Resolve the heavy images
+                        const rawGallery = fullCf.galerie || fullRef.acf?.gallery || [];
                         const [beforeUrl, afterUrl, resolvedGallery] = await Promise.all([
                             resolveMedia(fullCf.bild_vorher || fullRef.acf?.before_image),
                             resolveMedia(fullCf.bild_nachher || fullRef.acf?.after_image),
-                            Promise.all((fullCf.galerie || fullRef.acf?.gallery || []).map(img => resolveMedia(img)))
+                            Promise.all((Array.isArray(rawGallery) ? rawGallery : []).map(img => resolveMedia(img)))
                         ]);
 
                         if (cancelledAssets || controller.signal.aborted) return;
@@ -360,7 +361,7 @@ const ReferenceDetail = () => {
     }, [rawProject, project]);
 
     // ─── Render States ────────────────────────────────────────────────────────
-    if (status === 'ready' && !project && !rawProject) {
+    if ((status === 'loading' || status === 'ready') && !project && !rawProject) {
         // Still waiting for initial shell data
         return <ReferenceDetailSkeleton />;
     }

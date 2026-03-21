@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { getTestimonials, decodeHtmlEntities } from '@/cms/lib/cms';
+import { useLanguage } from '@/cms/i18n/useLanguage';
 import TestimonialCard from '@/cms/components/ui/TestimonialCard';
 import { renderCmsInline } from '@/cms/components/ui/CmsText';
 
@@ -10,6 +11,7 @@ import { renderCmsInline } from '@/cms/components/ui/CmsText';
  *           data.customFields.kundenstimme_text → text.
  */
 function mapTestimonial(raw) {
+    if (!raw || typeof raw !== 'object') return null;
     const cf = raw.customFields || raw.acf || raw.meta || {};
     
     // Robust name extraction: Try Title, then specific meta fields, then safe fallback.
@@ -40,6 +42,7 @@ const TestimonialsSection = ({
     page = 'Home',
     section = 'TestimonialsSection'
 }) => {
+    const { t, language: cmsLanguage } = useLanguage();
     const [items, setItems] = useState(fallbackItems ?? []);
     const [activeIndex, setActiveIndex] = useState(0);
     const scrollRef = useRef(null);
@@ -74,8 +77,8 @@ const TestimonialsSection = ({
         async function load() {
             try {
                 const raw = await getTestimonials(language ?? 'DE');
-                if (cancelled || !raw.length) return;
-                setItems(raw.map(mapTestimonial));
+                if (cancelled || !raw || !Array.isArray(raw) || !raw.length) return;
+                setItems(raw.map(mapTestimonial).filter(Boolean));
             } catch (err) {
                 console.error('[TestimonialsSection] CMS load failed:', err);
             }

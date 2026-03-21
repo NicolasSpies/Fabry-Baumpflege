@@ -24,7 +24,7 @@ const ReferenceCard = ({
 
 
     const { t } = useLanguage();
-    const detailPath = props.path || `${ROUTES[language].referenceDetail.split('/:')[0]}/${props.slug || props.id}`;
+    const detailPath = props.path || `${ROUTES[language || 'DE'].referenceDetail.split('/:')[0]}/${props.slug || props.id}`;
     const linkRef = useRef(null);
     const hasPrefetchedRef = useRef(false);
 

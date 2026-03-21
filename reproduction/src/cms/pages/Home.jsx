@@ -218,12 +218,13 @@ const Home = () => {
             ]);
                 if (cancelled) return;
 
-                const mappedRefs = rawRefs.map(item => ({
-                    ...mapReferenceCard(item),
-                    data: item
-                }));
-
+                const mappedRefs = (rawRefs || []).map(item => {
+                    const mapped = mapReferenceCard(item);
+                    return mapped ? { ...mapped, data: item } : null;
+                }).filter(Boolean);
+                
                 const mappedTestimonials = (rawTestimonials || []).slice(0, 3).map(item => {
+                    if (!item) return null;
                     const cf = item.customFields || item.acf || item.meta || {};
                     const name = decodeHtmlEntities(
                         item.title?.rendered || 
@@ -239,7 +240,7 @@ const Home = () => {
                         rating_raw: String(cf.sterne || '5'),
                         data: item
                     };
-                });
+                }).filter(Boolean);
 
                 startTransition(() => {
                     setPageData(prev => {

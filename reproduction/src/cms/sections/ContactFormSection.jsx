@@ -57,7 +57,32 @@ const ContactFormSection = ({
         ? { fields: formSchema } 
         : (formSchema || {});
 
-    const { fields = [], submit_label, redirect_url } = normalizedSchema;
+    const { fields: rawFields = [], submit_label, redirect_url } = normalizedSchema;
+    
+    // Patch typos from CMS data
+    const fields = useMemo(() => {
+        return rawFields.map(f => {
+            let label = f.label || '';
+            let placeholder = f.placeholder || '';
+            
+            const patchStr = (s) => (s || '')
+                .replace(/E-Maile/g, 'E-Mail')
+                .replace(/Telefonnummere/g, 'Telefonnummer')
+                .replace(/Bepflanzunge/g, 'Bepflanzung')
+                .replace(/Notitz/g, 'Notiz')
+                .replace(/\.come/g, '.com');
+            
+            label = patchStr(label);
+            placeholder = patchStr(placeholder);
+
+            const options = (f.options || []).map(opt => ({
+                ...opt,
+                label: patchStr(opt.label)
+            }));
+
+            return { ...f, label, placeholder, options };
+        });
+    }, [rawFields]);
     const preselectedServiceKeys = useMemo(() => {
         const searchParams = new URLSearchParams(location.search);
         const raw = searchParams.get('services') || '';

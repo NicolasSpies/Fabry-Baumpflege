@@ -753,6 +753,7 @@ export async function resolveMedia(idOrUrl) {
  * Preserves raw language metadata for diagnostics and backward compatibility.
  */
 export function mapReferenceCard(item, catMap = {}) {
+    if (!item) return null;
     // Thumbnail: check 'featured_image' (returned by some WP REST plugins/themes),
     // then fall back to standard wp:featuredmedia embed.
     const cf = item.customFields || item.acf || item.meta || {};
@@ -848,7 +849,7 @@ export function mapReferenceCard(item, catMap = {}) {
  * @param {string} [pageId] - The logical name of the page in ContentBridge (e.g. "Home")
  */
 export function mapPageContent(rawPage, localContent, pageId) {
-    if (!rawPage) return localContent;
+    if (!rawPage || typeof rawPage !== 'object') return localContent;
     
     // Deep clone to avoid mutating the original fallback object
     const content = JSON.parse(JSON.stringify(localContent));

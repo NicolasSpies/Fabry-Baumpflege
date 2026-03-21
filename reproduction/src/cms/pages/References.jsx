@@ -111,8 +111,12 @@ const References = () => {
                 const [refsRes, catsRes] = await Promise.allSettled([refsPromise, catsPromise]);
                 if (cancelled) return;
 
-                const rawRefs = refsRes.status === 'fulfilled' ? refsRes.value : [];
-                const rawCats = catsRes.status === 'fulfilled' ? catsRes.value : [];
+                const rawRefs = Array.isArray(refsRes.status === 'fulfilled' ? refsRes.value : []) 
+                    ? (refsRes.status === 'fulfilled' ? refsRes.value : []) 
+                    : [];
+                const rawCats = Array.isArray(catsRes.status === 'fulfilled' ? catsRes.value : [])
+                    ? (catsRes.status === 'fulfilled' ? catsRes.value : [])
+                    : [];
 
                 if (refsRes.status === 'rejected' && (!rawRefs || rawRefs.length === 0)) {
                     setError(true);
@@ -120,7 +124,7 @@ const References = () => {
                     return;
                 }
 
-                const catMap = rawCats.reduce((acc, c) => { if (c?.id) acc[String(c.id)] = c.name; return acc; }, {});
+                const catMap = (Array.isArray(rawCats) ? rawCats : []).reduce((acc, c) => { if (c?.id) acc[String(c.id)] = c.name; return acc; }, {});
                 const mappedRefs = (Array.isArray(rawRefs) ? rawRefs : []).map(item => {
                     if (!item) return null;
                     try {
@@ -140,7 +144,7 @@ const References = () => {
                 const filteredCats = [];
                 const seenCategoryNames = new Set();
 
-                rawCats.forEach(c => {
+                (Array.isArray(rawCats) ? rawCats : []).forEach(c => {
                     const cleanName = decodeHtmlEntities(c.name || '').trim();
                     const n = cleanName.toLowerCase();
                     if (!cleanName || seenCategoryNames.has(n)) return;
@@ -208,27 +212,6 @@ const References = () => {
     const [displayCount, setDisplayCount] = useState(4);
     const loadMoreTriggerRef = React.useRef(null);
 
-    // Intersection Observer for scroll-based loading
-    useEffect(() => {
-        if (isLoading || filteredRefs.length <= displayCount) return;
-
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                // Debounced/Guarded increment
-                setDisplayCount(prev => Math.min(prev + 12, filteredRefs.length));
-            }
-        }, { rootMargin: '400px', threshold: 0.1 });
-
-        const currentTrigger = loadMoreTriggerRef.current;
-        if (currentTrigger) {
-            observer.observe(currentTrigger);
-        }
-
-        return () => {
-            if (currentTrigger) observer.unobserve(currentTrigger);
-        };
-    }, [isLoading, filteredRefs.length, displayCount]);
-
     // Memoized filtering and list slicing
     const filteredRefs = React.useMemo(() => {
         return (allRefs || []).filter(ref => {
@@ -249,6 +232,27 @@ const References = () => {
     const handleLoadMore = () => {
         setDisplayCount(prev => prev + 12);
     };
+
+    // Intersection Observer for scroll-based loading
+    useEffect(() => {
+        if (isLoading || filteredRefs.length <= displayCount) return;
+
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                // Debounced/Guarded increment
+                setDisplayCount(prev => Math.min(prev + 12, filteredRefs.length));
+            }
+        }, { rootMargin: '400px', threshold: 0.1 });
+
+        const currentTrigger = loadMoreTriggerRef.current;
+        if (currentTrigger) {
+            observer.observe(currentTrigger);
+        }
+
+        return () => {
+            if (currentTrigger) observer.unobserve(currentTrigger);
+        };
+    }, [isLoading, filteredRefs.length, displayCount]);
 
 
     const getProps = (instanceName, localProps) => 
@@ -279,11 +283,13 @@ const References = () => {
                     <h1 className="text-4xl md:text-5xl font-serif text-primary mb-4">
                         {t('nav.references')}
                     </h1>
-                    <CmsText
-                        text={headerProps.intro}
-                        className="max-w-2xl mx-auto text-slate-700"
-                        paragraphClassName="text-[1.05rem] md:text-lg leading-[1.75]"
-                    />
+                    {headerProps?.intro && (
+                        <CmsText
+                            text={headerProps.intro}
+                            className="max-w-2xl mx-auto text-slate-700"
+                            paragraphClassName="text-[1.05rem] md:text-lg leading-[1.75]"
+                        />
+                    )}
                 </div>
             </section>
 
@@ -328,6 +334,7 @@ const References = () => {
                                 <ReferenceCard
                                     key={`${project.id || index}-${activeCatId}`}
                                     {...project}
+                                    language={language}
                                     animateEntry={isInitialRender}
                                     staggerIndex={index}
                                     forceSquare={false} 

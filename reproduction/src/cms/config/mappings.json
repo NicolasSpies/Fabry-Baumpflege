@@ -107,7 +107,7 @@
               "isUnstable": false
             },
             "stat1_label": {
-              "fieldPath": "customFields.startseite_zufriedene_unden",
+              "fieldPath": "customFields.startseite_zufriedene_kunden",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },
@@ -373,7 +373,7 @@
               "isUnstable": false
             },
             "stat1_label": {
-              "fieldPath": "customFields.startseite_zufriedene_unden",
+              "fieldPath": "customFields.startseite_zufriedene_kunden",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },

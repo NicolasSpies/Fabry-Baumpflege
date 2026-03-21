@@ -54,18 +54,16 @@ function App() {
 
   const [rawGlobal, setRawGlobal] = useState(null);
 
-  // Sync default labels if language changes while loading
+  // Sync default labels whenever language changes
   useEffect(() => {
-    if (!rawGlobal) {
-      setGlobalData(prev => ({
-        ...prev,
-        navbar: {
-          ...prev.navbar,
-          ctaLabel: language === 'FR' ? 'Contact' : 'Kontakt'
-        }
-      }));
-    }
-  }, [language, rawGlobal]);
+    setGlobalData(prev => ({
+      ...prev,
+      navbar: {
+        ...prev.navbar,
+        ctaLabel: language === 'FR' ? 'Contact' : 'Kontakt'
+      }
+    }));
+  }, [language]);
 
   // Fetch only true global CMS data for shell components.
   useEffect(() => {
@@ -122,6 +120,7 @@ function App() {
               <Route path={ROUTES.FR.contact} element={<Contact />} />
               <Route path={ROUTES.FR.about} element={<AboutMe />} />
 
+              <Route path="/ueber-uns" element={<Navigate to="/ueber-mich" replace />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
