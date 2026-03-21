@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { ROUTES } from '@/cms/i18n/routes';
-import { getReference, getTermsByIds, resolveMedia, decodeHtmlEntities } from '@/cms/lib/cms';
+import { getReference, getReferenceCore, getTermsByIds, resolveMedia, decodeHtmlEntities } from '@/cms/lib/cms';
 
 import { resolveInstanceProps, resolveInstancePropsAsync } from '@/cms/bridge-resolver';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
@@ -160,7 +160,8 @@ const ReferenceDetail = () => {
                 setProject(null);
                 setRawProject(null);
 
-                const ref = await getReference(slug, language, controller.signal);
+                // Phase 1: Core Fetch (Hero, Title, Meta) - no expensive _embed=1 yet
+                const ref = await getReferenceCore(slug, language, controller.signal);
 
                 if (controller.signal.aborted) return;
 
@@ -171,7 +172,7 @@ const ReferenceDetail = () => {
 
                 const cf = ref.customFields || ref.acf || ref.meta || {};
 
-                // Phase 1: Only resolve non-gallery critical media (Hero)
+                // Phase 1: Only resolve hero image
                 const thumbnail = await resolveMedia(ref.featured_image || ref._embedded?.['wp:featuredmedia']?.[0]?.source_url || null);
 
                 if (controller.signal.aborted) return;
@@ -249,24 +250,34 @@ const ReferenceDetail = () => {
 
                 setStatus('ready');
 
-                // ─── Phase 2: Deferred Asset Loading ───────────────────────────────
-                // We load gallery and side-by-side images after the shell is ready
+                // ─── Phase 2: Deferred Full Data & Asset Loading ───────────────────────────────
+                // We load the full reference (with _embed=1) and heavy images after the core is visible
                 const loadDeferredAssets = async () => {
                     try {
+                        // 1. Fetch the full object for gallery/before-after data
+                        const fullRef = await getReference(slug, language, controller.signal);
+                        if (controller.signal.aborted || !fullRef) return;
+
+                        const fullCf = fullRef.customFields || fullRef.acf || fullRef.meta || {};
+
+                        // 2. Resolve the heavy images
                         const [beforeUrl, afterUrl, resolvedGallery] = await Promise.all([
-                            resolveMedia(cf.bild_vorher || ref.acf?.before_image),
-                            resolveMedia(cf.bild_nachher || ref.acf?.after_image),
-                            Promise.all((cf.galerie || ref.acf?.gallery || []).map(img => resolveMedia(img)))
+                            resolveMedia(fullCf.bild_vorher || fullRef.acf?.before_image),
+                            resolveMedia(fullCf.bild_nachher || fullRef.acf?.after_image),
+                            Promise.all((fullCf.galerie || fullRef.acf?.gallery || []).map(img => resolveMedia(img)))
                         ]);
 
-                        if (cancelledAssets) return;
+                        if (cancelledAssets || controller.signal.aborted) return;
 
+                        setRawProject(fullRef);
                         setProject(prev => {
                             if (!prev) return prev;
                             return {
                                 ...prev,
                                 content: {
                                     ...prev.content,
+                                    challengeTitle: fullCf.challenge_title || fullRef.acf?.challenge_title || prev.content.challengeTitle,
+                                    description: decodeHtmlEntities(fullCf.beschreibung || fullRef.acf?.short_description || prev.content.description),
                                     beforeImage: beforeUrl,
                                     afterImage: afterUrl,
                                     gallery: (resolvedGallery || []).filter(Boolean)
@@ -274,7 +285,9 @@ const ReferenceDetail = () => {
                             };
                         });
                     } catch (deferErr) {
-                        console.warn('[ReferenceDetail] Deferred assets failed:', deferErr);
+                        if (deferErr.name !== 'AbortError') {
+                            console.warn('[ReferenceDetail] Deferred assets failed:', deferErr);
+                        }
                     }
                 };
 
@@ -283,7 +296,7 @@ const ReferenceDetail = () => {
                 if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
                     window.requestIdleCallback(() => loadDeferredAssets());
                 } else {
-                    setTimeout(() => loadDeferredAssets(), 150);
+                    setTimeout(() => loadDeferredAssets(), 200);
                 }
 
             } catch (err) {

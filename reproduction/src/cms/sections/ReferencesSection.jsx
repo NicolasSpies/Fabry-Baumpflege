@@ -37,6 +37,8 @@ const ReferencesSection = ({
                                     data={project.data}
                                     page={page}
                                     section={section}
+                                    loading="lazy" // Never eager on home to let Hero win
+                                    sizes="(max-width: 768px) 85vw, 400px"
                                 />
                             </div>
                         ))}
@@ -52,6 +54,8 @@ const ReferencesSection = ({
                             data={project.data} 
                             page={page}
                             section={section}
+                            loading="lazy" // Never eager on home to let Hero win
+                            sizes="(max-width: 1024px) 45vw, 30vw"
                         />
                     ))}
                 </div>

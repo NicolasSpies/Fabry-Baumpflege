@@ -56,7 +56,7 @@ const ReferenceCard = ({
                     image={props.thumbnailImage}
                     alt={props.title}
                     className="w-full h-full object-cover transition-transform duration-700 md:group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    sizes={props.sizes || "(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"}
                     loading={props.loading || 'lazy'}
                 />
                 

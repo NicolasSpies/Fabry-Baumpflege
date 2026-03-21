@@ -118,41 +118,48 @@ const ContactFormSection = ({
     }, [settings.enable_turnstile, turnstileSiteKey, formSchema]);
 
     useEffect(() => {
-        if (!fields.length || !preselectedServiceKeys.length) return;
+        if (!fields.length) return;
 
-        const nextFormData = {};
-        const nextSelectedServices = [];
+        // Defer heavy param processing to avoid blocking first paint
+        const timeoutId = setTimeout(() => {
+            if (!preselectedServiceKeys.length) return;
 
-        fields.forEach((field) => {
-            if (field.type === 'checkbox') {
-                const fieldLabelClean = String(field.label || '').trim().toLowerCase();
-                const fieldNameClean = String(field.name || '').trim().toLowerCase();
-                if (preselectedServiceKeys.includes(fieldLabelClean) || preselectedServiceKeys.includes(fieldNameClean)) {
-                    nextFormData[field.name] = true;
-                    nextSelectedServices.push(field.name);
+            const nextFormData = {};
+            const nextSelectedServices = [];
+
+            fields.forEach((field) => {
+                if (field.type === 'checkbox') {
+                    const fieldLabelClean = String(field.label || '').trim().toLowerCase();
+                    const fieldNameClean = String(field.name || '').trim().toLowerCase();
+                    if (preselectedServiceKeys.includes(fieldLabelClean) || preselectedServiceKeys.includes(fieldNameClean)) {
+                        nextFormData[field.name] = true;
+                        nextSelectedServices.push(field.name);
+                    }
                 }
-            }
 
-            if (field.type === 'checkbox_group' && Array.isArray(field.options)) {
-                const matchedValues = field.options
-                    .filter((option) => {
-                        const optLabelClean = String(option.label || '').trim().toLowerCase();
-                        const optValClean = String(option.value || '').trim().toLowerCase();
-                        return preselectedServiceKeys.includes(optLabelClean) || preselectedServiceKeys.includes(optValClean);
-                    })
-                    .map((option) => option.value);
+                if (field.type === 'checkbox_group' && Array.isArray(field.options)) {
+                    const matchedValues = field.options
+                        .filter((option) => {
+                            const optLabelClean = String(option.label || '').trim().toLowerCase();
+                            const optValClean = String(option.value || '').trim().toLowerCase();
+                            return preselectedServiceKeys.includes(optLabelClean) || preselectedServiceKeys.includes(optValClean);
+                        })
+                        .map((option) => option.value);
 
-                if (matchedValues.length) {
-                    nextFormData[field.name] = matchedValues;
-                    nextSelectedServices.push(...matchedValues);
+                    if (matchedValues.length) {
+                        nextFormData[field.name] = matchedValues;
+                        nextSelectedServices.push(...matchedValues);
+                    }
                 }
+            });
+
+            if (Object.keys(nextFormData).length) {
+                setFormData((prev) => ({ ...prev, ...nextFormData }));
+                setSelectedServices([...new Set(nextSelectedServices)]);
             }
-        });
+        }, 100);
 
-        if (!Object.keys(nextFormData).length) return;
-
-        setFormData((prev) => ({ ...prev, ...nextFormData }));
-        setSelectedServices([...new Set(nextSelectedServices)]);
+        return () => clearTimeout(timeoutId);
     }, [fields, preselectedServiceKeys]);
 
     // We render the shell even if the schema is loading to provide immediate visual feedback

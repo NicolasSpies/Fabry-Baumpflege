@@ -217,17 +217,22 @@ const References = () => {
         }
     }, [isLoading, allRefs.length]);
 
-    const filteredRefs = (allRefs || []).filter(ref => {
-        if (!activeCatId) return true;
-        const ids = Array.isArray(ref.categoryIds) ? ref.categoryIds : [];
-        const selectedCat = categories.find(c => String(c.id) === String(activeCatId));
-        if (selectedCat?.altIds) {
-            return ids.some(id => selectedCat.altIds.has(String(id)));
-        }
-        return ids.some(id => String(id) === String(activeCatId));
-    });
+    // Memoized filtering and list slicing
+    const filteredRefs = React.useMemo(() => {
+        return (allRefs || []).filter(ref => {
+            if (!activeCatId) return true;
+            const ids = Array.isArray(ref.categoryIds) ? ref.categoryIds : [];
+            const selectedCat = categories.find(c => String(c.id) === String(activeCatId));
+            if (selectedCat?.altIds) {
+                return ids.some(id => selectedCat.altIds.has(String(id)));
+            }
+            return ids.some(id => String(id) === String(activeCatId));
+        });
+    }, [allRefs, activeCatId, categories]);
 
-    const visibleRefs = filteredRefs.slice(0, displayCount);
+    const visibleRefs = React.useMemo(() => {
+        return filteredRefs.slice(0, displayCount);
+    }, [filteredRefs, displayCount]);
 
     const handleLoadMore = () => {
         setDisplayCount(prev => prev + 12);
@@ -303,7 +308,7 @@ const References = () => {
                     >
                         {isLoading && filteredRefs.length === 0 ? (
                             // Stable Skeleton Grid - Updated for overlay style
-                            [...Array(4)].map((_, i) => (
+                            [...Array(6)].map((_, i) => (
                                 <div key={`skeleton-${i}`} className="aspect-square rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
                             ))
                         ) : (
@@ -315,7 +320,8 @@ const References = () => {
                                     staggerIndex={index}
                                     forceSquare={false} // Use the new aspect-ratio responsive logic
                                     compactMobileOverlay={true}
-                                    loading={index < 2 ? 'eager' : 'lazy'}
+                                    loading={index < 1 ? 'eager' : 'lazy'}
+                                    sizes="(max-width: 768px) 95vw, (max-width: 1200px) 45vw, 30vw"
                                     page="References"
                                     section="ReferencesGridSection"
                                 />

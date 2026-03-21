@@ -51,14 +51,14 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
                     ref={heroRef}
                     alt=""
                     className={`w-full h-[120%] object-cover ${objectPosition === 'object-top' ? 'object-[60%_center] md:object-top' : objectPosition} md:filter md:brightness-[0.80] md:contrast-[1.05]`}
-                    sizes="100vw"
+                    sizes="(max-width: 768px) 100vw, 100vw"
                     loading="eager"
                     fetchPriority="high"
                     onLoad={() => setIsImageReady(true)}
                     onError={() => setIsImageReady(true)}
                 />
 
-                <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent transition-opacity duration-500 ${isImageReady ? 'opacity-100' : 'opacity-0'}`} />
+                <div className={`absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent transition-opacity duration-500 ${isImageReady ? 'opacity-100' : 'opacity-0'}`} />
             </div>
             <div className={`relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-center md:items-center h-full pt-12 md:pt-0 transition-[opacity,transform] duration-700 opacity-100 translate-y-0`}>
                 <div className="w-full md:max-w-2xl space-y-4 md:space-y-7 text-left flex flex-col items-start">

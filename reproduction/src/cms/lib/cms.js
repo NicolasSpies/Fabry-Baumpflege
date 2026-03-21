@@ -631,6 +631,22 @@ export async function getReferencesByCategory(categoryId, language = 'DE') {
     return [];
 }
 
+/** Fetch a single reference by slug or numeric ID with MINIMAL fields (Hero/Title/Meta only). */
+export async function getReferenceCore(idOrSlug, language = 'DE', signal = null) {
+    const fields = 'id,slug,title,link,featured_image,customFields,taxonomies,date,cc_alternates,pll_translations';
+    const query = `?fields=${fields}&per_page=1`;
+    
+    if (typeof idOrSlug === 'number' || /^\d+$/.test(String(idOrSlug))) {
+        const result = await fetchReferencesFromCMS(`/${idOrSlug}${query}`, language, signal, true);
+        if (result && !Array.isArray(result)) return result;
+    }
+    
+    const slugQuery = `?slug=${encodeURIComponent(idOrSlug)}&fields=${fields}`;
+    const result = await fetchReferencesFromCMS(slugQuery, language, signal);
+    if (Array.isArray(result) && result.length > 0) return result[0];
+    return null;
+}
+
 /** Fetch a single reference by slug. */
 export async function getReferenceBySlug(slug, language = 'DE', signal = null) {
     const result = await fetchReferencesFromCMS(`?slug=${encodeURIComponent(slug)}&_embed=1`, language, signal);
@@ -688,20 +704,28 @@ export async function prefetchReferenceDetail(idOrSlug, language = 'DE') {
  */
 export async function resolveMedia(idOrUrl) {
     if (!idOrUrl) return null;
+    
+    // If it's already a normalized object, return it
     const normalized = normalizeCmsImage(idOrUrl);
-    if (normalized?.src && typeof idOrUrl === 'object') {
+    if (normalized?.srcSet && typeof idOrUrl === 'object') {
         return normalized;
     }
-    if (typeof idOrUrl === 'string' && (idOrUrl.startsWith('http') || idOrUrl.startsWith('data:') || idOrUrl.startsWith('/') || idOrUrl.startsWith('./') || idOrUrl.startsWith('../'))) {
-        return idOrUrl;
+
+    // If it's a raw URL string, we can't easily get the srcset without an extra fetch,
+    // so we return the normalized object (which might have limited srcset if it's just a string).
+    if (typeof idOrUrl === 'string') {
+        return normalized;
     }
+
     try {
         // Use the same proxy path — strips /wp/v2 to hit /wp-json/wp/v2/media
         const base = CMS_API_BASE.replace(/\/wp\/v2$/, '');
         const res = await fetch(`${base}/wp/v2/media/${idOrUrl}`);
         if (!res.ok) return null;
         const media = await res.json();
-        return media?.source_url || null;
+        
+        // Return normalized object to preserve srcset
+        return normalizeCmsImage(media);
     } catch (error) {
         console.error(`[CMS] Failed to resolve media ID ${idOrUrl}:`, error);
         return null;
