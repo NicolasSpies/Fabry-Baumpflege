@@ -19,6 +19,8 @@ export default {
                 "background-dark": "#121212",
                 "surface-light": "#F8FAF5",
                 "surface-dark": "#1E1E1E",
+                "accent-label": "var(--accent-label)",
+                "muted-accessible": "var(--muted-accessible)",
             },
             fontFamily: {
                 display: ["Playfair Display", "serif"],

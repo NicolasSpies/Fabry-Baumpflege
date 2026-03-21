@@ -44,7 +44,7 @@ const expertiseImgRef = useRef(null);
                     </div>
                     <div className="w-full lg:w-1/2 space-y-10">
                         <div className="space-y-4">
-                            <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs block">{label}</span>
+                            <span className="text-accent-label font-bold tracking-widest uppercase text-xs block">{label}</span>
                             <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight reveal">{title}</h2>
                         </div>
                         <CmsText

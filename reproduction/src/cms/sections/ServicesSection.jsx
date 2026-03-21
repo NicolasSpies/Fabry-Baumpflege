@@ -179,7 +179,7 @@ const ServicesSection = ({
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-16 md:mb-24 space-y-4 soft-entrance-item">
-                    <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">{renderCmsInline(label)}</span>
+                    <span className="text-accent-label font-bold tracking-widest uppercase text-xs">{renderCmsInline(label)}</span>
                     <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight">{renderCmsInline(title)}</h2>
                 </div>
                 <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-6">

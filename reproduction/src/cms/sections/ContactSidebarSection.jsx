@@ -13,9 +13,9 @@ return (
             <div className="bg-white dark:bg-surface-dark p-8 md:p-9 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-8">
                 <section>
                     {contact_person && (
-                        <h3 className="text-2xl md:text-[1.65rem] font-serif text-primary mb-6 leading-tight break-words">
+                        <h1 className="text-2xl md:text-[1.65rem] font-serif text-primary mb-6 leading-tight break-words">
                             {contact_person}
-                        </h3>
+                        </h1>
                     )}
                     <ul className="space-y-7">
                         {safePhone && (
@@ -44,7 +44,7 @@ return (
                 </section>
                 {hasAreaBox && (
                     <section className="bg-primary/5 dark:bg-primary/10 p-6 rounded-xl border border-primary/10">
-                        {area_label && <h3 className="text-[10px] uppercase tracking-[0.3em] text-[#9bb221] font-bold mb-3">{area_label}</h3>}
+                        {area_label && <h2 className="text-[10px] uppercase tracking-[0.3em] text-accent-label font-bold mb-3">{area_label}</h2>}
                         {area_text && (
                             <CmsText
                                 text={area_text}

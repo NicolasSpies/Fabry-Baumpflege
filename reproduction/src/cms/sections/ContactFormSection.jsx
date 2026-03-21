@@ -9,13 +9,13 @@ import Icon from '@/cms/components/ui/Icon';
 
 
 const IconRenderer = ({ icon, isSelected }) => {
-    const className = `w-8 h-8 md:w-12 md:h-12 flex items-center justify-center text-3xl md:text-5xl font-light ${isSelected ? 'text-primary' : 'text-slate-400'}`;
+    const className = `w-8 h-8 md:w-12 md:h-12 flex items-center justify-center text-3xl md:text-5xl font-light ${isSelected ? 'text-primary' : 'text-muted-accessible'}`;
     switch (icon) {
         case 'BaumpflegeIcon': return <BaumpflegeIcon variant="outline" className={className} />;
-        case 'BaumfaellungIcon': return <BaumfaellungIcon variant="outline" className={`w-8 h-8 md:w-12 md:h-12 ${isSelected ? 'text-primary' : 'text-slate-400'}`} />;
+        case 'BaumfaellungIcon': return <BaumfaellungIcon variant="outline" className={`w-8 h-8 md:w-12 md:h-12 ${isSelected ? 'text-primary' : 'text-muted-accessible'}`} />;
         case 'GartenpflegeIcon': return <GartenpflegeIcon variant="outline" className={className} />;
         case 'BepflanzungIcon': return <BepflanzungIcon variant="outline" className={className} />;
-        default: return <Icon name="info" className={`text-3xl md:text-5xl font-light ${isSelected ? 'text-primary' : 'text-slate-400'}`} />;
+        default: return <Icon name="info" className={`text-3xl md:text-5xl font-light ${isSelected ? 'text-primary' : 'text-muted-accessible'}`} />;
     }
 };
 
@@ -314,7 +314,7 @@ const ContactFormSection = ({
                 return (
                     <fieldset key={name} className="space-y-6 col-span-full">
                         {label && (
-                            <legend className={`text-[10px] uppercase tracking-[0.2em] font-bold block ${hasError ? 'text-red-500' : 'text-slate-500'}`}>
+                            <legend className={`text-[10px] uppercase tracking-[0.2em] font-bold block ${hasError ? 'text-red-500' : 'text-muted-accessible'}`}>
                                 {label} {required && '*'}
                             </legend>
                         )}
@@ -337,7 +337,7 @@ const ContactFormSection = ({
                                         <p className={`text-[10px] md:text-[13px] font-bold uppercase tracking-widest mb-1 ${selectedServices.includes(opt.value) ? 'text-primary' : 'text-slate-700'}`}>
                                             {opt.label}
                                         </p>
-                                        {opt.sub && <p className="text-[9px] md:text-[11px] text-slate-400 uppercase tracking-widest leading-tight">{opt.sub}</p>}
+                                        {opt.sub && <p className="text-[9px] md:text-[11px] text-muted-accessible uppercase tracking-widest leading-tight">{opt.sub}</p>}
                                     </div>
                                 </button>
                             ))}

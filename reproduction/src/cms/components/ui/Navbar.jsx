@@ -108,7 +108,7 @@ const Navbar = ({
                     onClick={isMobile ? closeMenu : undefined}
                     className={({ isActive }) =>
                         isMobile 
-                            ? `text-lg font-serif uppercase tracking-widest transition-colors ${isActive ? 'text-primary' : 'text-slate-500 hover:text-primary'}`
+                            ? `text-lg font-serif uppercase tracking-widest transition-colors ${isActive ? 'text-primary' : 'text-muted-accessible hover:text-primary'}`
                             : `hover:text-primary transition-colors whitespace-nowrap ${isActive ? 'text-primary border-b-2 border-primary pb-1' : ''}`
                     }
                 >
@@ -156,7 +156,7 @@ const Navbar = ({
                                 onClick={() => setLanguage('DE')}
                                 aria-label={deLanguageLabel}
                                 aria-pressed={language === 'DE'}
-                                className={`transition-[opacity,color] duration-300 ${language === 'DE' ? 'opacity-100 text-primary' : 'opacity-40 hover:opacity-70 text-slate-600 dark:text-slate-400'}`}
+                                className={`transition-[opacity,color] duration-300 ${language === 'DE' ? 'opacity-100 text-primary' : 'opacity-70 hover:opacity-100 text-muted-accessible'}`}
                             >
                                 DE
                             </button>
@@ -165,7 +165,7 @@ const Navbar = ({
                                 onClick={() => setLanguage('FR')}
                                 aria-label={frLanguageLabel}
                                 aria-pressed={language === 'FR'}
-                                className={`transition-[opacity,color] duration-300 ${language === 'FR' ? 'opacity-100 text-primary' : 'opacity-40 hover:opacity-70 text-slate-600 dark:text-slate-400'}`}
+                                className={`transition-[opacity,color] duration-300 ${language === 'FR' ? 'opacity-100 text-primary' : 'opacity-70 hover:opacity-100 text-muted-accessible'}`}
                             >
                                 FR
                             </button>
@@ -221,7 +221,7 @@ const Navbar = ({
                             onClick={() => { setLanguage('DE'); closeMenu(); }}
                             aria-label={deLanguageLabel}
                             aria-pressed={language === 'DE'}
-                            className={`transition-[opacity,color,transform] duration-300 ${language === 'DE' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
+                            className={`transition-[opacity,color,transform] duration-300 ${language === 'DE' ? 'opacity-100 text-primary scale-110' : 'opacity-70 hover:opacity-100'}`}
                         >
                             DE
                         </button>
@@ -230,7 +230,7 @@ const Navbar = ({
                             onClick={() => { setLanguage('FR'); closeMenu(); }}
                             aria-label={frLanguageLabel}
                             aria-pressed={language === 'FR'}
-                            className={`transition-[opacity,color,transform] duration-300 ${language === 'FR' ? 'opacity-100 text-primary scale-110' : 'opacity-40 hover:opacity-60'}`}
+                            className={`transition-[opacity,color,transform] duration-300 ${language === 'FR' ? 'opacity-100 text-primary scale-110' : 'opacity-70 hover:opacity-100'}`}
                         >
                             FR
                         </button>

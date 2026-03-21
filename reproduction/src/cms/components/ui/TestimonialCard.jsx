@@ -28,7 +28,11 @@ const TestimonialCard = ({ author, rating_raw, text, data, page = 'Home', sectio
             </p>
             <div className="flex items-center justify-between border-t border-slate-50 dark:border-slate-800 pt-6 mt-auto">
                 <div>
-                    <h4 className="font-serif text-primary text-lg">{renderCmsInline(props.author)}</h4>
+                    {props.author && (
+                        <h3 className="font-serif text-primary text-lg">
+                            {renderCmsInline(props.author)}
+                        </h3>
+                    )}
                 </div>
             </div>
         </div>

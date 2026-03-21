@@ -24,7 +24,7 @@ return (
                     <p className="text-primary font-signature text-[3rem] sm:text-[4.25rem] md:text-8xl select-none leading-none whitespace-normal md:whitespace-nowrap">
                         {renderCmsInline(name)}
                     </p>
-                    <p className="text-[10px] tracking-[0.3em] md:tracking-[0.4em] uppercase text-slate-400 mt-3 md:mt-6 font-bold">
+                    <p className="text-[10px] tracking-[0.3em] md:tracking-[0.4em] uppercase text-muted-accessible mt-3 md:mt-6 font-bold">
                         {renderCmsInline(label)}
                     </p>
                 </div>

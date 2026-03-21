@@ -93,6 +93,16 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --accent-label: #5A6814;
+    --muted-accessible: #475569; /* slate-600 — 6.1:1 on white */
+  }
+
+  .dark {
+    --accent-label: #9BB221;
+    --muted-accessible: #94A3B8; /* slate-400 — 4.6:1 on background-dark */
+  }
+
   body {
     @apply bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300;
   }

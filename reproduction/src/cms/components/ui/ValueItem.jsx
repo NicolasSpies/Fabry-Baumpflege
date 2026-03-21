@@ -28,12 +28,12 @@ import { resolveInstanceProps } from '@/cms/bridge-resolver';
                     />
                 </div>
                 <div className="min-w-0 space-y-1.5">
-                    <h3 className="text-[1.1rem] font-serif text-primary">
+                    <h2 className="text-[1.1rem] font-serif text-primary">
                         {renderCmsInline(props.title)}
-                    </h3>
+                    </h2>
                     <CmsText
                         text={props.text}
-                        className="text-[0.95rem] text-slate-500 dark:text-slate-400"
+                        className="text-[0.95rem] text-muted-accessible"
                         paragraphClassName="leading-[1.6]"
                     />
                 </div>
@@ -49,12 +49,12 @@ import { resolveInstanceProps } from '@/cms/bridge-resolver';
                     />
                 </div>
                 <div className="space-y-2">
-                    <h3 className="text-xl font-serif text-primary">
+                    <h2 className="text-xl font-serif text-primary">
                         {renderCmsInline(props.title)}
-                    </h3>
+                    </h2>
                     <CmsText
                         text={props.text}
-                        className="text-sm text-slate-500 dark:text-slate-400"
+                        className="text-sm text-muted-accessible"
                         paragraphClassName="leading-[1.65]"
                     />
                 </div>

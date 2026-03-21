@@ -25,7 +25,7 @@ const ReferenceSidebarSection = ({
                 {dateValue && (
                     <>
                         <div>
-                            <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 block mb-1">{dateLabel}</span>
+                            <span className="text-[10px] uppercase tracking-[0.2em] text-muted-accessible block mb-1">{dateLabel}</span>
                             <p className="text-base font-medium">{dateValue}</p>
                         </div>
                         <div className="h-px bg-slate-200 dark:bg-slate-700" />

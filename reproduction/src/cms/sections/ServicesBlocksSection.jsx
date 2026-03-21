@@ -74,7 +74,7 @@ const ServiceBlockInternal = ({ id, title, description, list, image, reverse, to
                                 if (!text) return null;
                                 return (
                                     <li key={fIdx} className="flex items-start gap-2.5 md:gap-3">
-                                        <Icon name="check" className="text-[#9bb221] mt-[0.2rem] shrink-0" />
+                                        <Icon name="check" className="text-accent-label mt-[0.2rem] shrink-0" />
                                         <span className="text-[1rem] md:text-[1.02rem] lg:text-[1.05rem] text-slate-600 dark:text-slate-400 leading-[1.45]">{text}</span>
                                     </li>
                                 );

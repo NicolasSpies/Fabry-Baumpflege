@@ -305,9 +305,9 @@ const ReferenceDetail = () => {
     if (status === 'notfound') {
         return (
             <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
-                <h2 className="text-3xl font-display text-primary mb-4">
+                <h1 className="text-3xl font-display text-primary mb-4">
                     {t('refs.not_found')}
-                </h2>
+                </h1>
                 <Link to={ROUTES[language].references} className="text-primary hover:underline font-medium uppercase tracking-widest text-sm">
                     {t('refs.back_to_overview')}
                 </Link>
@@ -318,9 +318,9 @@ const ReferenceDetail = () => {
     if (status === 'error') {
         return (
             <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
-                <h2 className="text-3xl font-display text-red-500 mb-4">
+                <h1 className="text-3xl font-display text-red-500 mb-4">
                     {t('refs.error_occurred')}
-                </h2>
+                </h1>
                 <button onClick={() => window.location.reload()} className="text-primary hover:underline font-medium uppercase tracking-widest text-sm">
                     {t('refs.try_again')}
                 </button>
@@ -338,7 +338,7 @@ const ReferenceDetail = () => {
             <section className="max-w-7xl mx-auto px-6 pt-12 pb-8 mt-20">
                 <Link
                     to={ROUTES[language].references}
-                    className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-slate-400 hover:text-primary transition-colors"
+                    className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-muted-accessible hover:text-primary transition-colors"
                 >
                     <Icon name="arrow_back" className="text-sm" />
                     {t('refs.back_to_overview')}
@@ -380,7 +380,7 @@ const ReferenceDetail = () => {
                 >
                     <button 
                         onClick={closeLightbox}
-                        className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors z-50"
+                        className="absolute top-8 right-8 text-white/70 hover:text-white transition-colors z-50"
                     >
                         <Icon name="close" className="text-4xl" />
                     </button>
@@ -410,7 +410,7 @@ const ReferenceDetail = () => {
                             sizes="100vw"
                             onClick={(e) => e.stopPropagation()}
                         />
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 text-xs tracking-widest uppercase font-medium">
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 text-xs tracking-widest uppercase font-medium">
                             {activeImageIndex + 1} / {projectGallery.length}
                         </div>
                     </div>

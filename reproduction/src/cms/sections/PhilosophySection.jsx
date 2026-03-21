@@ -33,12 +33,12 @@ const PhilosophySection = ({
                     <div className="absolute -top-10 -left-10 hidden md:block w-40 h-40 bg-primary/10 rounded-full blur-3xl -z-10" />
                 </div>
                 <div className="text-left order-1 lg:order-2 soft-entrance-item">
-                    <span className="text-[#9bb221] font-bold tracking-widest uppercase text-[11px] md:text-xs mb-3 md:mb-8 block">
+                    <span className="text-accent-label font-bold tracking-widest uppercase text-[11px] md:text-xs mb-3 md:mb-8 block">
                         {renderCmsInline(label)}
                     </span>
-                    <div className="text-[2.1rem] sm:text-5xl lg:text-6xl font-serif text-primary mb-5 md:mb-12 leading-[1.02] italic">
+                    <h1 className="text-[2.1rem] sm:text-5xl lg:text-6xl font-serif text-primary mb-5 md:mb-12 leading-[1.02] italic">
                         <CmsText text={quote} className="space-y-2" paragraphClassName="leading-[1.02]" />
-                    </div>
+                    </h1>
                     <CmsText
                         text={text}
                         className="max-w-[34rem] space-y-4 text-slate-600 dark:text-slate-400 font-light"

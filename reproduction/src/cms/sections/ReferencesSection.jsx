@@ -22,10 +22,10 @@ const ReferencesSection = ({
     return (
         <section className="py-24 px-6 bg-primary/[0.035] dark:bg-surface-dark/50" id="references-preview">
             <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-20 space-y-4">
-                    <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">{renderCmsInline(label)}</span>
-                    <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">{renderCmsInline(title)}</h2>
-                </div>
+                    <div className="text-center space-y-4 mb-12 md:mb-16">
+                        <span className="text-accent-label font-bold tracking-widest uppercase text-xs block">{label}</span>
+                        <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">{title}</h2>
+                    </div>
                 <div className={`md:hidden -mx-6 px-6 overflow-x-auto scrollbar-hide ${isLoading ? 'min-h-[24rem]' : ''}`}>
                     <div className="flex gap-4 w-max snap-x snap-mandatory pb-2">
                         {!isLoading && items.map((project, idx) => (

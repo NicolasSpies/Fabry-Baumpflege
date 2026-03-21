@@ -236,6 +236,9 @@ const References = () => {
             {/* Page: References → Section: ReferencesHeaderSection */}
             <section className="pt-6 md:pt-8 pb-6 md:pb-8 px-4 md:px-6 text-center">
                 <div className="max-w-7xl mx-auto space-y-6">
+                    <h1 className="text-4xl md:text-5xl font-serif text-primary mb-4">
+                        {t('nav.references')}
+                    </h1>
                     <CmsText
                         text={headerProps.intro}
                         className="max-w-2xl mx-auto text-base opacity-90"
@@ -250,7 +253,7 @@ const References = () => {
                     <div className="flex flex-wrap items-center justify-center gap-2 md:gap-8 px-4 md:px-6">
                         <button
                             onClick={() => setActiveCatId(null)}
-                            className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-full text-[0.65rem] md:text-sm font-medium uppercase tracking-[0.16em] md:tracking-widest transition-[background-color,color,box-shadow] ${activeCatId === null ? 'bg-[#2a411a] text-white shadow-lg' : 'text-slate-500 hover:text-primary'}`}
+                            className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-full text-[0.65rem] md:text-sm font-medium uppercase tracking-[0.16em] md:tracking-widest transition-[background-color,color,box-shadow] ${activeCatId === null ? 'bg-[#2a411a] text-white shadow-lg' : 'text-muted-accessible hover:text-primary'}`}
                         >
                             {headerProps.all}
                         </button>
@@ -258,7 +261,7 @@ const References = () => {
                             <button
                                 key={cat.id}
                                 onClick={() => setActiveCatId(cat.id)}
-                                className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-full text-[0.65rem] md:text-sm font-medium uppercase tracking-[0.16em] md:tracking-widest transition-[background-color,color,box-shadow] ${activeCatId !== null && String(activeCatId) === String(cat.id) ? 'bg-[#2a411a] text-white shadow-lg' : 'text-slate-500 hover:text-primary'}`}
+                                className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-full text-[0.65rem] md:text-sm font-medium uppercase tracking-[0.16em] md:tracking-widest transition-[background-color,color,box-shadow] ${activeCatId !== null && String(activeCatId) === String(cat.id) ? 'bg-[#2a411a] text-white shadow-lg' : 'text-muted-accessible hover:text-primary'}`}
                             >
                                 {cat.name}
                             </button>

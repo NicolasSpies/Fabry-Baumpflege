@@ -127,7 +127,7 @@ const TestimonialsSection = ({
         <section ref={sectionRef} className="py-20 md:py-24 bg-background-light dark:bg-background-dark overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 md:px-6 mb-12 md:mb-16">
                 <div className="text-center space-y-4">
-                    <span className="text-[#9bb221] font-bold tracking-widest uppercase text-xs">{renderCmsInline(label)}</span>
+                    <span className="text-accent-label font-bold tracking-widest uppercase text-xs">{renderCmsInline(label)}</span>
                     <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">{renderCmsInline(title)}</h2>
                 </div>
             </div>

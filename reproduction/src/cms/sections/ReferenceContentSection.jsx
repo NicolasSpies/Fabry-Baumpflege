@@ -25,7 +25,7 @@ const ReferenceContentSection = ({
                 {description && (
                     <CmsText
                         text={description}
-                        className="text-slate-600 dark:text-slate-400 mb-6"
+                        className="text-muted-accessible mb-6"
                         paragraphClassName="leading-relaxed"
                     />
                 )}
