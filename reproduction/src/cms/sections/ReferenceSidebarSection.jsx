@@ -12,9 +12,33 @@ const ReferenceSidebarSection = ({
     locationValue,
     ctaLabel = '',
     ctaLink = '/kontakt',
-    ctaState = undefined
+    ctaState = undefined,
+    language = 'DE'
 }) => {
     const isExternalCta = isExternalHref(ctaLink);
+
+    // Smart date formatting: if it's an ISO string or German format, format it as "Month Year"
+    const displayDate = React.useMemo(() => {
+        if (!dateValue || typeof dateValue !== 'string') return dateValue;
+        
+        let dateObj;
+        // Handle German/Standard dots: DD.MM.YYYY
+        if (/^\d{2}\.\d{2}\.\d{4}/.test(dateValue)) {
+            const rawDatePart = dateValue.split(/[ T]/)[0]; // Drop " 14:12" or "T14:12:00"
+            const [d, m, y] = rawDatePart.split('.');
+            dateObj = new Date(y, m - 1, d);
+        } else {
+            dateObj = new Date(dateValue);
+        }
+
+        if (!dateObj || isNaN(dateObj.getTime())) return dateValue;
+        
+        // Format as "Month Year" (e.g. März 2026)
+        return dateObj.toLocaleDateString(language === 'FR' ? 'fr-FR' : 'de-DE', { 
+            month: 'long', 
+            year: 'numeric' 
+        });
+    }, [dateValue, language]);
 
     return (
         <div className="bg-surface-light dark:bg-surface-dark p-6 md:p-8 lg:p-10 rounded-3xl space-y-5 md:space-y-6">
@@ -25,8 +49,8 @@ const ReferenceSidebarSection = ({
                 {dateValue && (
                     <>
                         <div>
-                            <span className="text-[10px] uppercase tracking-[0.2em] text-muted-accessible block mb-1">{dateLabel}</span>
-                            <p className="text-base font-medium">{dateValue}</p>
+                            <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 block mb-1">{dateLabel}</span>
+                            <p className="text-base font-medium">{displayDate}</p>
                         </div>
                         <div className="h-px bg-slate-200 dark:bg-slate-700" />
                     </>

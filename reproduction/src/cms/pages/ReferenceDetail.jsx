@@ -53,50 +53,35 @@ const ReferenceDetail = () => {
     const [hydratedProps, setHydratedProps] = useState(null);
     const [activeImageIndex, setActiveImageIndex] = useState(null);
 
-    const detectServiceKey = (value) => {
-        const token = String(value || '')
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z]+/g, ' ');
-        const compactToken = token.replace(/\s+/g, '');
-
-        if (token.includes('baum fall') || compactToken.includes('baumfall') || compactToken.includes('baumfaellung') || token.includes('abattage')) return 'baumfaellung';
-        if (token.includes('baum pflege') || compactToken.includes('baumpflege') || token.includes('taille raisonnee') || compactToken.includes('tailleraisonnee')) return 'baumpflege';
-        if (token.includes('garten pflege') || compactToken.includes('gartenpflege') || token.includes('entretien de jardin') || compactToken.includes('entretiendejardin')) return 'gartenpflege';
-        if (token.includes('bepflanz') || compactToken.includes('bepflanz') || token.includes('plantation') || compactToken.includes('plantation')) return 'bepflanzung';
-
-        return null;
-    };
-
     // ─── Data Resolution ─────────────────────────────────────────────────────
     const getLocalContent = () => ({
         hero: {
-            title: slug ? slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : '',
-            categoryLabel: t('refs.reference_project'),
+            title: '',
+            categoryLabel: '',
             image: ''
         },
         sidebar: {
-            title: t('refs.project_details'),
-            dateLabel: t('refs.date'),
+            title: t('detail.project_details') || 'Projekt Details',
+            dateLabel: t('detail.date'),
             dateValue: '',
-            serviceLabel: t('refs.service'),
+            serviceLabel: t('detail.service'),
             categories: [],
-            locationLabel: t('refs.location'),
+            locationLabel: t('detail.location'),
             locationValue: '',
-            ctaLabel: t('refs.request_similar'),
+            ctaLabel: t('detail.request_similar'),
         },
         content: {
-            challengeTitle: t('refs.challenge'),
+            challengeTitle: t('detail.challenge'),
             description: '',
             beforeImage: '',
             afterImage: '',
-            beforeLabel: t('refs.before'),
-            afterLabel: t('refs.after'),
+            beforeLabel: t('detail.before'),
+            afterLabel: t('detail.after'),
             gallery: [],
             galleryTitle: t('refs.gallery'),
         }
     });
+
 
     // ─── Mappings ───────────────────────────────────────────────────────────
     
@@ -117,11 +102,11 @@ const ReferenceDetail = () => {
     const sidebarProps = getSectionProps('ReferenceSidebarSection', project?.sidebar || getLocalContent().sidebar);
     const preselectedServiceKeys = [...new Set(
         (sidebarProps.categories || [])
-            .map((category) => detectServiceKey(category))
+            .map((category) => String(category).trim().toLowerCase())
             .filter(Boolean)
     )];
     const ctaLink = preselectedServiceKeys.length
-        ? `${ROUTES[language].contact}?services=${preselectedServiceKeys.join(',')}`
+        ? `${ROUTES[language].contact}?services=${encodeURIComponent(preselectedServiceKeys.join(','))}`
         : ROUTES[language].contact;
     const ctaState = preselectedServiceKeys.length
         ? { preselectedServices: preselectedServiceKeys }
@@ -205,23 +190,38 @@ const ReferenceDetail = () => {
                 }
 
                 // ─── Format Localized Date ───────────────────────────────────────────
-                let formattedDate = '';
+                // Pass the raw date string to the sidebar for formatting
                 const rawDateStr = cf.referenz_datum || ref.acf?.referenz_datum || ref.date || ref.post_date || '';
-                if (rawDateStr) {
-                    const dateObj = new Date(rawDateStr);
-                    if (!isNaN(dateObj.getTime())) {
-                        formattedDate = dateObj.toLocaleDateString(
-                            language === 'DE' ? 'de-DE' : 'fr-FR',
-                            { year: 'numeric', month: 'long' }
-                        );
-                    }
-                }
 
                 setRawProject(ref);
                 
                 // Register alternates for API-driven routing
-                if (ref.cc_alternates || ref.pll_translations) {
-                    setAlternates(ref.cc_alternates || ref.pll_translations);
+                const translations = ref.cc_alternates || ref.pll_translations || ref.translations || {};
+                if (Object.keys(translations).length > 0) {
+                    const resolvedAlternates = { ...translations };
+                    
+                    // If translation values are just IDs, fetch the actual translated reference to get its resolved_path
+                    await Promise.all(
+                        Object.entries(translations).map(async ([lang, value]) => {
+                            if (!value) return;
+                            if (typeof value === 'number' || /^\d+$/.test(String(value))) {
+                                try {
+                                    const targetLangCode = lang.toUpperCase();
+                                    const translatedRef = await getReference(value, targetLangCode, controller.signal);
+                                    if (translatedRef && !controller.signal.aborted) {
+                                        const path = translatedRef.resolved_path || translatedRef.link || '';
+                                        resolvedAlternates[lang] = { url: path };
+                                    }
+                                } catch (err) {
+                                    console.trace(`[ReferenceDetail] Failed to resolve translation ID ${value} for ${lang}`);
+                                }
+                            }
+                        })
+                    );
+                    
+                    if (!controller.signal.aborted) {
+                        setAlternates(resolvedAlternates);
+                    }
                 }
 
                 const local = getLocalContent();
@@ -236,7 +236,7 @@ const ReferenceDetail = () => {
                     },
                     sidebar: { 
                         ...local.sidebar, 
-                        dateValue: formattedDate, 
+                        dateValue: rawDateStr, 
                         categories: catNames, 
                         locationValue: cf.referenz_ort || ref.acf?.location || '' 
                     },
@@ -383,6 +383,7 @@ const ReferenceDetail = () => {
                             {...sidebarProps} 
                             ctaLink={ctaLink}
                             ctaState={ctaState}
+                            language={language}
                         />
                     </div>
 
@@ -394,6 +395,7 @@ const ReferenceDetail = () => {
                         {...sidebarProps} 
                         ctaLink={ctaLink}
                         ctaState={ctaState}
+                        language={language}
                     />
                 }
                 onOpenLightbox={openLightbox}

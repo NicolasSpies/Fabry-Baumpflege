@@ -496,7 +496,9 @@ export async function getReferenceCategories(language = 'DE') {
                 return terms.map(cat => ({
                     id: cat.id,
                     name: decodeHtmlEntities(cat.name || ''),
-                    slug: cat.slug || ''
+                    slug: cat.slug || '',
+                    pll_lang: cat.pll_lang || cat.language || cat.lang || null,
+                    translations: cat.translations || cat.pll_translations || null,
                 }));
             }
         } catch (error) {

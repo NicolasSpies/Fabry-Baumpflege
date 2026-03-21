@@ -16,7 +16,7 @@ const TestimonialCard = ({ author, rating_raw, text, data, page = 'Home', sectio
     return (
         <div
             data-testimonial-card
-            className="flex-shrink-0 self-stretch w-[78vw] sm:w-[30rem] md:w-[28rem] bg-white dark:bg-surface-dark px-6 py-7 md:px-9 md:py-9 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm md:shadow-md transition-shadow pointer-events-none flex flex-col"
+            className="flex-shrink-0 self-stretch w-[78vw] sm:w-[30rem] md:w-[28rem] bg-white dark:bg-surface-dark px-6 py-7 md:px-9 md:py-9 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm md:shadow-md transition-shadow flex flex-col"
         >
             <div className="flex items-center gap-1 text-amber-400 mb-3 md:mb-4">
                 {[...Array(rating)].map((_, i) => (

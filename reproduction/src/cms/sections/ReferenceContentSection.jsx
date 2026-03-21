@@ -33,7 +33,7 @@ const ReferenceContentSection = ({
 
             {hasBeforeAfter && (
                 <div className="mt-16">
-                    <div className="relative w-full aspect-[16/10] overflow-hidden rounded-3xl no-select group shadow-2xl bg-slate-100">
+                    <div className="relative w-full aspect-square md:aspect-[16/10] overflow-hidden rounded-3xl no-select group shadow-2xl bg-slate-100">
                         {afterImage && <CmsImage image={afterImage} alt={afterLabel} className="absolute inset-0 w-full h-full object-cover" sizes="(max-width: 1280px) 100vw, 1200px" />}
                         <span className="absolute top-6 right-6 font-sans text-[10px] text-white/90 uppercase tracking-[0.2em] z-10 bg-black/20 backdrop-blur-sm px-3 py-1 rounded">{afterLabel}</span>
 
@@ -47,13 +47,24 @@ const ReferenceContentSection = ({
                             </div>
                         )}
 
-                        <div className="absolute inset-y-0 -ml-[1px] w-[2px] bg-white cursor-ew-resize z-20" style={{ left: `${sliderValue}%` }}>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-white rounded-full flex items-center justify-center slider-handle-shadow border-4 border-white transition-transform group-hover:scale-105">
-                                <Icon name="swap_horiz" className="text-primary text-3xl font-bold select-none" />
+                        <div className="absolute inset-y-0 -ml-[1px] w-[2px] bg-white shadow-sm cursor-ew-resize z-20 pointer-events-none" style={{ left: `${sliderValue}%` }}>
+                            {/* Glassmorphic, elegant custom split arrows */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/95 backdrop-blur-md rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.15)] border border-white flex items-center justify-center transition-transform group-hover:scale-105">
+                                <Icon name="arrow_back_ios_new" className="text-primary/70 text-[10px] md:text-sm -mr-0.5 md:-mr-1 font-light" />
+                                <Icon name="arrow_forward_ios" className="text-primary/70 text-[10px] md:text-sm font-light" />
                             </div>
                         </div>
 
-                        <input type="range" min="0" max="100" value={sliderValue} onChange={(e) => setSliderValue(Number(e.target.value))} aria-label="Vorher-Nachher-Vergleich" className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-30" />
+                        {/* touch-pan-y ensures vertical scrolling works over the image, while horizontal intercepts the slide */}
+                        <input 
+                            type="range" 
+                            min="0" 
+                            max="100" 
+                            value={sliderValue} 
+                            onChange={(e) => setSliderValue(Number(e.target.value))} 
+                            aria-label="Vorher-Nachher-Vergleich" 
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-30 touch-pan-y appearance-none" 
+                        />
                     </div>
                 </div>
             )}

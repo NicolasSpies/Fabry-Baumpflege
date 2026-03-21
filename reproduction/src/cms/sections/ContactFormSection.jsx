@@ -6,6 +6,7 @@ import GartenpflegeIcon from '@/cms/components/icons/GartenpflegeIcon';
 import BepflanzungIcon from '@/cms/components/icons/BepflanzungIcon';
 import { submitForm } from '@/cms/lib/cms';
 import Icon from '@/cms/components/ui/Icon';
+import { useLanguage } from '@/cms/i18n/useLanguage';
 
 
 const IconRenderer = ({ icon, isSelected }) => {
@@ -21,29 +22,14 @@ const IconRenderer = ({ icon, isSelected }) => {
 
 const getServiceIcon = (field) => {
     const token = `${field?.name || ''} ${field?.label || ''}`.toLowerCase();
+    const noAccents = token.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-    if (token.includes('baumfaellung') || token.includes('baumfällung')) return 'BaumfaellungIcon';
-    if (token.includes('baumpflege')) return 'BaumpflegeIcon';
-    if (token.includes('gartenpflege')) return 'GartenpflegeIcon';
-    if (token.includes('bepflanzung')) return 'BepflanzungIcon';
+    if (noAccents.includes('baumfaellung') || noAccents.includes('baumfallung') || noAccents.includes('abattage')) return 'BaumfaellungIcon';
+    if (noAccents.includes('baumpflege') || noAccents.includes('entretien des arbres') || noAccents.includes('taille')) return 'BaumpflegeIcon';
+    if (noAccents.includes('gartenpflege') || noAccents.includes('entretien de jardin')) return 'GartenpflegeIcon';
+    if (noAccents.includes('bepflanzung') || noAccents.includes('plantation')) return 'BepflanzungIcon';
 
     return field?.icon || 'info';
-};
-
-const detectServiceKey = (value) => {
-    const token = String(value || '')
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z]+/g, ' ');
-    const compactToken = token.replace(/\s+/g, '');
-
-    if (token.includes('baum fall') || compactToken.includes('baumfall') || compactToken.includes('baumfaellung') || token.includes('abattage')) return 'baumfaellung';
-    if (token.includes('baum pflege') || compactToken.includes('baumpflege') || token.includes('taille raisonnee') || compactToken.includes('tailleraisonnee')) return 'baumpflege';
-    if (token.includes('garten pflege') || compactToken.includes('gartenpflege') || token.includes('entretien de jardin') || compactToken.includes('entretiendejardin')) return 'gartenpflege';
-    if (token.includes('bepflanz') || compactToken.includes('bepflanz') || token.includes('plantation') || compactToken.includes('plantation')) return 'bepflanzung';
-
-    return null;
 };
 
 const ContactFormSection = ({ 
@@ -52,17 +38,9 @@ const ContactFormSection = ({
     button: _defaultButtonLabel,
     language = 'DE'
 }) => {
+    const { t } = useLanguage();
     const location = useLocation();
-    const isFrench = language === 'FR';
-    const messages = {
-        heading: isFrench ? 'Comment puis-je vous aider ?' : 'Womit kann ich helfen?',
-        submit: isFrench ? 'Envoyer la demande' : 'Anfrage senden',
-        turnstileMissing: isFrench ? 'Validation Turnstile manquante.' : 'Turnstile-Prüfung fehlt.',
-        successTitle: isFrench ? 'Demande envoyée.' : 'Anfrage versendet.',
-        successBody: isFrench ? 'Merci. Je reviens vers vous rapidement.' : 'Danke. Ich melde mich schnellstmöglich zurück.',
-        error: isFrench ? "Le formulaire n'a pas pu être envoyé." : 'Formular konnte nicht gesendet werden.',
-        sending: isFrench ? 'ENVOI EN COURS' : 'WIRD GESENDET',
-    };
+    
     const [formData, setFormData] = useState({});
     const [selectedServices, setSelectedServices] = useState([]);
     const [errors, setErrors] = useState({});
@@ -83,7 +61,7 @@ const ContactFormSection = ({
     const preselectedServiceKeys = useMemo(() => {
         const searchParams = new URLSearchParams(location.search);
         const raw = searchParams.get('services') || '';
-        const fromQuery = raw
+        const fromQuery = decodeURIComponent(raw)
             .split(',')
             .map((item) => item.trim().toLowerCase())
             .filter(Boolean);
@@ -93,8 +71,8 @@ const ContactFormSection = ({
 
         return [...new Set([...fromQuery, ...fromState])];
     }, [location.search, location.state]);
-    const finalHeading = heading || messages.heading;
-    const finalButtonLabel = messages.submit;
+    const finalHeading = heading || t('contact.help_heading');
+    const finalButtonLabel = t('contact.send');
     const checkboxFields = fields.filter(f => f.type === 'checkbox');
     const nonCheckboxFields = fields.filter(f => f.type !== 'checkbox');
     const settings = normalizedSchema.settings || {};
@@ -147,17 +125,20 @@ const ContactFormSection = ({
 
         fields.forEach((field) => {
             if (field.type === 'checkbox') {
-                const fieldKey = detectServiceKey(`${field.name} ${field.label}`);
-                if (fieldKey && preselectedServiceKeys.includes(fieldKey)) {
+                const fieldLabelClean = String(field.label || '').trim().toLowerCase();
+                const fieldNameClean = String(field.name || '').trim().toLowerCase();
+                if (preselectedServiceKeys.includes(fieldLabelClean) || preselectedServiceKeys.includes(fieldNameClean)) {
                     nextFormData[field.name] = true;
+                    nextSelectedServices.push(field.name);
                 }
             }
 
             if (field.type === 'checkbox_group' && Array.isArray(field.options)) {
                 const matchedValues = field.options
                     .filter((option) => {
-                        const optionKey = detectServiceKey(`${option.value} ${option.label}`);
-                        return optionKey && preselectedServiceKeys.includes(optionKey);
+                        const optLabelClean = String(option.label || '').trim().toLowerCase();
+                        const optValClean = String(option.value || '').trim().toLowerCase();
+                        return preselectedServiceKeys.includes(optLabelClean) || preselectedServiceKeys.includes(optValClean);
                     })
                     .map((option) => option.value);
 
@@ -224,7 +205,7 @@ const ContactFormSection = ({
         if (!validateForm()) return;
         if (settings.enable_turnstile && !turnstileToken) {
             setSubmitState('error');
-            setSubmitMessage(messages.turnstileMissing);
+            setSubmitMessage(t('contact.turnstile_missing'));
             return;
         }
 
@@ -254,7 +235,7 @@ const ContactFormSection = ({
             }
 
             setSubmitState('success');
-            setSubmitMessage(messages.successBody);
+            setSubmitMessage(t('contact.success_body'));
             setFormData({});
             setSelectedServices([]);
             setErrors({});
@@ -267,7 +248,7 @@ const ContactFormSection = ({
             }
         } catch (error) {
             setSubmitState('error');
-            setSubmitMessage(error?.message || messages.error);
+            setSubmitMessage(error?.message || t('contact.error_submit'));
         }
     };
 
@@ -391,11 +372,11 @@ const ContactFormSection = ({
 
     return (
         <div className="lg:col-span-8 reveal stagger-1">
-            <div className="bg-white dark:bg-surface-dark p-8 md:p-9 border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl">
+            <div className="bg-white dark:bg-surface-dark p-6 md:p-9 border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl">
                 <form ref={formRef} className="space-y-6 md:space-y-8" onSubmit={handleSubmit}>
                     <fieldset disabled={isSubmitting} className="space-y-6 md:space-y-8 disabled:opacity-70">
-                        <div className="space-y-6">
-                            <h2 className="text-2xl font-serif italic text-primary">{finalHeading}</h2>
+                        <div className="space-y-5 md:space-y-6">
+                            <h2 className="text-xl md:text-2xl font-serif italic text-primary">{finalHeading}</h2>
                             {checkboxFields.length > 0 && (
                                 <div className="grid grid-cols-2 gap-4">
                                     {checkboxFields.map(renderField)}
@@ -430,7 +411,7 @@ const ContactFormSection = ({
                                 {turnstileSiteKey ? (
                                     <div ref={turnstileRef} />
                                 ) : (
-                                    <p className="text-sm text-red-600">Turnstile ist aktiv, aber es fehlt ein Site Key.</p>
+                                    <p className="text-sm text-red-600">{t('contact.turnstile_error')}</p>
                                 )}
                             </div>
                         )}
@@ -444,7 +425,7 @@ const ContactFormSection = ({
                                         </div>
                                         <div className="min-w-0">
                                             <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/80">
-                                                {messages.successTitle}
+                                                {t('contact.success_title')}
                                             </p>
                                             <p className="mt-1 text-base font-medium text-white">
                                                 {submitMessage}
@@ -467,7 +448,7 @@ const ContactFormSection = ({
                                         disabled={isSubmitting}
                                         className="bg-primary text-white w-full md:w-auto px-14 py-4 text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-opacity-90 transition-colors flex items-center justify-center rounded-full shadow-lg disabled:cursor-not-allowed disabled:opacity-80"
                                     >
-                                        {isSubmitting ? messages.sending : finalButtonLabel}
+                                        {isSubmitting ? t('contact.sending') : finalButtonLabel}
                                     </button>
                                 </div>
                             )}

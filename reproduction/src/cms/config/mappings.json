@@ -107,7 +107,7 @@
               "isUnstable": false
             },
             "stat1_label": {
-              "fieldPath": "customFields.startseite_zufriedene_kunden",
+              "fieldPath": "customFields.startseite_zufriedene_unden",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },
@@ -212,6 +212,21 @@
               "isUnstable": false
             }
           }
+        },
+        "TestimonialsSection": {
+          "component": "TestimonialsSection",
+          "props": {
+            "label": {
+              "fieldPath": "customFields.startseite_titel_kundenstimmen",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "title": {
+              "fieldPath": "customFields.startseite_untertitel_kundenstimmen",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
         }
       }
     },
@@ -274,6 +289,21 @@
         "ReferenceDetail": {
           "component": "ReferenceDetail",
           "props": {}
+        },
+        "ReferenceSidebarSection": {
+          "component": "ReferenceSidebarSection",
+          "props": {
+            "dateValue": {
+              "fieldPath": "date",
+              "sourceId": "uk1jxgem",
+              "isUnstable": false
+            },
+            "locationValue": {
+              "fieldPath": "customFields.referenz_ort",
+              "sourceId": "uk1jxgem",
+              "isUnstable": false
+            }
+          }
         },
         "ReferenceContentSection": {
           "component": "ReferenceContentSection",
@@ -343,7 +373,7 @@
               "isUnstable": false
             },
             "stat1_label": {
-              "fieldPath": "customFields.startseite_zufriedene_kunden",
+              "fieldPath": "customFields.startseite_zufriedene_unden",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },

@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 
 export const useSoftEntrance = (ref, options = {}) => {
     const {
-        threshold = 0.15,
+        threshold = 0.05,
+        rootMargin = '0px 0px -10% 0px',
         staggerDelayMs = 70,
         itemSelector = '.soft-entrance-item',
         durationMs = 600,
@@ -61,7 +62,7 @@ export const useSoftEntrance = (ref, options = {}) => {
                 // Animate exactly once
                 observer.disconnect();
             }
-        }, { threshold });
+        }, { threshold, rootMargin });
 
         observer.observe(container);
 

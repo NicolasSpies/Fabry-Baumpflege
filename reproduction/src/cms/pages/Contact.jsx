@@ -35,22 +35,22 @@ const Contact = () => {
 
     const getInitialContent = () => ({
         hero: {
-            title: t('contact.title'),
+            title: '',
             image: '',
         },
         sidebar: {
-            contact_person: globalCmsData?.options?.contact_person || 'Vincent Fabry',
-            phone: globalCmsData?.options?.phone || '+32 (0) 470 12 65 72',
-            email: globalCmsData?.options?.email || 'info@fabry-baumpflege.be',
-            office_label: t('contact.office'),
-            address: globalCmsData?.options?.address || 'EUPEN, BELGIEN',
+            contact_person: globalCmsData?.options?.contact_person || '',
+            phone: globalCmsData?.options?.phone || '',
+            email: globalCmsData?.options?.email || '',
+            office_label: t('contact.office') || 'Büro',
+            address: globalCmsData?.options?.address || '',
             address_link: globalCmsData?.options?.address_link || '#',
-            area_label: t('contact.area'),
-            area_text: t('contact.area_text'),
+            area_label: t('contact.area') || 'Einsatzgebiet',
+            area_text: t('contact.area_text') || '',
         },
         form: {
-            heading: t('contact.help_heading'),
-            button: t('contact.send'),
+            heading: t('contact.help_heading') || 'Kontakt',
+            button: t('contact.send') || 'Absenden',
         },
     });
 

@@ -13,9 +13,13 @@ const StatCounter = ({ statValue, statLabel, className = "", compact = false, da
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !hasAnimated.current) {
-                hasAnimated.current = true;
                 const safeVal = String(props.statValue || '0');
                 const target = parseInt(safeVal.replace(/\D/g, '')) || 0;
+                
+                if (target > 0) {
+                    hasAnimated.current = true;
+                }
+
                 const duration = 2000;
                 let startTime = null;
 
@@ -28,7 +32,7 @@ const StatCounter = ({ statValue, statLabel, className = "", compact = false, da
                 };
                 requestAnimationFrame(animate);
             }
-        }, { threshold: 0.5 });
+        }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
 
         if (countRef.current) observer.observe(countRef.current);
         return () => observer.disconnect();
@@ -37,8 +41,10 @@ const StatCounter = ({ statValue, statLabel, className = "", compact = false, da
     const safeValStr = String(props.statValue || '');
     const suffix = safeValStr.includes('+') ? '+' : safeValStr.includes('%') ? '%' : '';
 
+    if (!props.statValue && !props.statLabel) return null;
+
     return (
-        <div ref={countRef} className={`text-center px-2 md:px-3 reveal font-sans ${className}`}>
+        <div ref={countRef} className={`text-center px-2 md:px-3 font-sans ${className}`}>
             <div className={`${compact ? 'text-[2.35rem] md:text-[3rem] mb-1' : 'text-4xl md:text-5xl mb-2'} font-serif text-primary leading-none`}>
                 {count}{suffix}
             </div>

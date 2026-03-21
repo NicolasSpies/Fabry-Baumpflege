@@ -47,9 +47,9 @@ const References = () => {
 
     const getInitialContent = () => ({
         header: {
-            intro: t('refs.intro'),
+            intro: '',
             load_more: t('refs.load_more'),
-            all: t('refs.all'),
+            all: t('refs.all') || 'Alle',
         },
         items: []
     });
@@ -133,34 +133,41 @@ const References = () => {
                 setAllRefs(mappedRefs);
                 setPageData(prev => ({ ...prev, items: mappedRefs }));
 
-                // 4. Process Categories (Memoized logic)
-                const derivedCatsMap = new Map();
-                const usedCategoryIds = new Set();
-                
-                mappedRefs.forEach(ref => {
-                    if (Array.isArray(ref.categoryIds)) {
-                        ref.categoryIds.forEach(id => { if (id) usedCategoryIds.add(String(id)); });
+                // 4. Process Categories
+                // The taxonomy API returns all categories regardless of active references.
+                // We filter out cross-language bleed matching Polylang meta tags.
+                const targetLang = String(language).toLowerCase();
+                const filteredCats = [];
+                const seenCategoryNames = new Set();
+
+                rawCats.forEach(c => {
+                    const cleanName = decodeHtmlEntities(c.name || '').trim();
+                    const n = cleanName.toLowerCase();
+                    if (!cleanName || seenCategoryNames.has(n)) return;
+
+                    // 1. Strict metadata match (safest)
+                    let matchesLang = true;
+                    if (c.pll_lang) matchesLang = String(c.pll_lang).toLowerCase() === targetLang;
+                    else if (c.language) matchesLang = String(c.language).toLowerCase() === targetLang;
+                    else if (c.lang) matchesLang = String(c.lang).toLowerCase() === targetLang;
+                    // 2. Empirical fallback if meta is stripped
+                    else {
+                        if (targetLang === 'fr') {
+                            if (n.includes('pflege') || n.includes('fällung') || n.includes('pflanzung') || n.includes('baum')) matchesLang = false;
+                        } else {
+                            if (n.includes('entretien') || n.includes('abattage') || n.includes('jardin') || n.includes('plant') || n.includes('tous')) matchesLang = false;
+                        }
                     }
-                    if (Array.isArray(ref.categoryObjects)) {
-                        ref.categoryObjects.forEach(cat => {
-                            if (!cat || !cat.name) return;
-                            const cleanName = decodeHtmlEntities(cat.name).trim();
-                            const key = cleanName.toLowerCase();
-                            if (key && !derivedCatsMap.has(key)) {
-                                derivedCatsMap.set(key, { ...cat, name: cleanName, altIds: new Set([String(cat.id), String(cat.slug)]) });
-                            } else if (key) {
-                                const existing = derivedCatsMap.get(key);
-                                existing.altIds.add(String(cat.id));
-                                existing.altIds.add(String(cat.slug));
-                            }
+
+                    if (matchesLang) {
+                        seenCategoryNames.add(n);
+                        filteredCats.push({
+                            id: cleanName, // mapReferenceCard coerces IDs to names
+                            name: cleanName,
+                            slug: c.slug || cleanName.replace(/\s+/g, '-')
                         });
                     }
                 });
-
-                const allAvailableCats = Array.from(derivedCatsMap.values());
-                const filteredCats = allAvailableCats.filter(cat => 
-                    Array.from(cat.altIds).some(id => usedCategoryIds.has(id))
-                );
 
                 const getPriorityScore = (cat) => {
                     const n = (cat?.name || '').toLowerCase();
@@ -179,8 +186,7 @@ const References = () => {
                 };
 
                 const finalCats = [...filteredCats]
-                    .sort((a, b) => getPriorityScore(a) - getPriorityScore(b) || (a?.name || '').localeCompare(b?.name || ''))
-                    .map(cat => ({ ...cat, id: Array.from(cat.altIds).find(id => id !== 'undefined' && id !== 'null') || cat.id }));
+                    .sort((a, b) => getPriorityScore(a) - getPriorityScore(b) || (a?.name || '').localeCompare(b?.name || ''));
 
                 setCategories(finalCats);
 
@@ -253,7 +259,7 @@ const References = () => {
             {/* Page: References → Section: ReferencesHeaderSection */}
             <section className="pt-6 md:pt-8 pb-6 md:pb-8 px-4 md:px-6 text-center">
                 <div className="max-w-7xl mx-auto space-y-6">
-                    <h1 className="text-4xl md:text-5xl font-serif text-primary mb-4">
+                    <h1 className="text-[2.6rem] md:text-6xl lg:text-7xl font-serif text-primary mb-6 md:mb-10 leading-[1.1] font-medium tracking-tight">
                         {t('nav.references')}
                     </h1>
                     <CmsText

@@ -13,6 +13,7 @@ const HomeIntroSection = ({
     const paragraphs = normalizeCmsParagraphs(description);
     const [lineProgress, setLineProgress] = useState(0);
     const [lineMetrics, setLineMetrics] = useState({ top: 0, height: 0 });
+    const [activeIndex, setActiveIndex] = useState(-1);
     const safeParagraphs = useMemo(() => paragraphs.slice(0, 4), [paragraphs]);
 
     useEffect(() => {
@@ -20,133 +21,135 @@ const HomeIntroSection = ({
         const timelineNode = timelineRef.current;
         if (!sectionNode || !timelineNode) return;
 
-        let rafId = null;
-
-        const updateLine = () => {
+        const updateData = () => {
             const timelineRect = timelineNode.getBoundingClientRect();
             const validDots = dotRefs.current.filter(Boolean);
             if (validDots.length < 2) return;
+            
             const firstRect = validDots[0].getBoundingClientRect();
             const lastRect = validDots[validDots.length - 1].getBoundingClientRect();
+            
             const top = (firstRect.top - timelineRect.top) + (firstRect.height / 2);
             const bottom = (lastRect.top - timelineRect.top) + (lastRect.height / 2);
-            setLineMetrics({
-                top,
-                height: Math.max(0, bottom - top),
-            });
-        };
+            setLineMetrics({ top, height: Math.max(0, bottom - top) });
 
-        const updateProgress = () => {
-            const rect = sectionNode.getBoundingClientRect();
-            const viewportHeight = window.innerHeight || 1;
+            // Precise Progress Calculation
+            const viewportHeight = window.innerHeight;
+            const activationPoint = viewportHeight * 0.5; // Focus point: 50% down the screen (Center)
             
-            // Refined thresholds for smoother entrance/exit
-            const startThreshold = viewportHeight * 0.8;
-            const endThreshold = viewportHeight * 0.2;
-            const scrollDistance = rect.height + (viewportHeight * 0.1);
+            const firstPixel = firstRect.top + firstRect.height / 2;
+            const lastPixel = lastRect.top + lastRect.height / 2;
+            const totalTravel = lastPixel - firstPixel;
             
-            const raw = (startThreshold - rect.top) / scrollDistance;
-            const smoothed = Math.max(0, Math.min(1, raw));
-            
-            setLineProgress(Number(smoothed.toFixed(4)));
+            if (totalTravel > 0) {
+                const travelled = activationPoint - firstPixel;
+                const progress = Math.max(0, Math.min(1, travelled / totalTravel));
+                setLineProgress(Number(progress.toFixed(4)));
+
+                // Calculate which index is NEWLY active
+                const currentIdx = Math.floor(progress * safeParagraphs.length);
+                if (currentIdx !== activeIndex) setActiveIndex(currentIdx);
+            }
         };
 
-        const handleScroll = () => {
-            updateProgress();
-        };
+        const handleScroll = () => updateData();
+        const handleResize = () => updateData();
 
-        const handleResize = () => {
-            updateLine();
-            updateProgress();
-        };
-
-        // Initial measurement
-        updateLine();
-        updateProgress();
-
+        updateData();
         window.addEventListener('scroll', handleScroll, { passive: true });
         window.addEventListener('resize', handleResize, { passive: true });
-
-        // Backup re-calculation for late layout shifts
-        const t1 = setTimeout(updateLine, 500);
-        const t2 = setTimeout(updateLine, 1500);
+        const timer = setTimeout(updateData, 100);
 
         return () => {
-            if (rafId !== null) window.cancelAnimationFrame(rafId);
             window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('resize', handleResize);
-            clearTimeout(t1);
-            clearTimeout(t2);
+            clearTimeout(timer);
         };
-    }, [safeParagraphs.length]);
+    }, [safeParagraphs.length, activeIndex]);
 
-    if (!title && !description) {
-        return null;
-    }
+    if (!title && !description) return null;
 
     return (
         <section
             ref={sectionRef}
-            className="bg-primary/[0.035] dark:bg-surface-dark/40 border-y border-slate-100 dark:border-slate-800 px-6 py-16 md:py-20 overflow-hidden"
+            className="bg-primary/[0.035] dark:bg-surface-dark/40 border-y border-slate-100 dark:border-slate-800 px-6 py-16 md:py-24 overflow-hidden"
         >
             <div className="max-w-7xl mx-auto">
                 <div className="max-w-[72rem] mx-auto">
-                    {title ? (
-                        <div className="soft-entrance-item mb-10 md:mb-12 grid grid-cols-[2rem_minmax(0,1fr)] gap-5 md:gap-6 max-w-[56rem] mx-auto">
+                    {title && (
+                        <div className="soft-entrance-item mb-12 md:mb-16 grid grid-cols-[2rem_minmax(0,1fr)] gap-5 md:gap-7 max-w-[56rem] mx-auto">
                             <div aria-hidden="true" />
-                            <h2 className="text-[1.8rem] leading-[1.08] text-primary md:text-[2rem] lg:text-[2.15rem] font-serif text-left">
+                            <h2 className="text-[1.8rem] leading-[1.08] text-primary md:text-[2.2rem] lg:text-[2.4rem] font-serif text-left">
                                 {renderCmsInline(title)}
                             </h2>
                         </div>
-                    ) : null}
-                    {safeParagraphs.length > 0 ? (
+                    )}
+                    
+                    {safeParagraphs.length > 0 && (
                         <div ref={timelineRef} className="soft-entrance-item relative max-w-[56rem] mx-auto">
+                            {/* Guide Track */}
                             <div
-                                className="absolute w-[3px] rounded-full bg-primary/14"
+                                className="absolute w-[3px] rounded-full bg-primary/10"
                                 style={{
                                     top: `${lineMetrics.top}px`,
                                     height: `${lineMetrics.height}px`,
                                     left: 'calc(1rem - 1.5px)',
                                 }}
                             />
+                            {/* Actual Growing Line */}
                             <div
-                                className="absolute w-[3px] rounded-full bg-primary origin-top transition-transform duration-100 linear will-change-transform"
+                                className="absolute w-[3px] rounded-full bg-primary origin-top transition-transform duration-200 ease-out will-change-transform"
                                 style={{
                                     top: `${lineMetrics.top}px`,
                                     height: `${lineMetrics.height}px`,
                                     left: 'calc(1rem - 1.5px)',
                                     transform: `scaleY(${lineProgress})`,
+                                    boxShadow: lineProgress > 0 ? '0 0 10px rgba(62, 95, 37, 0.4)' : 'none'
                                 }}
                             />
-                            <div className="space-y-6 md:space-y-7">
-                                {safeParagraphs.map((paragraph, index) => (
-                                    <div
-                                        key={`intro-paragraph-${index}`}
-                                        className="grid grid-cols-[2rem_minmax(0,1fr)] items-start gap-5 md:gap-6"
-                                    >
-                                        <div className="relative flex justify-center pt-[0.72rem]">
-                                            <span
-                                                ref={(node) => {
-                                                    dotRefs.current[index] = node;
-                                                }}
-                                                className="h-3.5 w-3.5 rounded-full bg-primary transition-opacity duration-500 ease-in-out"
-                                                style={{
-                                                    opacity: index === 0 ? 1 : (lineProgress >= (safeParagraphs.length === 1 ? 1 : index / (safeParagraphs.length - 1)) ? 1 : 0.28),
-                                                }}
-                                            />
-                                        </div>
-                                        <p
-                                            className={index === 0
-                                                ? 'max-w-[48rem] text-[1rem] leading-[1.72] font-semibold text-slate-700 dark:text-slate-200'
-                                                : 'max-w-[48rem] text-[1rem] leading-[1.72] text-slate-600 dark:text-slate-300'}
+                            
+                            <div className="space-y-8 md:space-y-10">
+                                {safeParagraphs.map((paragraph, index) => {
+                                    const progressThreshold = safeParagraphs.length <= 1 ? 0 : index / (safeParagraphs.length - 1);
+                                    const isActive = lineProgress >= (progressThreshold - 0.01); // 1% earlier for better feel
+                                    
+                                    return (
+                                        <div
+                                            key={`intro-paragraph-${index}`}
+                                            className="grid grid-cols-[2rem_minmax(0,1fr)] items-start gap-5 md:gap-7"
                                         >
-                                            {renderCmsInline(paragraph)}
-                                        </p>
-                                    </div>
-                                ))}
+                                            <div className="relative flex justify-center pt-[0.7rem]">
+                                                {/* Active Glow Ring */}
+                                                <div 
+                                                    className={`absolute top-[0.68rem] h-4 w-4 rounded-full border border-primary transition-all duration-700 ease-out ${
+                                                        isActive ? 'opacity-100 scale-150' : 'opacity-0 scale-50'
+                                                    }`} 
+                                                />
+                                                {/* Solid Dot */}
+                                                <span
+                                                    ref={(node) => {
+                                                        dotRefs.current[index] = node;
+                                                    }}
+                                                    className={`relative z-10 h-3.5 w-3.5 rounded-full bg-primary transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1) ${
+                                                        isActive ? 'opacity-100 scale-100 shadow-[0_0_8px_rgba(62,95,37,0.5)]' : 'opacity-20 scale-75'
+                                                    }`}
+                                                />
+                                            </div>
+                                            <p
+                                                className={`max-w-[48rem] text-[1.05rem] md:text-[1.1rem] leading-[1.72] transition-all duration-700 ease-out font-normal ${
+                                                    isActive 
+                                                        ? 'text-slate-800 dark:text-slate-100 opacity-100 translate-x-1' 
+                                                        : 'text-slate-400 dark:text-slate-500 opacity-25 translate-x-0'
+                                                }`}
+                                            >
+                                                {renderCmsInline(paragraph)}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
-                    ) : null}
+                    )}
                 </div>
             </div>
         </section>

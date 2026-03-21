@@ -102,6 +102,8 @@ export const translations = {
         'common.error': 'Ein Fehler ist aufgetreten',
         'common.retry': 'Erneut versuchen',
         'common.not_found': 'Nicht gefunden',
+        'common.client': 'Kunde',
+        'common.belgium': 'Belgien',
 
         // Detail Page
         'detail.switching_lang': 'Sprache wird gewechselt...',
@@ -129,9 +131,7 @@ export const translations = {
         'contact.phone_field': 'Telefonnummer',
         'contact.note': 'Notiz',
         'contact.placeholder': 'How can I help you?',
-        'contact.send': 'Send Request',
-
-        // Contact Form Specific
+        'contact.send': 'Anfrage senden',
         'contact.form.baumpflege.label': 'Baumpflege',
         'contact.form.baumpflege.sub': 'Kronenschnitt & Erhalt',
         'contact.form.baumfaellung.label': 'Baumfällung',
@@ -141,6 +141,12 @@ export const translations = {
         'contact.form.bepflanzung.label': 'Bepflanzung',
         'contact.form.bepflanzung.sub': 'Nachhaltige Neuanlage',
         'contact.area_text': 'Ich bin in der gesamten Region Ostbelgien und Umgebung für dich im Einsatz und berate dich fachgerecht direkt vor Ort.',
+        'contact.turnstile_missing': 'Sicherheitsprüfung (Turnstile) fehlt.',
+        'contact.success_title': 'Anfrage versendet.',
+        'contact.success_body': 'Danke. Ich melde mich schnellstmöglich zurück.',
+        'contact.error_submit': 'Formular konnte nicht gesendet werden.',
+        'contact.sending': 'WIRD GESENDET',
+        'contact.turnstile_error': 'Turnstile ist aktiv, aber es fehlt ein Site Key.',
 
         // References Overview
         'refs.all': 'Alle',
@@ -268,6 +274,8 @@ export const translations = {
         'common.error': 'Une erreur est survenue',
         'common.retry': 'Réessayer',
         'common.not_found': 'Non trouvé',
+        'common.client': 'Client',
+        'common.belgium': 'Belgique',
 
         // Detail Page
         'detail.switching_lang': 'Changement de langue...',
@@ -296,8 +304,6 @@ export const translations = {
         'contact.note': 'Note',
         'contact.placeholder': 'Comment puis-je vous aider ?',
         'contact.send': 'Envoyer la demande',
-
-        // Contact Form Specific
         'contact.form.baumpflege.label': 'Taille raisonnée',
         'contact.form.baumpflege.sub': 'Taille & Maintien',
         'contact.form.baumfaellung.label': 'Abattage',
@@ -307,6 +313,12 @@ export const translations = {
         'contact.form.bepflanzung.label': 'Plantation',
         'contact.form.bepflanzung.sub': 'Nouvelle Plantation',
         'contact.area_text': 'Je suis à votre service dans toute la région d’Ostbelgie et ses environs, et je vous conseille professionnellement directement sur place.',
+        'contact.turnstile_missing': 'Validation de sécurité (Turnstile) manquante.',
+        'contact.success_title': 'Demande envoyée.',
+        'contact.success_body': 'Merci. Je reviens vers vous rapidement.',
+        'contact.error_submit': "Le formulaire n'a pas pu être envoyé.",
+        'contact.sending': 'ENVOI EN COURS',
+        'contact.turnstile_error': 'Turnstile est actif, mais la clé du site est manquante.',
 
         // References Overview
         'refs.all': 'Tous',

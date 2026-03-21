@@ -2,7 +2,7 @@ import React, { startTransition, useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { getLocalizedPath } from '@/cms/i18n/routes';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, getLatestReferences, getTestimonials, mapReferenceCard, mapPageContent, PAGE_IDS, decodeHtmlEntities } from '@/cms/lib/cms';
+import { getPage, getLatestReferences, getReferences, getTestimonials, mapReferenceCard, mapPageContent, PAGE_IDS, decodeHtmlEntities } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
@@ -106,35 +106,35 @@ const Home = () => {
 
     const getInitialContent = () => ({
         hero: {
-            title_top: t('hero.precision'),
-            title_main: t('hero.meets'),
-            description: t('hero.description'),
-            cta: t('hero.cta'),
+            title_top: '',
+            title_main: '',
+            description: '',
+            cta: t('nav.contact'),
             ctaHref: getLocalizedPath('contact', language),
             image: '',
         },
         stats: {
-            stat1_value: '250', stat1_label: t('stats.projects') || 'Projekte',
-            stat2_value: '1200', stat2_label: t('stats.trees'),
-            stat3_value: '8', stat3_label: t('stats.experience'),
-            stat4_value: '0', stat4_label: t('stats.accidents'),
+            stat1_value: '', stat1_label: '',
+            stat2_value: '', stat2_label: '',
+            stat3_value: '', stat3_label: '',
+            stat4_value: '', stat4_label: '',
         },
         intro: {
             title: '',
             description: '',
         },
         services: {
-            label: t('expertise.title'),
-            title: t('expertise.subtitle'),
-            s1_title: t('services.baumpflege.title'), s1_description: t('services.baumpflege.desc'), s1_icon: 'BaumpflegeIcon', s1_id: 'baumpflege',
-            s2_title: t('services.baumfaellung.title'), s2_description: t('services.baumfaellung.desc'), s2_icon: 'BaumfaellungIcon', s2_id: 'baumfaellung',
-            s3_title: t('services.gartenpflege.title'), s3_description: t('services.gartenpflege.desc'), s3_icon: 'GartenpflegeIcon', s3_id: 'gartenpflege',
-            s4_title: t('services.bepflanzung.title'), s4_description: t('services.bepflanzung.desc'), s4_icon: 'BepflanzungIcon', s4_id: 'bepflanzung',
+            label: t('nav.services'),
+            title: '',
+            s1_title: '', s1_description: '', s1_icon: 'BaumpflegeIcon', s1_id: 'baumpflege',
+            s2_title: '', s2_description: '', s2_icon: 'BaumfaellungIcon', s2_id: 'baumfaellung',
+            s3_title: '', s3_description: '', s3_icon: 'GartenpflegeIcon', s3_id: 'gartenpflege',
+            s4_title: '', s4_description: '', s4_icon: 'BepflanzungIcon', s4_id: 'bepflanzung',
         },
         references: {
-            label: t('refs.preview_label') || 'REFERENZEN',
-            title: t('refs.preview_title'),
-            view_all: t('nav.references'),
+            label: t('nav.references'),
+            title: '',
+            view_all: t('refs.view_all'),
             items: [],
         },
         testimonials: {
@@ -143,11 +143,11 @@ const Home = () => {
             items: [],
         },
         about: {
-            label: t('about.teaser_label'),
-            title: t('about.teaser_title'),
-            description: t('about.teaser_text'),
-            quote: t('about.quote'),
-            cta: t('about.teaser_cta'),
+            label: t('nav.about'),
+            title: '',
+            description: '',
+            quote: '',
+            cta: t('nav.contact'),
             ctaHref: getLocalizedPath('contact', language),
             image: '',
         },
@@ -211,11 +211,11 @@ const Home = () => {
         async function loadDeferredContent() {
             try {
                 setRefsLoading(true);
-                const [rawRefs, rawTestimonials, servicesPage] = await Promise.all([
-                    getLatestReferences(3, language),
-                    getTestimonials(language),
-                    getPage(PAGE_IDS.services, language)
-                ]);
+            const [rawRefs, rawTestimonials, servicesPage] = await Promise.all([
+                getLatestReferences(3, language),
+                getTestimonials(language),
+                getPage(PAGE_IDS.services, language)
+            ]);
                 if (cancelled) return;
 
                 const mappedRefs = rawRefs.map(item => ({
@@ -234,7 +234,7 @@ const Home = () => {
                         ''
                     );
                     return {
-                        author: name || 'Kunde',
+                        author: name || t('common.client'),
                         text: decodeHtmlEntities(cf.kundenstimme_text || ''),
                         rating_raw: String(cf.sterne || '5'),
                         data: item
@@ -245,8 +245,8 @@ const Home = () => {
                     setPageData(prev => {
                         let next = {
                             ...prev,
-                            references: { ...prev.references, items: mappedRefs },
-                            testimonials: { ...prev.testimonials, items: mappedTestimonials }
+                            references: { ...prev.references, items: mappedRefs, isLoading: false },
+                            testimonials: { ...prev.testimonials, items: mappedTestimonials, isLoading: false }
                         };
                         if (servicesPage) {
                             next = mergeServicePreviewContent(next, servicesPage);

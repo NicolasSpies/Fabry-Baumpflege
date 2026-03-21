@@ -41,21 +41,21 @@ const AboutMe = () => {
 
     const getInitialContent = () => ({
         philosophy: {
-            label: t('aboutme.philosophy.label'),
-            quote: t('aboutme.philosophy.quote'),
-            text: t('aboutme.philosophy.text'),
+            label: '',
+            quote: '',
+            text: '',
             image: '',
         },
         values: {
-            val1_title: t('aboutme.values.precision.title'), val1_text: t('aboutme.values.precision.text'), val1_image: '',
-            val2_title: t('aboutme.values.sustainability.title'), val2_text: t('aboutme.values.sustainability.text'), val2_image: '',
-            val3_title: t('aboutme.values.expertise.title'), val3_text: t('aboutme.values.expertise.text'), val3_image: '',
+            val1_title: '', val1_text: '', val1_image: '',
+            val2_title: '', val2_text: '', val2_image: '',
+            val3_title: '', val3_text: '', val3_image: '',
         },
         signature: {
-            title: t('aboutme.signature.title'),
-            name: 'Vincent Fabry',
-            label: t('aboutme.signature.label'),
-            cta: t('aboutme.signature.cta'),
+            title: '',
+            name: globalCmsData?.options?.contact_person || '',
+            label: '',
+            cta: '',
             ctaHref: ROUTES[language].contact,
         },
     });

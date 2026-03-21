@@ -37,7 +37,7 @@ const expertiseImgRef = useRef(null);
                                 image={image}
                                 ref={expertiseImgRef}
                                 alt=""
-                                className="w-full h-[650px] object-cover"
+                                className="w-full aspect-square object-cover"
                                 sizes="(max-width: 1024px) 100vw, 50vw"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent p-10 flex items-end">

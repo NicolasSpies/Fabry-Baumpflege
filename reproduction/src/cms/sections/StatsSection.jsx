@@ -21,7 +21,7 @@ const StatsSection = ({
     useSoftEntrance(sectionRef);
     const sectionTone =
         tone === 'tint'
-            ? 'bg-primary/[0.035] border-y border-primary/10'
+            ? 'bg-primary/[0.035] border-y border-slate-100 dark:border-slate-800'
             : 'bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800';
 
     return (

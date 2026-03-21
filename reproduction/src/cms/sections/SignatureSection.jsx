@@ -5,14 +5,20 @@ import { renderCmsInline } from '@/cms/components/ui/CmsText';
 import { isExternalHref } from '@/cms/bridge-resolver';
 
 
+import { useLanguage } from '@/cms/i18n/useLanguage';
+
 const SignatureSection = ({ 
     title,
     name,
-    label = "Ihr Partner für die Natur", 
-    cta = "Jetzt anfragen", 
+    label, 
+    cta, 
     ctaHref = "/kontakt" 
 }) => {
+const { t } = useLanguage();
 const isExternalCta = isExternalHref(ctaHref);
+
+const displayLabel = label || t('aboutme.signature.label');
+const displayCta = cta || t('aboutme.signature.cta');
 
 return (
         <section className="py-14 md:py-32 bg-primary/[0.035] dark:bg-surface-dark/30 border-y border-slate-100 dark:border-slate-800">
@@ -25,7 +31,7 @@ return (
                         {renderCmsInline(name)}
                     </p>
                     <p className="text-[10px] tracking-[0.3em] md:tracking-[0.4em] uppercase text-muted-accessible mt-3 md:mt-6 font-bold">
-                        {renderCmsInline(label)}
+                        {renderCmsInline(displayLabel)}
                     </p>
                 </div>
                 {isExternalCta ? (
@@ -35,7 +41,7 @@ return (
                         target="_blank"
                         rel="noreferrer"
                     >
-                        {cta}
+                        {displayCta}
                         <Icon name="arrow_forward" className="group-hover:translate-x-1 transition-transform" />
                     </a>
                 ) : (
@@ -43,7 +49,7 @@ return (
                         to={ctaHref}
                         className="inline-flex items-center gap-3 md:gap-4 bg-primary text-white px-9 md:px-12 py-3.5 md:py-5 rounded-full text-[0.95rem] md:text-lg font-bold uppercase tracking-widest hover:bg-opacity-90 transition-all group shadow-md md:shadow-xl reveal stagger-2"
                     >
-                        {cta}
+                        {displayCta}
                         <Icon name="arrow_forward" className="group-hover:translate-x-1 transition-transform" />
                     </Link>
                 )}

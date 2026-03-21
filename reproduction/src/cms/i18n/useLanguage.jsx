@@ -14,25 +14,6 @@ export function getLangFromPath(path) {
 
 /** Map a pathname + source language + target language to the corresponding target path. */
 function mapPathToTargetLang(currentPath, currentLang, targetLang, alternates = null) {
-    if (alternates && alternates[targetLang]) {
-        // CONTENT CORE / API DRIVEN: 
-        // If the current page has already provided its official translated slugs, use them.
-        const slug = alternates[targetLang].slug || alternates[targetLang];
-        
-        // If it's the home page, it might just be / or /fr
-        if (slug === '/' || slug === '/fr') return slug;
-
-        // Otherwise, construct the path. 
-        // For subpages, we usually prefix /fr for French if it's not already there.
-        if (targetLang === 'FR' && !slug.startsWith('/fr')) {
-            return `/fr/${slug.replace(/^\//, '')}`;
-        }
-        if (targetLang === 'DE') {
-            return `/${slug.replace(/^\/fr\//, '').replace(/^\//, '')}`;
-        }
-        return slug.startsWith('/') ? slug : `/${slug}`;
-    }
-
     const targetRoutes = ROUTES[targetLang];
     const currentRoutes = ROUTES[currentLang];
 
@@ -40,18 +21,55 @@ function mapPathToTargetLang(currentPath, currentLang, targetLang, alternates = 
     const normalize = (p) => decodeURIComponent(p).replace(/\/$/, '') || '/';
     const normalizedCurrent = normalize(currentPath);
 
-    // Exact match on a known static route (non-parameterised)
+    // 1. Check for official alternates (e.g. from Polylang or Content-Core)
+    // Supports 'FR', 'fr', 'fr_FR', etc.
+    const alt = alternates ? (
+        alternates[targetLang] || 
+        alternates[targetLang.toLowerCase()] || 
+        alternates[`${targetLang.toLowerCase()}_${targetLang}`] ||
+        alternates[`${targetLang.toLowerCase()}_${targetLang.toUpperCase()}`] ||
+        Object.values(alternates).find(a => a.lang === targetLang.toLowerCase() || a.language === targetLang.toLowerCase())
+    ) : null;
+
+    // 2. Exact match on a known static route (non-parameterised)
     for (const [key, path] of Object.entries(currentRoutes)) {
         if (!path.includes(':') && normalize(path) === normalizedCurrent) {
             return targetRoutes[key] ?? (targetLang === 'FR' ? '/fr' : '/');
         }
     }
 
+    // 3. Detail routes matching (e.g. /referenzen/:slug)
     const currentDetailBase = normalize(currentRoutes.referenceDetail.split('/:')[0]);
     if (normalizedCurrent === currentDetailBase || normalizedCurrent.startsWith(`${currentDetailBase}/`)) {
-        const slug = normalizedCurrent.slice(currentDetailBase.length).replace(/^\//, '');
+        let slug = normalizedCurrent.slice(currentDetailBase.length).replace(/^\//, '');
+        
+        // If an official alternate slug exists for this target language, use it!
+        if (alt) {
+            const rawAlt = alt.slug || alt.link || alt.url || alt.permalink || (typeof alt === 'string' ? alt : null);
+            if (rawAlt) {
+                // Safely extract the last non-empty segment from a possible URL or path
+                const segments = String(rawAlt).split('/').filter(Boolean);
+                slug = segments.pop() || slug;
+            }
+        }
+
         const targetDetailBase = normalize(targetRoutes.referenceDetail.split('/:')[0]);
         return slug ? `${targetDetailBase}/${slug}` : targetDetailBase;
+    }
+
+    // 4. Fallback for alternates that might be full paths or strings
+    if (alt) {
+        const rawAlt = alt.slug || alt.link || alt.url || alt.permalink || (typeof alt === 'string' ? alt : null);
+        if (rawAlt) {
+            let path = String(rawAlt).replace(/^https?:\/\/[^\/]+/, '');
+            if (targetLang === 'FR' && !path.startsWith('/fr')) {
+                return `/fr/${path.replace(/^\//, '')}`;
+            }
+            if (targetLang === 'DE') {
+                return `/${path.replace(/^\/fr\//, '').replace(/^\//, '')}`;
+            }
+            return path.startsWith('/') ? path : `/${path}`;
+        }
     }
 
     // Fallback to home for unknown paths
