@@ -14,7 +14,7 @@ const ServicesIntroSection = ({
             <div ref={sectionRef} className="max-w-7xl mx-auto">
                 <div className="space-y-6 md:space-y-10 soft-entrance-item">
                     {title ? (
-                        <h1 className="font-serif text-primary leading-[1.05] text-[2.4rem] md:text-[4.25rem] lg:text-[5.5rem] font-medium tracking-tight max-w-[14em] mx-auto">
+                        <h1 className="font-serif text-primary leading-[1.05] text-4xl md:text-5xl font-medium tracking-tight max-w-[14em] mx-auto">
                             {renderCmsInline(title)}
                         </h1>
                     ) : null}
