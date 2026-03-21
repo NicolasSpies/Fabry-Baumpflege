@@ -259,7 +259,7 @@ const References = () => {
             {/* Page: References → Section: ReferencesHeaderSection */}
             <section className="pt-6 md:pt-8 pb-6 md:pb-8 px-4 md:px-6 text-center">
                 <div className="max-w-7xl mx-auto space-y-6">
-                    <h1 className="text-[2.6rem] md:text-6xl lg:text-7xl font-serif text-primary mb-6 md:mb-10 leading-[1.1] font-medium tracking-tight">
+                    <h1 className="text-4xl md:text-5xl font-serif text-primary mb-4">
                         {t('nav.references')}
                     </h1>
                     <CmsText
