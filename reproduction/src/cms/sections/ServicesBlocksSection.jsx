@@ -10,7 +10,7 @@ import CmsText from '@/cms/components/ui/CmsText';
 
 const ServiceImage = ({ src, alt, priority = false }) => {
     const ref = useRef(null);
-    useParallax(ref, { speed: 0.04, maxTravel: 20, scale: 1.1 });
+    useParallax(ref, { speed: 0.08, maxTravel: 40, scale: 1.1 });
     return (
         <CmsImage
             image={src}

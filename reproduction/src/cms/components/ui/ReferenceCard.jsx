@@ -16,10 +16,10 @@ const preloadReferenceDetailPage = () => import('@/cms/pages/ReferenceDetail');
 const ReferenceCard = ({ 
     id, slug, path, title, description, location, thumbnailImage, 
     animateEntry, staggerIndex, forceSquare, compactMobileOverlay = false, 
-    language, data, page = 'Home', section = 'ReferencesSection' 
+    language, data, page = 'Home', section = 'ReferencesSection', loading 
 }) => {
     const props = resolveInstanceProps(page, `${section}/ReferenceCard`, {
-        id, slug, path, title, description, location, thumbnailImage
+        id, slug, path, title, description, location, thumbnailImage, loading
     }, data);
 
 
@@ -70,7 +70,7 @@ const ReferenceCard = ({
                     alt={props.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    loading="lazy"
+                    loading={props.loading || 'lazy'}
                 />
                 <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-primary/70 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end text-white ${compactMobileOverlay ? 'p-4 md:p-8' : 'p-8'}`} style={{ willChange: 'opacity' }}>
                     <div className={`mb-3 flex flex-wrap gap-x-3 gap-y-1 opacity-100 md:opacity-0 group-hover:opacity-100 transform translate-y-0 md:translate-y-4 group-hover:translate-y-0 transition-[opacity,transform] duration-500 delay-100`}>

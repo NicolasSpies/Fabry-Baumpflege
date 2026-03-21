@@ -158,7 +158,7 @@ const ReferenceDetail = () => {
         window.scrollTo(0, 0);
     }, [slug]);
 
-    // ─── Primary Fetch Effect ─────────────────────────────────────────────────
+    // ─── Primary Fetch Effect (Phase 1: Shell & Hero) ──────────────────────────
     useEffect(() => {
         if (!slug) {
             setStatus('notfound');
@@ -186,17 +186,12 @@ const ReferenceDetail = () => {
 
                 const cf = ref.customFields || ref.acf || ref.meta || {};
 
-                const [thumbnail, beforeUrl, afterUrl, resolvedGallery] = await Promise.all([
-                    resolveMedia(ref.featured_image || ref._embedded?.['wp:featuredmedia']?.[0]?.source_url || null),
-                    resolveMedia(cf.bild_vorher || ref.acf?.before_image),
-                    resolveMedia(cf.bild_nachher || ref.acf?.after_image),
-                    Promise.all((cf.galerie || ref.acf?.gallery || []).map(img => resolveMedia(img)))
-                ]);
+                // Phase 1: Only resolve non-gallery critical media (Hero)
+                const thumbnail = await resolveMedia(ref.featured_image || ref._embedded?.['wp:featuredmedia']?.[0]?.source_url || null);
 
                 if (controller.signal.aborted) return;
 
                 // ─── Extract Robust Category Names ──────────────────────────────────
-                // Search across embedded terms, taxonomies, and custom fields
                 const tax = ref.taxonomies || ref.taxonomy || {};
                 const embeddedTerms = ref._embedded?.['wp:term']?.flat() || [];
                 
@@ -222,7 +217,6 @@ const ReferenceDetail = () => {
                     }
                 }
 
-
                 setRawProject(ref);
                 
                 // Register alternates for API-driven routing
@@ -235,16 +229,11 @@ const ReferenceDetail = () => {
                     hero: {
                         ...local.hero,
                         title: decodeHtmlEntities(
-                            ref.title?.rendered ||
-                            (typeof ref.title === 'string' ? ref.title : '') ||
-                            ref.post_title ||
-                            ref.name ||
-                            ''
+                            ref.title?.rendered || (typeof ref.title === 'string' ? ref.title : '') || ref.post_title || ref.name || ''
                         ),
                         image: thumbnail,
                         categoryLabel: catNames[0] || ''
                     },
-
                     sidebar: { 
                         ...local.sidebar, 
                         dateValue: formattedDate, 
@@ -254,14 +243,49 @@ const ReferenceDetail = () => {
                     content: { 
                         ...local.content, 
                         description: decodeHtmlEntities(cf.beschreibung || ref.acf?.short_description || ''), 
-                        beforeImage: beforeUrl, 
-                        afterImage: afterUrl,
                         challengeTitle: cf.challenge_title || ref.acf?.challenge_title || local.content.challengeTitle,
-                        gallery: (resolvedGallery || []).filter(Boolean)
                     }
                 });
 
                 setStatus('ready');
+
+                // ─── Phase 2: Deferred Asset Loading ───────────────────────────────
+                // We load gallery and side-by-side images after the shell is ready
+                const loadDeferredAssets = async () => {
+                    try {
+                        const [beforeUrl, afterUrl, resolvedGallery] = await Promise.all([
+                            resolveMedia(cf.bild_vorher || ref.acf?.before_image),
+                            resolveMedia(cf.bild_nachher || ref.acf?.after_image),
+                            Promise.all((cf.galerie || ref.acf?.gallery || []).map(img => resolveMedia(img)))
+                        ]);
+
+                        if (cancelledAssets) return;
+
+                        setProject(prev => {
+                            if (!prev) return prev;
+                            return {
+                                ...prev,
+                                content: {
+                                    ...prev.content,
+                                    beforeImage: beforeUrl,
+                                    afterImage: afterUrl,
+                                    gallery: (resolvedGallery || []).filter(Boolean)
+                                }
+                            };
+                        });
+                    } catch (deferErr) {
+                        console.warn('[ReferenceDetail] Deferred assets failed:', deferErr);
+                    }
+                };
+
+                // Use idle period if available, otherwise minor delay
+                let cancelledAssets = false;
+                if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+                    window.requestIdleCallback(() => loadDeferredAssets());
+                } else {
+                    setTimeout(() => loadDeferredAssets(), 150);
+                }
+
             } catch (err) {
                 if (err.name === 'AbortError') return;
                 console.error('[ReferenceDetail] Fetch failed:', err);

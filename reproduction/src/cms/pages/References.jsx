@@ -349,6 +349,7 @@ const References = () => {
                                 staggerIndex={index}
                                 forceSquare={true}
                                 compactMobileOverlay={true}
+                                loading={index < 2 ? 'eager' : 'lazy'}
                                 page="References"
                                 section="ReferencesGridSection"
                             />

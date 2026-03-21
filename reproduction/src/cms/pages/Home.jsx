@@ -223,12 +223,23 @@ const Home = () => {
                     data: item
                 }));
 
-                const mappedTestimonials = (rawTestimonials || []).slice(0, 3).map(item => ({
-                    author: item.title?.rendered || '',
-                    text: item.customFields?.kundenstimme_text || '',
-                    rating_raw: String(item.customFields?.sterne || '5'),
-                    data: item
-                }));
+                const mappedTestimonials = (rawTestimonials || []).slice(0, 3).map(item => {
+                    const cf = item.customFields || item.acf || item.meta || {};
+                    const name = decodeHtmlEntities(
+                        item.title?.rendered || 
+                        (typeof item.title === 'string' ? item.title : '') ||
+                        cf.kundenname || 
+                        cf.name ||
+                        item.post_title || 
+                        ''
+                    );
+                    return {
+                        author: name || 'Kunde',
+                        text: decodeHtmlEntities(cf.kundenstimme_text || ''),
+                        rating_raw: String(cf.sterne || '5'),
+                        data: item
+                    };
+                });
 
                 startTransition(() => {
                     setPageData(prev => {

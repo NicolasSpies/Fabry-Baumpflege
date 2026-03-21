@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { getTestimonials } from '@/cms/lib/cms';
+import { getTestimonials, decodeHtmlEntities } from '@/cms/lib/cms';
 import TestimonialCard from '@/cms/components/ui/TestimonialCard';
 import { renderCmsInline } from '@/cms/components/ui/CmsText';
 
@@ -10,12 +10,24 @@ import { renderCmsInline } from '@/cms/components/ui/CmsText';
  *           data.customFields.kundenstimme_text → text.
  */
 function mapTestimonial(raw) {
+    const cf = raw.customFields || raw.acf || raw.meta || {};
+    
+    // Robust name extraction: Try Title, then specific meta fields, then safe fallback.
+    const name = decodeHtmlEntities(
+        raw.title?.rendered || 
+        (typeof raw.title === 'string' ? raw.title : '') ||
+        cf.kundenname || 
+        cf.name ||
+        raw.post_title || 
+        ''
+    );
+
     return {
         // Fallback props — used when CB hydration cannot resolve a value
-        author: raw.title?.rendered ?? '',
+        author: name || 'Kunde',
         // rating_raw matches the prop name in TestimonialCard
-        rating_raw: raw.customFields?.sterne ?? '5',
-        text: raw.customFields?.kundenstimme_text ?? '',
+        rating_raw: String(cf.sterne || '5'),
+        text: decodeHtmlEntities(cf.kundenstimme_text || ''),
         // Raw CMS post → passed as `data` so the CB hydration block activates
         data: raw,
     };

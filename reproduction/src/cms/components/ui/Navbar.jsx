@@ -140,6 +140,8 @@ const Navbar = ({
                         alt="Fabry Baumpflege Logo"
                         className={`w-auto object-contain transition-[height] duration-300 ${isMobileMode ? 'h-10 md:h-12' : (isScrolled ? 'h-12' : 'h-16')}`}
                         src={logo}
+                        width="130"
+                        height="64"
                     />
                 </Link>
 

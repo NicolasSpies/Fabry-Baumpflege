@@ -36,6 +36,8 @@ const Footer = ({
                         alt="Fabry Logo White"
                         className="h-8 brightness-0 invert"
                         src={logo}
+                        width="65"
+                        height="32"
                     />
                     <p className="text-white leading-relaxed text-xs">
                         {renderCmsInline(actualDescription)}

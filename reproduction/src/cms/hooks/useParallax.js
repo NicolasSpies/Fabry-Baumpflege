@@ -21,6 +21,7 @@ const updateLayouts = () => {
 const runLoop = () => {
     const scrollY = window.pageYOffset;
     const vh = window.innerHeight;
+    const isMobile = window.innerWidth < 768;
 
     // Only update if we've actually scrolled or are in a small buffer
     registry.forEach(item => {
@@ -33,10 +34,14 @@ const runLoop = () => {
 
         if (bottom > -100 && top < vh + 100) {
             const centerOffset = (top + item.layout.height / 2) - (vh / 2);
+            
+            // Reduced motion on mobile (50%)
+            const finalTravel = isMobile ? maxTravel * 0.5 : maxTravel;
+            
             const travel = centerOffset * -speed;
-            const clampedTravel = Math.max(-maxTravel, Math.min(maxTravel, travel));
+            const clampedTravel = Math.max(-finalTravel, Math.min(finalTravel, travel));
 
-            el.style.setProperty('transform', `translate3d(0, ${clampedTravel}px, 0) scale(${scale})`, 'important');
+            el.style.setProperty('transform', `translate3d(0, ${clampedTravel.toFixed(2)}px, 0) scale(${scale})`, 'important');
         }
     });
 
@@ -48,6 +53,7 @@ const runLoop = () => {
 const startLoop = () => {
     if (!isRunning) {
         isRunning = true;
+        updateLayouts();
         rafId = requestAnimationFrame(runLoop);
     }
 };
@@ -79,8 +85,7 @@ export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, di
         if (!el || disabled) return;
 
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const isMobile = window.innerWidth < 768;
-        if (prefersReducedMotion || isMobile) return;
+        if (prefersReducedMotion) return;
 
         // Force transition none to prevent lag
         el.style.setProperty('transition', 'none', 'important');
@@ -92,18 +97,27 @@ export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, di
             layout: null
         };
 
-        const rect = el.getBoundingClientRect();
-        item.layout = {
-            top: rect.top + window.pageYOffset,
-            height: rect.height
+        const updateItem = () => {
+            const rect = el.getBoundingClientRect();
+            item.layout = {
+                top: rect.top + window.pageYOffset,
+                height: rect.height
+            };
         };
 
+        updateItem();
         registry.add(item);
+
+        // Re-calculate after a short delay for lazy-loaded images
+        const t1 = setTimeout(updateItem, 500);
+        const t2 = setTimeout(updateItem, 1500);
 
         // Ensure loop starts on first use
         startLoop();
 
         return () => {
+            clearTimeout(t1);
+            clearTimeout(t2);
             registry.delete(item);
             if (registry.size === 0) {
                 stopLoop();
