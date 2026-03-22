@@ -94,12 +94,12 @@
 
 @layer base {
   :root {
-    --accent-label: #67862A;
+    --accent-label: #9BB221; /* Brand Second Accent */
     --muted-accessible: #475569; /* slate-600 — 6.1:1 on white */
   }
 
   .dark {
-    --accent-label: #9BB221;
+    --accent-label: #A3E635; /* Keep it slightly more vibrant for dark mode contrast */
     --muted-accessible: #94A3B8; /* slate-400 — 4.6:1 on background-dark */
   }
 

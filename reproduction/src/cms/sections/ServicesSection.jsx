@@ -30,11 +30,11 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
         ? 'opacity-10'
         : 'opacity-0';
     const titleState = isActive
-        ? 'text-[#3E5F25]'
+        ? 'text-[#395824]'
         : '';
     const iconContainerState = isActive
-        ? 'bg-[#3E5F25] text-white'
-        : 'bg-slate-100 dark:bg-slate-800/50 text-[#3E5F25]';
+        ? 'bg-[#395824] text-white'
+        : 'bg-slate-100 dark:bg-slate-800/50 text-[#395824]';
 
     const cardClassName = `group relative bg-white dark:bg-surface-dark rounded-[2rem] p-8 md:p-10 transition-[transform,box-shadow] duration-500 shadow-lg md:shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full md:hover:-translate-y-2 md:hover:shadow-xl md:hover:shadow-slate-200/60 ${activeState}`;
 
@@ -50,10 +50,10 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
                 )}
                 
                 <div className="relative z-10 flex flex-col flex-grow">
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 ${iconContainerState} md:group-hover:bg-[#3E5F25] md:group-hover:text-white`}>
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 ${iconContainerState} md:group-hover:bg-[#395824] md:group-hover:text-white`}>
                         {renderServiceIcon(icon, iconVariant)}
                     </div>
-                    <h3 className={`text-2xl font-serif text-primary mb-4 transition-colors ${titleState} md:group-hover:text-[#3E5F25]`}>
+                    <h3 className={`text-2xl font-serif text-primary mb-4 transition-colors ${titleState} md:group-hover:text-[#395824]`}>
                         {renderCmsInline(title)}
                     </h3>
                     {description && (
@@ -63,7 +63,7 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
                             paragraphClassName="text-[0.9375rem] leading-relaxed"
                         />
                     )}
-                    <div className="flex items-center text-primary font-bold text-xs tracking-[0.15em] uppercase mt-auto">
+                    <div className="flex items-center text-accent-label font-bold text-xs tracking-[0.15em] uppercase mt-auto">
                         <span>
                             {ctaLabel}
                         </span>

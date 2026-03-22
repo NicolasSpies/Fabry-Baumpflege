@@ -77,7 +77,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
                         {isExternalCta ? (
                             <a
                                 href={ctaHref}
-                                className="inline-block bg-[#3E5F25] text-white px-8 py-3.5 rounded-full font-semibold tracking-widest uppercase text-xs hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
+                                className="inline-block bg-[#395824] text-white px-8 py-3.5 rounded-full font-semibold tracking-widest uppercase text-xs hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
                                 target="_blank"
                                 rel="noreferrer"
                             >
@@ -86,7 +86,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
                         ) : (
                             <Link
                                 to={ctaHref}
-                                className="inline-block bg-[#3E5F25] text-white px-8 py-3.5 rounded-full font-semibold tracking-widest uppercase text-xs hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
+                                className="inline-block bg-[#395824] text-white px-8 py-3.5 rounded-full font-semibold tracking-widest uppercase text-xs hover:bg-[#2e471b] transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
                             >
                                 {cta}
                             </Link>

@@ -13,7 +13,7 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: "#3E5F25",
+                primary: "#395824",
                 deepolive: "#4B4A16",
                 "background-light": "#FFFFFF",
                 "background-dark": "#121212",
