@@ -23,42 +23,13 @@ export const PAGE_IDS = {
 };
 
 const CMS_CACHE_TTL_MS = 5 * 60 * 1000;
-const SESSION_CACHE_KEY = 'cms_resp_cache_v1';
-
-function getSessionCache() {
-    if (typeof window === 'undefined' || !window.sessionStorage) return new Map();
-    try {
-        const raw = window.sessionStorage.getItem(SESSION_CACHE_KEY);
-        if (!raw) return new Map();
-        const parsed = JSON.parse(raw);
-        const map = new Map(Object.entries(parsed));
-        // Cleanup expired items on load
-        const now = Date.now();
-        map.forEach((val, key) => {
-            if (val.expiresAt < now) map.delete(key);
-        });
-        return map;
-    } catch (e) {
-        return new Map();
-    }
-}
-
-function saveSessionCache(map) {
-    if (typeof window === 'undefined' || !window.sessionStorage) return;
-    try {
-        const obj = Object.fromEntries(map);
-        window.sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify(obj));
-    } catch (e) {}
-}
-
-const cmsResponseCache = getSessionCache();
+const cmsResponseCache = new Map();
 const cmsInflightCache = new Map();
 
 function cloneCmsPayload(payload) {
     if (payload === undefined || payload === null) return payload;
-    // Fast clone for performance
     if (typeof structuredClone === 'function') {
-        try { return structuredClone(payload); } catch (e) {}
+        return structuredClone(payload);
     }
     return JSON.parse(JSON.stringify(payload));
 }
@@ -352,7 +323,6 @@ export async function fetchFromCMS(endpoint, language = 'DE', signal = null) {
                 data: payload,
                 expiresAt: Date.now() + CMS_CACHE_TTL_MS,
             });
-            saveSessionCache(cmsResponseCache);
         }
         return cloneCmsPayload(payload);
     } finally {

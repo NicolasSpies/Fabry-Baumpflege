@@ -125,39 +125,21 @@ const ContactFormSection = ({
     }, [formSchema, language]);
 
     useEffect(() => {
-        if (!settings.enable_turnstile || !turnstileSiteKey || typeof window === 'undefined') {
+        if (!settings.enable_turnstile || !turnstileRef.current || !turnstileSiteKey || typeof window === 'undefined' || !window.turnstile) {
             return;
         }
 
-        // Lazy load the Turnstile script if it's not already present
-        const SCRIPT_ID = 'cf-turnstile-script';
-        if (!document.getElementById(SCRIPT_ID)) {
-            const script = document.createElement('script');
-            script.id = SCRIPT_ID;
-            script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-            script.async = true;
-            script.defer = true;
-            document.head.appendChild(script);
+        if (turnstileWidgetIdRef.current !== null) {
+            window.turnstile.remove(turnstileWidgetIdRef.current);
+            turnstileWidgetIdRef.current = null;
         }
 
-        const renderTurnstile = () => {
-            if (window.turnstile && turnstileRef.current) {
-                if (turnstileWidgetIdRef.current !== null) {
-                    window.turnstile.remove(turnstileWidgetIdRef.current);
-                }
-                turnstileWidgetIdRef.current = window.turnstile.render(turnstileRef.current, {
-                    sitekey: turnstileSiteKey,
-                    callback: (token) => setTurnstileToken(token),
-                    'expired-callback': () => setTurnstileToken(''),
-                    'error-callback': () => setTurnstileToken(''),
-                });
-            } else {
-                // Retry in a moment if the script is still loading
-                setTimeout(renderTurnstile, 250);
-            }
-        };
-
-        renderTurnstile();
+        turnstileWidgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+            sitekey: turnstileSiteKey,
+            callback: (token) => setTurnstileToken(token),
+            'expired-callback': () => setTurnstileToken(''),
+            'error-callback': () => setTurnstileToken(''),
+        });
 
         return () => {
             if (turnstileWidgetIdRef.current !== null && window.turnstile) {

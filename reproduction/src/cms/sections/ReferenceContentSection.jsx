@@ -55,7 +55,7 @@ const ReferenceContentSection = ({
                         {beforeImage && (
                             <div
                                 className="absolute inset-0 overflow-hidden border-r-2 border-primary/30 z-10"
-                                style={{ clipPath: `inset(0 ${100 - sliderValue}% 0 0)`, willChange: 'clip-path' }}
+                                style={{ clipPath: `inset(0 ${100 - sliderValue}% 0 0)` }}
                             >
                                 <CmsImage 
                                     image={beforeImage} 
