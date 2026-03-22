@@ -59,6 +59,17 @@ const runLoop = () => {
 
 const startLoop = () => {
     if (!isRunning) {
+        if (typeof window !== 'undefined') {
+            const isMobile = window.innerWidth < 768;
+            // Check if there are any items that actually need to animate on this device
+            const hasAnimatableItems = Array.from(registry).some(item => {
+                const { disabled, desktopOnly } = item.options;
+                return !disabled && !(desktopOnly && isMobile);
+            });
+
+            if (!hasAnimatableItems) return;
+        }
+
         isRunning = true;
         updateLayouts();
         rafId = requestAnimationFrame(runLoop);

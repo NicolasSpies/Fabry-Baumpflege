@@ -100,44 +100,41 @@ const Services = () => {
 
     useEffect(() => {
         let cancelled = false;
-        async function loadContent() {
+        async function loadAllContent() {
             try {
-                const page = await getPage(PAGE_IDS.services, language);
+                // Parallellize both critical page content and secondary stats
+                const [page, statsData] = await Promise.all([
+                    getPage(PAGE_IDS.services, language),
+                    getHomeStats(language)
+                ]);
+
                 if (cancelled) return;
+
                 if (page) {
                     setRawPage(page);
                     const mappedServices = mapPageContent(page, getInitialContent(), 'Services');
-                    setPageData(prev => ({ ...prev, ...mappedServices }));
+                    
+                    // If we have stats from the home fetch, merge them in
+                    const finalData = statsData 
+                        ? mergeHomeStats(mappedServices, statsData)
+                        : mappedServices;
+                        
+                    setPageData(finalData);
 
-                    // Register alternates for API-driven routing
                     if (page.cc_alternates || page.pll_translations) {
                         setAlternates(page.cc_alternates || page.pll_translations);
                     }
                 }
-            } catch (err) {
-                console.error('[Services] CMS load failed:', err);
-            }
-        }
-        loadContent();
 
-        async function loadHomeStats() {
-            try {
-                const statsData = await getHomeStats(language);
-                if (cancelled) return;
                 if (statsData) {
                     setStatsCmsData(statsData);
-                    setPageData(prev => mergeHomeStats(prev, statsData));
                 }
             } catch (err) {
-                console.warn('[Services] Home stats fetch failed, using fallbacks');
+                console.error('[Services] CMS consolidation failed:', err);
             }
         }
 
-        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-            window.requestIdleCallback(() => loadHomeStats());
-        } else {
-            loadHomeStats();
-        }
+        loadAllContent();
         return () => { cancelled = true; };
     }, [language, t]);
 

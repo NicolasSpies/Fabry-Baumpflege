@@ -233,27 +233,6 @@ const References = () => {
         setDisplayCount(prev => prev + 12);
     };
 
-    // Intersection Observer for scroll-based loading
-    useEffect(() => {
-        if (isLoading || filteredRefs.length <= displayCount) return;
-
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                // Debounced/Guarded increment
-                setDisplayCount(prev => Math.min(prev + 12, filteredRefs.length));
-            }
-        }, { rootMargin: '400px', threshold: 0.1 });
-
-        const currentTrigger = loadMoreTriggerRef.current;
-        if (currentTrigger) {
-            observer.observe(currentTrigger);
-        }
-
-        return () => {
-            if (currentTrigger) observer.unobserve(currentTrigger);
-        };
-    }, [isLoading, filteredRefs.length, displayCount]);
-
 
     const getProps = (instanceName, localProps) => 
         resolveInstanceProps('References', instanceName, localProps, rawPage); // Header can hydrate from page data
@@ -336,11 +315,11 @@ const References = () => {
                                     {...project}
                                     language={language}
                                     animateEntry={isInitialRender}
-                                    staggerIndex={index}
+                                    staggerIndex={index % 12} // Stagger only current batch
                                     forceSquare={false} 
                                     compactMobileOverlay={true}
-                                    loading={index < 2 ? 'eager' : 'lazy'}
-                                    fetchPriority={index < 2 ? 'high' : 'low'}
+                                    loading="lazy"
+                                    fetchPriority="low"
                                     sizes="(max-width: 768px) 95vw, (max-width: 1200px) 45vw, 30vw"
                                     page="References"
                                     section="ReferencesGridSection"
@@ -348,9 +327,23 @@ const References = () => {
                             ))
                         )}
                     </div>
+
                     {filteredRefs.length > displayCount && (
-                        <div ref={loadMoreTriggerRef} className="h-20 flex items-center justify-center mt-12">
-                            {isLoading && <Icon name="refresh" className="animate-spin text-primary text-2xl" />}
+                        <div className="flex flex-col items-center justify-center mt-16 gap-4">
+                            <button 
+                                onClick={handleLoadMore}
+                                disabled={isLoading}
+                                className="px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm uppercase tracking-widest disabled:opacity-50"
+                            >
+                                {isLoading ? (
+                                    <Icon name="refresh" className="animate-spin text-xl" />
+                                ) : (
+                                    t('refs.load_more') || 'Mehr laden'
+                                )}
+                            </button>
+                            <p className="text-xs text-muted-accessible uppercase tracking-widest">
+                                {displayCount} von {filteredRefs.length} Projekten angezeigt
+                            </p>
                         </div>
                     )}
                 </div>

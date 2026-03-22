@@ -77,10 +77,17 @@ const ContactFormSection = ({
 
             const options = (f.options || []).map(opt => ({
                 ...opt,
-                label: patchStr(opt.label)
+                label: patchStr(opt.label),
+                computedIcon: getServiceIcon({ name: opt.value, label: opt.label, icon: opt.icon })
             }));
 
-            return { ...f, label, placeholder, options };
+            return { 
+                ...f, 
+                label, 
+                placeholder, 
+                options,
+                computedIcon: getServiceIcon({ name: f.name, label: f.label, icon: f.icon })
+            };
         });
     }, [rawFields]);
     const preselectedServiceKeys = useMemo(() => {
@@ -118,21 +125,39 @@ const ContactFormSection = ({
     }, [formSchema, language]);
 
     useEffect(() => {
-        if (!settings.enable_turnstile || !turnstileRef.current || !turnstileSiteKey || typeof window === 'undefined' || !window.turnstile) {
+        if (!settings.enable_turnstile || !turnstileSiteKey || typeof window === 'undefined') {
             return;
         }
 
-        if (turnstileWidgetIdRef.current !== null) {
-            window.turnstile.remove(turnstileWidgetIdRef.current);
-            turnstileWidgetIdRef.current = null;
+        // Lazy load the Turnstile script if it's not already present
+        const SCRIPT_ID = 'cf-turnstile-script';
+        if (!document.getElementById(SCRIPT_ID)) {
+            const script = document.createElement('script');
+            script.id = SCRIPT_ID;
+            script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
         }
 
-        turnstileWidgetIdRef.current = window.turnstile.render(turnstileRef.current, {
-            sitekey: turnstileSiteKey,
-            callback: (token) => setTurnstileToken(token),
-            'expired-callback': () => setTurnstileToken(''),
-            'error-callback': () => setTurnstileToken(''),
-        });
+        const renderTurnstile = () => {
+            if (window.turnstile && turnstileRef.current) {
+                if (turnstileWidgetIdRef.current !== null) {
+                    window.turnstile.remove(turnstileWidgetIdRef.current);
+                }
+                turnstileWidgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+                    sitekey: turnstileSiteKey,
+                    callback: (token) => setTurnstileToken(token),
+                    'expired-callback': () => setTurnstileToken(''),
+                    'error-callback': () => setTurnstileToken(''),
+                });
+            } else {
+                // Retry in a moment if the script is still loading
+                setTimeout(renderTurnstile, 250);
+            }
+        };
+
+        renderTurnstile();
 
         return () => {
             if (turnstileWidgetIdRef.current !== null && window.turnstile) {
@@ -332,7 +357,7 @@ const ContactFormSection = ({
                             className="sr-only"
                             aria-checked={!!formData[name]}
                         />
-                        <IconRenderer icon={getServiceIcon(field)} isSelected={!!formData[name]} />
+                        <IconRenderer icon={field.computedIcon} isSelected={!!formData[name]} />
                         <div>
                             <p className={`text-[10px] md:text-[13px] font-bold uppercase tracking-widest mb-1 ${formData[name] ? 'text-primary' : 'text-slate-700'}`}>
                                 {label}
@@ -362,7 +387,7 @@ const ContactFormSection = ({
                                     }`}
                                     onClick={() => toggleService(name, opt.value)}
                                 >
-                                    <IconRenderer icon={opt.icon || 'info'} isSelected={selectedServices.includes(opt.value)} />
+                                    <IconRenderer icon={opt.computedIcon} isSelected={selectedServices.includes(opt.value)} />
                                     <div>
                                         <p className={`text-[10px] md:text-[13px] font-bold uppercase tracking-widest mb-1 ${selectedServices.includes(opt.value) ? 'text-primary' : 'text-slate-700'}`}>
                                             {opt.label}

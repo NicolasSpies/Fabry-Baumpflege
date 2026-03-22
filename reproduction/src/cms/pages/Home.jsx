@@ -10,11 +10,13 @@ import HeroSection from '@/cms/sections/HeroSection';
 import StatsSection from '@/cms/sections/StatsSection';
 import HomeIntroSection from '@/cms/sections/HomeIntroSection';
 import ServicesSection from '@/cms/sections/ServicesSection';
-import ReferencesSection from '@/cms/sections/ReferencesSection';
-import TestimonialsSection from '@/cms/sections/TestimonialsSection';
-import AboutSection from '@/cms/sections/AboutSection';
+const ReferencesSection = React.lazy(() => import('@/cms/sections/ReferencesSection'));
+const TestimonialsSection = React.lazy(() => import('@/cms/sections/TestimonialsSection'));
+const AboutSection = React.lazy(() => import('@/cms/sections/AboutSection'));
+
 import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
+import { Suspense } from 'react';
 
 
 
@@ -322,23 +324,29 @@ const Home = () => {
             />
 
             {/* Page: Home → Section: ReferencesSection */}
-            <ReferencesSection
-                {...getProps('ReferencesSection', pageData.references)}
-                language={language}
-                allRefsHref={getLocalizedPath('references', language)}
-                isLoading={refsLoading}
-            />
+            <Suspense fallback={<div className="h-40 animate-pulse bg-slate-50 dark:bg-slate-800/50" />}>
+                <ReferencesSection
+                    {...getProps('ReferencesSection', pageData.references)}
+                    language={language}
+                    allRefsHref={getLocalizedPath('references', language)}
+                    isLoading={refsLoading}
+                />
+            </Suspense>
 
             {/* Page: Home → Section: TestimonialsSection */}
-            <TestimonialsSection
-                {...getProps('TestimonialsSection', pageData.testimonials)}
-                language={language}
-            />
+            <Suspense fallback={<div className="h-40 animate-pulse bg-slate-50 dark:bg-slate-800/50" />}>
+                <TestimonialsSection
+                    {...getProps('TestimonialsSection', pageData.testimonials)}
+                    language={language}
+                />
+            </Suspense>
 
             {/* Page: Home → Section: AboutSection */}
-            <AboutSection
-                {...getProps('AboutSection', pageData.about)}
-            />
+            <Suspense fallback={<div className="h-40 animate-pulse bg-slate-50 dark:bg-slate-800/50" />}>
+                <AboutSection
+                    {...getProps('AboutSection', pageData.about)}
+                />
+            </Suspense>
         </main>
     );
 };
