@@ -124,7 +124,7 @@ export function resolveMetadata(route, apiData, globalSeo) {
         locale: defaults.locale,
         title: title,
         description: description,
-        ogImage: ogImage || globalSeo?.og_image_url || defaults.ogImage,
+        ogImage: ogImage || globalSeo?.default_og_image_url || defaults.ogImage,
         ogTitle: seo.og_title || title,
         ogDescription: seo.og_description || description,
         url: currentUrl,

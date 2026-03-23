@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { resolveRouteContext, resolveMetadata, injectMetadata, getImageVariant, CMS_HOST } from '../src/cms/lib/seo-logic.mjs';
+import { PRODUCTION_TEMPLATE } from '../src/cms/lib/template.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -55,40 +56,14 @@ export default async function handler(req, res) {
     // 2. Resolve Global Metadata Logic
     const metadata = resolveMetadata({ ...route, path: originalPath, isHome: originalPath === '/' || originalPath === '/fr' }, pageData, globalSeo);
 
-    // 3. Transformation: Robust Template Discovery
-    // We check multiple locations because Vercel/Serverless paths vary between local/dev/prod
-    const possiblePaths = [
-        path.join(process.cwd(), 'index.html'),
-        path.join(__dirname, '../index.html'),
-        path.join(__dirname, 'index.html')
-    ];
+    // 3. Transformation: Deterministic Rendering
+    let html = PRODUCTION_TEMPLATE;
 
-    let html = '';
-    let foundPath = null;
-
-    for (const p of possiblePaths) {
-        try {
-            if (fs.existsSync(p)) {
-                html = fs.readFileSync(p, 'utf8');
-                foundPath = p;
-                break;
-            }
-        } catch (e) { /* ignore individual check fail */ }
-    }
-
-    if (!html) {
-        console.error(`[SEO-RENDER] EXCEPTION: Template missing. Serving EMERGENCY FALLBACK. Checked: ${possiblePaths.join(', ')}`);
-        // Emergency Fallback: If template is missing, do NOT white-screen.
-        // Return a basic shell that allows client-side hydration to eventually take over.
-        html = `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8" /><meta name="ssr-fallback" content="true" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>${metadata.title || 'Fabry Baumpflege'}</title></head><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>`;
-    } else {
-        console.log(`[SEO-RENDER] Template SUCCESS: Resolved from ${foundPath}`);
-    }
-
-    // Add Debug Markers
-    const debugMarker = `<meta name="x-seo-runtime" content="api-render-${route.lang}-${route.type}">`;
+    // Add Production-Level Debug Markers
+    const debugMarker = `<meta name="x-seo-runtime" content="api-ssr-deterministic">`;
     html = html.replace('</head>', `  ${debugMarker}\n</head>`);
     
+    // Inject ALL fields (title, description, og, twitter, robots, canonical)
     html = injectMetadata(html, metadata);
 
     // 4. Final Response (Force Dynamic)
