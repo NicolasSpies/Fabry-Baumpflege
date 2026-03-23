@@ -174,6 +174,24 @@ function versionToSlug(v) {
     return isNaN(date.getTime()) ? '1' : String(Math.floor(date.getTime() / 1000));
 }
 
+export function getImageVariant(image, size = '768') {
+    if (!image) return '';
+    const variants = image.variants || image.media?.variants || {};
+    
+    // 1. Explicit requested size (if exists)
+    if (variants[size]?.url) return variants[size].url;
+    
+    // 2. Original escape hatch: Bypass fallbacks if explicitly asking for master
+    if (size === 'original') return image.url || image.src || '';
+    
+    // 3. Performance Fallback chain
+    return variants['768']?.url 
+        || variants['480']?.url 
+        || image.url 
+        || image.src 
+        || '';
+}
+
 export function normalizeCmsImage(image) {
     if (!image) return null;
 
@@ -198,29 +216,27 @@ export function normalizeCmsImage(image) {
 
     const sourceList = buildResponsiveSourceList(image);
     
-    // 1. Identify Canonical src (High-quality responsive variant preferred for desktop)
+    // 1. Identify Canonical src (Medium-quality responsive variant preferred as default base)
     const v = image.variants || image.sources || image.media_details?.sizes || {};
     // Priority: explicit version > modified timestamp > fallback
     const imgVersion = image.version || image.v || (image.modified ? image.modified : null);
     
-    // Look for plugin-specific numeric variants first
-    const responsiveSrc = getUrl(v['1280'] || v['768'] || v['480']);
+    // Standardized variant selection via helper
+    const responsiveSrc = getImageVariant(image, '768');
     
-    // If no numeric variants, search sources for a high-res (but not too high) variant
+    // If no numeric variants, search sources for a medium variant
     let fallbackVariant = null;
     if (!responsiveSrc) {
-        // Find smallest source that is at least 1200w, excluding the likely master/main
-        fallbackVariant = sourceList.find(s => (s.width || 0) >= 1200 && s.key !== 'main' && s.key !== 'original');
-        // If still nothing, take the largest available source that isn't the absolute master
+        // Find smallest source that is at least 700w (medium fallback)
+        fallbackVariant = sourceList.find(s => (s.width || 0) >= 700 && s.key !== 'main' && s.key !== 'original');
         if (!fallbackVariant) {
-            fallbackVariant = sourceList.find(s => (s.width || 0) >= 800 && s.key !== 'main' && s.key !== 'original');
+            fallbackVariant = sourceList.find(s => (s.width || 0) >= 400 && s.key !== 'main' && s.key !== 'original');
         }
     }
 
     const canonicalSrc = responsiveSrc || getUrl(fallbackVariant);
 
     // Final src: Prioritize responsive variant, fallback sequentially to master only as last resort
-    // CRITICAL: We avoid unversioned naked URLs as primary src if a better responsive variant exists.
     const hasResponsive = !!(v['1280'] || v['768'] || v['480']);
     const nakedMaster = getUrl(v['original'] || image.full || image.original) || image.src || image.url || image.source_url || '';
     const isNakedUnversioned = nakedMaster && !nakedMaster.includes('?v=') && !/-(1280|768|480)\./.test(nakedMaster);
@@ -258,13 +274,15 @@ export function normalizeCmsImage(image) {
 
     const apiSrcSet = sanitizeSrcSet(rawApiSrcSet);
 
-    const srcSet = apiSrcSet || sourceList
+    const srcSetObject = sourceList
         .filter(s => {
             const isNakedMaster = !/-(1280|768|480)\./.test(s.url);
             const isVersioned = s.url.includes('?v=');
             const hasResponsive = sourceList.some(o => /-(1280|768|480)\./.test(o.url));
             return !isNakedMaster || isVersioned || !hasResponsive;
-        })
+        });
+
+    const srcSet = apiSrcSet || srcSetObject
         .map((entry) => `${buildVersionedUrl(entry.url, imgVersion)} ${entry.width}w`)
         .join(', ');
 
@@ -276,45 +294,60 @@ export function normalizeCmsImage(image) {
         ...image,
         src,
         srcSet,
-        // Default sizes to 100vw to ensure browser picks from srcset
+        rawSrcSetEntries: srcSetObject.map(s => ({ ...s, url: buildVersionedUrl(s.url, imgVersion) })),
         sizes: (image.sizes && typeof image.sizes === 'string' && image.sizes !== '') ? image.sizes : '100vw',
         alt: image.alt || image.title?.rendered || '',
         width,
         height,
-        variants: v
+        variants: v,
+        imgVersion
     };
 }
 
 export function getCmsImageProps(image, options = {}) {
+    // 1. Base Normalization (Standardized default to 768px)
     const normalized = normalizeCmsImage(image);
     if (!normalized?.src) return null;
 
-    // Hints for the initial 'src' attribute.
-    // preferSmallSource/preferMediumSource allow a component to force a specific variant for the 'src' fallback.
+    // 2. Standardization Logic: Prioritize explicit size or hints
     const v = normalized.variants || {};
+    
+    // Explicit size request via helper
+    const explicitSrc = options.size ? getImageVariant(image, options.size) : null;
+    
     const hintSource = 
+        explicitSrc ||
         (options.preferSmall && (v['480'] || v['768'])) ||
         (options.preferMedium && (v['768'] || v['1280'])) ||
         null;
 
-    const fallbackSrc = getUrl(hintSource) || normalized.src;
+    let src = getUrl(hintSource) || normalized.src;
+    let srcSet = normalized.srcSet;
 
-    const props = {
-        src: fallbackSrc,
-        alt: options.alt ?? normalized.alt ?? '',
-    };
-
-    // ALWAYS provide srcset and sizes so the browser can make the most efficient choice.
-    if (normalized.srcSet) props.srcSet = normalized.srcSet;
-    if (options.sizes || normalized.sizes) {
-        props.sizes = options.sizes || normalized.sizes;
+    // Apply maxWidth constraint to limit resolution (e.g. for cards)
+    if (options.maxWidth && normalized.rawSrcSetEntries) {
+        const filteredEntries = normalized.rawSrcSetEntries.filter(s => (s.width || 0) <= options.maxWidth);
+        if (filteredEntries.length > 0) {
+            srcSet = filteredEntries.map(s => `${s.url} ${s.width}w`).join(', ');
+            // If the current src is larger than maxWidth, downgrade it to the best available
+            const currentWidthMatch = src.match(/-(\d+)\./);
+            const currentWidth = currentWidthMatch ? parseInt(currentWidthMatch[1]) : 9999;
+            if (currentWidth > options.maxWidth) {
+                src = filteredEntries[filteredEntries.length - 1].url;
+            }
+        }
     }
 
-    if (normalized.width) props.width = normalized.width;
-    if (normalized.height) props.height = normalized.height;
-    
-    // Default to 'lazy' for optimal performance, unless explicitly overridden (e.g. Hero sections)
-    props.loading = options.loading || 'lazy';
+    const props = {
+        src,
+        srcSet,
+        alt: options.alt ?? normalized.alt ?? '',
+        sizes: options.sizes || normalized.sizes,
+        width: normalized.width,
+        height: normalized.height,
+        loading: options.loading || 'lazy'
+    };
+
     if (options.decoding) props.decoding = options.decoding;
     if (options.fetchPriority) props.fetchPriority = options.fetchPriority;
 

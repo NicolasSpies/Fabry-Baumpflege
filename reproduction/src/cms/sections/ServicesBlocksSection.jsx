@@ -21,10 +21,12 @@ const ServiceImage = ({ src, alt, priority = false }) => {
             image={src}
             ref={ref}
             alt={alt}
+            size="768"
             className="w-full h-full object-cover"
             sizes="(max-width: 768px) 85vw, 33vw"
             loading={priority ? "eager" : "lazy"}
             fetchPriority={priority ? "high" : "low"}
+            maxWidth={768}
         />
     );
 };

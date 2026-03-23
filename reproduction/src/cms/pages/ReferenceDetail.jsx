@@ -475,6 +475,7 @@ const ReferenceDetail = () => {
                             <CmsImage
                                 image={projectGallery[activeImageIndex]}
                                 alt="Project Gallery"
+                                size="original"
                                 className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-500"
                                 sizes="100vw"
                                 onClick={(e) => e.stopPropagation()}

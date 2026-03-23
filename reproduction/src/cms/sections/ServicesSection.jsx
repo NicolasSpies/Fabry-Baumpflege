@@ -43,7 +43,7 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
                 {/* Visual enhancement: Show service image if available, else show gradient blob */}
                 {image ? (
                     <div className={`absolute inset-x-0 bottom-0 top-1/2 transition-opacity duration-700 ${imageState} md:opacity-0 md:group-hover:opacity-10`}>
-                         <CmsImage image={image} className="w-full h-full object-cover grayscale" alt="" sizes="(max-width: 1024px) 100vw, 25vw" loading="lazy" />
+                         <CmsImage image={image} size="768" className="w-full h-full object-cover grayscale" alt="" sizes="(max-width: 1024px) 100vw, 25vw" loading="lazy" maxWidth={768} />
                     </div>
                 ) : (
                     <div className={`absolute top-0 right-0 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 transition-colors duration-500 ${isActive ? 'bg-primary/10' : ''} md:group-hover:bg-primary/10`}></div>

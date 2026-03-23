@@ -30,6 +30,7 @@ const PhilosophySection = ({
                             image={image}
                             ref={heroPortraitRef}
                             alt=""
+                            size="768"
                             className="w-full h-full object-cover"
                             sizes="(max-width: 768px) 85vw, 33vw"
                             loading="eager"

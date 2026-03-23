@@ -62,9 +62,11 @@ const ReferenceCard = ({
                 <CmsImage
                     image={props.thumbnailImage}
                     alt={props.title}
+                    size="768"
                     className="w-full h-full object-cover transition-transform duration-700 md:group-hover:scale-110"
                     sizes={props.sizes || "(max-width: 768px) 85vw, 33vw"}
                     loading={props.loading || 'lazy'}
+                    maxWidth={768}
                 />
                 
                 {/* Unified Overlay System */}

@@ -37,16 +37,19 @@ export function useCmsSeo(seo) {
     // Robots
     updateOrCreateMeta('robots', null, seo.robots);
 
-    // 3. Canonical
-    if (seo.canonical) {
-        let canonicalLink = head.querySelector('link[rel="canonical"]');
-        if (!canonicalLink) {
-            canonicalLink = document.createElement('link');
-            canonicalLink.setAttribute('rel', 'canonical');
-            head.appendChild(canonicalLink);
-        }
-        canonicalLink.setAttribute('href', seo.canonical);
+    // 3. Canonical (Build from frontend URL)
+    const currentUrlHost = window.location.hostname === 'localhost' ? 'fabry-baumpflege.be' : window.location.hostname;
+    const currentUrl = `https://${currentUrlHost}${window.location.pathname}`;
+    let canonicalLink = head.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+        canonicalLink = document.createElement('link');
+        canonicalLink.setAttribute('rel', 'canonical');
+        head.appendChild(canonicalLink);
     }
+    canonicalLink.setAttribute('href', currentUrl);
+
+    // og:url
+    updateOrCreateMeta(null, 'og:url', currentUrl);
 
   }, [seo]);
 }

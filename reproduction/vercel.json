@@ -5,6 +5,10 @@
             "destination": "https://cms.fabry-baumpflege.be/wp-json/:path*"
         },
         {
+            "source": "/((?!.*\\.).*)",
+            "destination": "/api/render?path=/$1"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }

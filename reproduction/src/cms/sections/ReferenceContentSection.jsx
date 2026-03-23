@@ -105,6 +105,7 @@ const ReferenceContentSection = ({
                                <CmsImage
                                    image={img}
                                    alt={`Project Gallery ${idx + 1}`}
+                                   size="480"
                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                    sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
                                    loading="lazy"

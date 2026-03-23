@@ -50,6 +50,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
                     image={image}
                     ref={heroRef}
                     alt=""
+                    size="1280"
                     className={`w-full h-[120%] object-cover ${objectPosition === 'object-top' ? 'object-[60%_center] md:object-top' : objectPosition} md:filter md:brightness-[0.80] md:contrast-[1.05]`}
                     sizes="(max-width: 768px) 100vw, 100vw"
                     loading="eager"

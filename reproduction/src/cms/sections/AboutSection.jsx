@@ -37,6 +37,7 @@ const expertiseImgRef = useRef(null);
                                 image={image}
                                 ref={expertiseImgRef}
                                 alt=""
+                                size="768"
                                 className="w-full aspect-square object-cover"
                                 sizes="(max-width: 768px) 85vw, 33vw"
                                 loading="lazy"
