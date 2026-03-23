@@ -22,7 +22,7 @@ const ServiceImage = ({ src, alt, priority = false }) => {
             ref={ref}
             alt={alt}
             className="w-full h-full object-cover"
-            sizes="(max-width: 1024px) 100vw, 50vw"
+            sizes="(max-width: 768px) 85vw, 33vw"
             loading={priority ? "eager" : "lazy"}
             fetchPriority={priority ? "high" : "low"}
         />
