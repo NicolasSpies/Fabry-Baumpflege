@@ -55,16 +55,34 @@ export default async function handler(req, res) {
     // 2. Resolve Global Metadata Logic
     const metadata = resolveMetadata({ ...route, path: originalPath, isHome: originalPath === '/' || originalPath === '/fr' }, pageData, globalSeo);
 
-    // 3. Transformation
-    // Vercel serverless resolution: index.html is in the project root
-    const indexPath = path.join(process.cwd(), 'index.html');
+    // 3. Transformation: Robust Template Discovery
+    // We check multiple locations because Vercel/Serverless paths vary between local/dev/prod
+    const possiblePaths = [
+        path.join(process.cwd(), 'index.html'),
+        path.join(__dirname, '../index.html'),
+        path.join(__dirname, 'index.html')
+    ];
+
     let html = '';
-    
-    try {
-        html = fs.readFileSync(indexPath, 'utf8');
-    } catch (err) {
-        console.error(`[SEO] Template read failed:`, err.message);
-        return res.status(500).send('Production template not found at ' + indexPath);
+    let foundPath = null;
+
+    for (const p of possiblePaths) {
+        try {
+            if (fs.existsSync(p)) {
+                html = fs.readFileSync(p, 'utf8');
+                foundPath = p;
+                break;
+            }
+        } catch (e) { /* ignore individual check fail */ }
+    }
+
+    if (!html) {
+        console.error(`[SEO-RENDER] EXCEPTION: Template missing. Serving EMERGENCY FALLBACK. Checked: ${possiblePaths.join(', ')}`);
+        // Emergency Fallback: If template is missing, do NOT white-screen.
+        // Return a basic shell that allows client-side hydration to eventually take over.
+        html = `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8" /><meta name="ssr-fallback" content="true" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>${metadata.title || 'Fabry Baumpflege'}</title></head><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>`;
+    } else {
+        console.log(`[SEO-RENDER] Template SUCCESS: Resolved from ${foundPath}`);
     }
 
     // Add Debug Markers

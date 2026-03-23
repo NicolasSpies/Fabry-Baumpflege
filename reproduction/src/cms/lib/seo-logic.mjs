@@ -18,14 +18,14 @@ export const DEFAULT_SEO = {
     DE: {
         title: 'Fabry Baumpflege | Fachgerechte Baumpflege & Erhaltung',
         description: 'Professionelle Baumpflege, Baumerhaltung und sichere Baumfällung in Ostbelgien und Umgebung. Ihre Experten für gesunde Wälder und Gärten.',
-        ogImage: 'https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/fabry-baumpflege-default-og.jpg',
+        ogImage: 'https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/fabry-baumpflege-leistung-baumfaellung.webp',
         url: 'https://fabry-baumpflege.be',
         locale: 'de_DE'
     },
     FR: {
         title: 'Fabry Baumpflege | Soins des arbres et élagage professionnel',
         description: 'Votre expert pour les soins des arbres, la conservation et l\'abattage sécurisé en Communauté germanophone et environs.',
-        ogImage: 'https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/fabry-baumpflege-default-og.jpg',
+        ogImage: 'https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/fabry-baumpflege-leistung-baumfaellung.webp',
         url: 'https://fabry-baumpflege.be/fr',
         locale: 'fr_FR'
     }
