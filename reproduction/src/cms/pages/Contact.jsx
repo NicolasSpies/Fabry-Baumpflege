@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, mapPageContent, getForm, PAGE_IDS } from '@/cms/lib/cms';
+import { getPage, mapPageContent, getForm, resolveMedia, PAGE_IDS } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
 import ContactSidebarSection from '@/cms/sections/ContactSidebarSection';
 import ContactFormSection from '@/cms/sections/ContactFormSection';
-import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
+import { resolveInstanceProps, resolveInstancePropsAsync, awaitMappings } from '@/cms/bridge-resolver';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
 
 
@@ -59,6 +59,7 @@ const Contact = () => {
     const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);
     const [formSchema, setFormSchema] = useState(null);
+    const [hydratedProps, setHydratedProps] = useState({});
     useScrollReveal([rawPage, formSchema]);
 
     useEffect(() => {
@@ -88,6 +89,21 @@ const Contact = () => {
                     if (page.cc_alternates || page.pll_translations) {
                         setAlternates(page.cc_alternates || page.pll_translations);
                     }
+
+                    // ─── Hydration ───
+                    const [hero, sidebar, form] = await Promise.all([
+                        resolveInstancePropsAsync('Contact', 'PageHeroSection', mappedContact.hero, page),
+                        resolveInstancePropsAsync('Contact', 'ContactSidebarSection', mappedContact.sidebar, page),
+                        resolveInstancePropsAsync('Contact', 'ContactFormSection', mappedContact.form, page)
+                    ]);
+
+                    if (!cancelled) {
+                        setHydratedProps({
+                            PageHeroSection: hero,
+                            ContactSidebarSection: sidebar,
+                            ContactFormSection: form
+                        });
+                    }
                 }
                 if (form) {
                     setFormSchema(form);
@@ -105,6 +121,7 @@ const Contact = () => {
 
 
     const getProps = (instanceName, localProps) => {
+        if (hydratedProps[instanceName]) return hydratedProps[instanceName];
         return resolveInstanceProps('Contact', instanceName, localProps, rawPage);
     };
 

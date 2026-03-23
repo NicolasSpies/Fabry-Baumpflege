@@ -15,7 +15,7 @@
  */
 
 // contentbridge:cms-host
-export const CMS_HOST = 'http://cms.fabry-baumpflege.be';
+export const CMS_HOST = 'https://cms.fabry-baumpflege.be';
 
 /**
  * The WordPress REST API v2 base path, relative to the Vite dev proxy.

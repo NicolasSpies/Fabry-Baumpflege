@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, getHomeStats, mapPageContent, PAGE_IDS } from '@/cms/lib/cms';
+import { getPage, getHomeStats, mapPageContent, resolveMedia, PAGE_IDS } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
 import ServicesIntroSection from '@/cms/sections/ServicesIntroSection';
 import ServicesBlocksSection from '@/cms/sections/ServicesBlocksSection';
 import StatsSection from '@/cms/sections/StatsSection';
-import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
+import { resolveInstanceProps, resolveInstancePropsAsync, awaitMappings } from '@/cms/bridge-resolver';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
 
 
@@ -91,6 +91,7 @@ const Services = () => {
 
     const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);
+    const [hydratedProps, setHydratedProps] = useState({});
     useScrollReveal([rawPage, statsCmsData]);
 
     useEffect(() => {
@@ -134,16 +135,39 @@ const Services = () => {
             }
         }
 
-        loadAllContent();
+        async function hydrate() {
+            if (!rawPage) return;
+            try {
+                const [intro, blocks, stats] = await Promise.all([
+                    resolveInstancePropsAsync('Services', 'ServicesIntroSection', pageData.intro, rawPage),
+                    resolveInstancePropsAsync('Services', 'ServicesBlocksSection', pageData.blocks, rawPage),
+                    resolveInstancePropsAsync('Services', 'StatsSection', pageData.stats, statsCmsData || rawPage || globalCmsData)
+                ]);
+
+                if (!cancelled) {
+                    setHydratedProps({
+                        ServicesIntroSection: intro,
+                        ServicesBlocksSection: blocks,
+                        StatsSection: stats
+                    });
+                }
+            } catch (err) {
+                console.error('[Services] Hydration failed:', err);
+            }
+        }
+
+        loadAllContent().then(() => hydrate());
         return () => { cancelled = true; };
-    }, [language, t]);
+    }, [language, t, rawPage, statsCmsData]);
 
     useCmsSeo(rawPage?.seo || globalSeo);
 
 
 
-    const getProps = (instanceName, localProps) => 
-        resolveInstanceProps('Services', instanceName, localProps, rawPage || globalCmsData);
+    const getProps = (instanceName, localProps) => {
+        if (hydratedProps[instanceName]) return hydratedProps[instanceName];
+        return resolveInstanceProps('Services', instanceName, localProps, rawPage || globalCmsData);
+    };
 
     // No longer blocking on full rawPage or statsCmsData
     // We render immediately with localized fallbacks.

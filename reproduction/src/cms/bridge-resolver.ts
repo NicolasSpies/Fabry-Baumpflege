@@ -439,13 +439,15 @@ function extractImageValue(
 
   // ── Case 3: media object → extract the best available URL ──────────────────
   if (resolvedVal && typeof resolvedVal === 'object') {
+    // New Plugin Structure priority
     if (
-      resolvedVal.src ||
-      resolvedVal.srcSet ||
-      resolvedVal.srcset ||
-      resolvedVal.sources ||
-      resolvedVal.full?.url ||
-      resolvedVal.fallback?.url
+        typeof resolvedVal.src === 'string' ||
+        resolvedVal.variants ||
+        resolvedVal.sources ||
+        resolvedVal.srcSet ||
+        resolvedVal.srcset ||
+        resolvedVal.full?.url ||
+        resolvedVal.fallback?.url
     ) {
       return { object: resolvedVal };
     }
@@ -454,17 +456,17 @@ function extractImageValue(
       resolvedVal.source_url                           ||
       resolvedVal.url                                  ||
       resolvedVal.guid?.rendered                       ||
-      resolvedVal.guid                                 || // Some setups have raw guid
+      resolvedVal.guid                                 ||
       resolvedVal.sizes?.full?.source_url              ||
       resolvedVal.sizes?.large?.source_url             ||
       resolvedVal.sizes?.medium_large?.source_url      ||
       resolvedVal.sizes?.medium?.source_url;
 
     if (typeof candidate === 'string' && (candidate.startsWith('http') || candidate.startsWith('/'))) {
-      return { url: candidate };
+      const srcSet = resolvedVal.srcSet || resolvedVal.srcset || '';
+      return { object: { ...resolvedVal, src: candidate, srcSet } };
     }
 
-    // Object might be a simple { id: 123 } reference
     const idCandidate = resolvedVal.id || resolvedVal.ID || resolvedVal.media_id;
     if (typeof idCandidate === 'number' && idCandidate > 0) {
       return { mediaId: idCandidate };

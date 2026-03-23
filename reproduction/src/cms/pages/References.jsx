@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
-import { getReferences, getReferenceCategories, mapReferenceCard, getPage, mapPageContent, PAGE_IDS, decodeHtmlEntities } from '@/cms/lib/cms';
+import { getReferences, getReferenceCategories, mapReferenceCard, getPage, mapPageContent, resolveMedia, PAGE_IDS, decodeHtmlEntities } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 import ReferenceCard from '@/cms/components/ui/ReferenceCard';
-import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
+import { resolveInstanceProps, resolveInstancePropsAsync, awaitMappings } from '@/cms/bridge-resolver';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
 
 import Icon from '@/cms/components/ui/Icon';
@@ -44,6 +44,7 @@ const References = () => {
     const [error, setError] = useState(null);
     const [isInitialRender, setIsInitialRender] = useState(true);
     const [rawPage, setRawPage] = useState(null);
+    const [hydratedProps, setHydratedProps] = useState({});
 
     const getInitialContent = () => ({
         header: {
@@ -125,17 +126,35 @@ const References = () => {
                 }
 
                 const catMap = (Array.isArray(rawCats) ? rawCats : []).reduce((acc, c) => { if (c?.id) acc[String(c.id)] = c.name; return acc; }, {});
-                const mappedRefs = (Array.isArray(rawRefs) ? rawRefs : []).map(item => {
+                
+                // ─── Resolve Reference Thumbnails asynchronously ───
+                const mappedRefs = await Promise.all((Array.isArray(rawRefs) ? rawRefs : []).map(async (item) => {
                     if (!item) return null;
                     try {
-                        return { ...mapReferenceCard(item, catMap), data: item };
+                        const baseMapped = mapReferenceCard(item, catMap);
+                        // Explicitly resolve thumbnail if it's an ID
+                        const resolvedThumbnail = await resolveMedia(baseMapped.thumbnailImage);
+                        return { 
+                            ...baseMapped, 
+                            thumbnailImage: resolvedThumbnail || baseMapped.thumbnailImage,
+                            data: item 
+                        };
                     } catch (e) {
                         return null;
                     }
-                }).filter(Boolean);
+                }));
+                const filteredMappedRefs = mappedRefs.filter(Boolean);
 
-                setAllRefs(mappedRefs);
-                setPageData(prev => ({ ...prev, items: mappedRefs }));
+                setAllRefs(filteredMappedRefs);
+                setPageData(prev => ({ ...prev, items: filteredMappedRefs }));
+
+                // ─── Hydrate Page Header ───
+                const header = await resolveInstancePropsAsync('References', 'ReferencesHeaderSection', pageData.header, page);
+                if (!cancelled) {
+                    setHydratedProps({
+                        ReferencesHeaderSection: header
+                    });
+                }
 
                 // 4. Process Categories
                 // The taxonomy API returns all categories regardless of active references.
@@ -234,8 +253,10 @@ const References = () => {
     };
 
 
-    const getProps = (instanceName, localProps) => 
-        resolveInstanceProps('References', instanceName, localProps, rawPage); // Header can hydrate from page data
+    const getProps = (instanceName, localProps) => {
+        if (hydratedProps[instanceName]) return hydratedProps[instanceName];
+        return resolveInstanceProps('References', instanceName, localProps, rawPage);
+    };
 
     if (error) {
         return (

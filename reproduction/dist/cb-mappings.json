@@ -27,7 +27,7 @@
               "isUnstable": false
             },
             "image": {
-              "fieldPath": "customFields.startseite_headerbild.url",
+              "fieldPath": "customFields.startseite_headerbild",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },
@@ -37,7 +37,7 @@
               "isUnstable": false
             },
             "ctaHref": {
-              "fieldPath": "customFields.startseite_header_button.url",
+              "fieldPath": "customFields.startseite_header_button",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             }
@@ -82,7 +82,7 @@
               "isUnstable": false
             },
             "image": {
-              "fieldPath": "customFields.startseite_ueber_mich_bild.url",
+              "fieldPath": "customFields.startseite_ueber_mich_bild",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },
@@ -92,7 +92,7 @@
               "isUnstable": false
             },
             "ctaHref": {
-              "fieldPath": "customFields.startseite_button_ueber_mich.url",
+              "fieldPath": "customFields.startseite_button_ueber_mich",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             }
@@ -319,12 +319,12 @@
               "isUnstable": false
             },
             "beforeImage": {
-              "fieldPath": "customFields.bild_vorher.url",
+              "fieldPath": "customFields.bild_vorher",
               "sourceId": "uk1jxgem",
               "isUnstable": false
             },
             "afterImage": {
-              "fieldPath": "customFields.bild_nachher.url",
+              "fieldPath": "customFields.bild_nachher",
               "sourceId": "uk1jxgem",
               "isUnstable": false
             },
@@ -358,7 +358,7 @@
           "component": "PageHeroSection",
           "props": {
             "image": {
-              "fieldPath": "customFields.header_leistungen.url",
+              "fieldPath": "customFields.header_leistungen",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             }
@@ -517,7 +517,7 @@
               "isUnstable": false
             },
             "image": {
-              "fieldPath": "customFields.profil_bild.url",
+              "fieldPath": "customFields.profil_bild",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             }
@@ -596,7 +596,7 @@
           "component": "PageHeroSection",
           "props": {
             "image": {
-              "fieldPath": "customFields.kontakt_header.url",
+              "fieldPath": "customFields.kontakt_header",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             }

@@ -39,6 +39,7 @@ const expertiseImgRef = useRef(null);
                                 alt=""
                                 className="w-full aspect-square object-cover"
                                 sizes="(max-width: 1024px) 100vw, 50vw"
+                                loading="lazy"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent p-10 flex items-end">
                                 <div className="text-white italic font-serif text-2xl border-l-4 border-primary pl-4 drop-shadow-lg">

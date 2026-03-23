@@ -22,7 +22,7 @@ const PhilosophySection = ({
     });
 
     return (
-        <section className="relative lg:min-h-[calc(100vh-80px)] flex items-center py-10 md:py-20 lg:py-0 px-6 overflow-hidden bg-background-light dark:bg-background-dark">
+        <section className="relative lg:min-h-screen flex items-center py-10 md:py-20 lg:py-0 lg:pt-24 px-6 overflow-hidden bg-background-light dark:bg-background-dark">
             <div ref={sectionRef} className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-16 lg:gap-20 items-center w-full">
                 <div className="relative order-2 lg:order-1 soft-entrance-item">
                     <div className="relative z-10 rounded-xl overflow-hidden shadow-sm md:shadow-2xl aspect-square sm:h-[21rem] md:aspect-auto md:h-[min(78vw,32rem)] lg:h-[38rem]">

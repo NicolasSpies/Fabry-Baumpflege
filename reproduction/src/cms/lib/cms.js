@@ -22,7 +22,7 @@ export const PAGE_IDS = {
     references: 28,
 };
 
-const CMS_CACHE_TTL_MS = 5 * 60 * 1000;
+const CMS_CACHE_TTL_MS = import.meta.env.DEV ? 2000 : 5 * 60 * 1000;
 const cmsResponseCache = new Map();
 const cmsInflightCache = new Map();
 
@@ -58,23 +58,56 @@ function buildResponsiveSourceList(image) {
 
     const collected = [];
     const pushSource = (entry, key) => {
-        if (!entry || typeof entry !== 'object') return;
-        const entryUrl = entry.url || entry.source_url || (typeof entry === 'string' ? entry : '');
+        if (!entry) return;
+
+        let entryUrl = '';
+        let widthStr = undefined;
+        let heightStr = undefined;
+        let mimeStr = '';
+
+        if (typeof entry === 'string') {
+            entryUrl = entry;
+            if (/^\d+$/.test(key)) {
+                widthStr = key;
+            } else if (key === 'original' || key === 'full' || key === 'main') {
+                widthStr = image.width || image.media_details?.width;
+            }
+        } else if (typeof entry === 'object') {
+            entryUrl = entry.url || entry.source_url || (typeof entry.src === 'string' ? entry.src : '');
+            widthStr = entry.width || entry.file_width || entry.media_details?.width;
+            heightStr = entry.height || entry.file_height || entry.media_details?.height;
+            mimeStr = entry.mime_type || entry['mime-type'] || '';
+            
+            // Fallback for non-numeric keys in object entries
+            if (!widthStr && (key === 'original' || key === 'full' || key === 'main')) {
+                widthStr = image.width || image.media_details?.width;
+            }
+        }
+
         if (!entryUrl || typeof entryUrl !== 'string') return;
         
-        // Skip if this URL is already collected
-        if (collected.some(e => e.url === entryUrl)) return;
+        // Skip if this URL is already collected with same or larger width
+        const existing = collected.find(e => e.url === entryUrl);
+        if (existing) {
+            if (widthStr && (!existing.width || Number(widthStr) > existing.width)) {
+                existing.width = Number(widthStr);
+            }
+            return;
+        }
 
         collected.push({
             key,
             url: entryUrl,
-            width: Number(entry.width || entry.file_width) || undefined,
-            height: Number(entry.height || entry.file_height) || undefined,
-            mime_type: entry.mime_type || entry['mime-type'] || '',
+            width: Number(widthStr) || undefined,
+            height: Number(heightStr) || undefined,
+            mime_type: mimeStr,
         });
     };
 
-    // 1. Content Core 'sources' map
+    // 1. Plugin 'variants' / 'sources' map (Prioritize numeric keys 480, 768, 1280)
+    if (image.variants && typeof image.variants === 'object') {
+        Object.entries(image.variants).forEach(([key, entry]) => pushSource(entry, key));
+    }
     if (image.sources && typeof image.sources === 'object') {
         Object.entries(image.sources).forEach(([key, entry]) => pushSource(entry, key));
     }
@@ -85,11 +118,10 @@ function buildResponsiveSourceList(image) {
         Object.entries(wpSizes).forEach(([key, entry]) => pushSource(entry, key));
     }
 
-    // 3. Generic 'sizes' map (common in ACF / some REST payloads)
+    // 3. Generic 'sizes' map
     if (image.sizes && typeof image.sizes === 'object') {
         Object.entries(image.sizes).forEach(([key, entry]) => {
-            // Some payloads have a 'sizes' string or other non-size objects inside 'sizes'
-            if (typeof entry === 'object' && entry !== null) {
+            if ((typeof entry === 'object' && entry !== null) || typeof entry === 'string') {
                 pushSource(entry, key);
             }
         });
@@ -97,17 +129,13 @@ function buildResponsiveSourceList(image) {
 
     // 4. Known variant buckets
     if (image.full) pushSource(image.full, 'full');
+    if (image.original) pushSource(image.original, 'original');
     if (image.fallback) pushSource(image.fallback, 'fallback');
 
     // 5. Main asset source
     const mainUrl = image.src || image.url || image.source_url || image.guid?.rendered || image.guid;
     if (mainUrl && typeof mainUrl === 'string') {
-        pushSource({
-            url: mainUrl,
-            width: image.width || image.media_details?.width,
-            height: image.height || image.media_details?.height,
-            mime_type: image.mime_type || image.media_details?.mime_type
-        }, 'original');
+        pushSource(mainUrl, 'main');
     }
 
     return collected
@@ -115,21 +143,54 @@ function buildResponsiveSourceList(image) {
         .sort((a, b) => (a.width || 0) - (b.width || 0));
 }
 
+function getUrl(val) {
+    if (!val) return '';
+    return typeof val === 'string' ? val : (val?.url || val?.src || val?.source_url || '');
+}
+
+/**
+ * Standardizes raw image data from the CMS into a consistent object.
+ * Priority: 
+ * 1. Normalized Responsive Variants (1280, 768, 480)
+ * 2. High-quality fallback from other sources
+ * 3. Original/Master as last resort
+ */
+// Helper to ensure URL has a ?v= versioning parameter
+const buildVersionedUrl = (url, v) => {
+    if (!url || typeof url !== 'string') return url;
+    if (url.includes('?v=')) return url; // Already versioned from backend
+    if (!v) return url; // Do NOT add static fallback if no version available
+    const sep = url.includes('?') ? '&' : '?';
+    return `${url}${sep}v=${versionToSlug(v)}`;
+};
+
+/**
+ * Normalizes a date-like version string into a stable numeric slug.
+ */
+function versionToSlug(v) {
+    if (!v) return '1';
+    if (typeof v === 'number') return String(v);
+    const date = new Date(v);
+    return isNaN(date.getTime()) ? '1' : String(Math.floor(date.getTime() / 1000));
+}
+
 export function normalizeCmsImage(image) {
     if (!image) return null;
 
-    if (typeof image === 'string') {
+    if (typeof image === 'string' || typeof image === 'number') {
+        const id = typeof image === 'number' ? image : ((/^\d+$/.test(image)) ? parseInt(image, 10) : null);
+        const url = typeof image === 'string' && !id ? image : '';
+        const versionedUrl = buildVersionedUrl(url, null);
+        
         return {
-            src: image,
-            url: image,
+            id,
+            src: versionedUrl,
             srcSet: '',
-            sizes: '',
+            sizes: '100vw',
             alt: '',
             width: undefined,
             height: undefined,
-            full: { url: image },
-            sources: {},
-            fallback: { url: image },
+            variants: url ? { original: versionedUrl } : {}
         };
     }
 
@@ -137,47 +198,90 @@ export function normalizeCmsImage(image) {
 
     const sourceList = buildResponsiveSourceList(image);
     
-    // Preferred candidate for the 'src' attribute fallback
-    const preferredSource =
-        image.sources?.cc_medium ||
-        image.sources?.cc_small ||
-        image.media_details?.sizes?.medium ||
-        image.sizes?.medium ||
-        sourceList.find(s => s.width >= 600 && s.width <= 1200) ||
-        image.full ||
-        image.fallback ||
-        sourceList[0] ||
-        null;
+    // 1. Identify Canonical src (High-quality responsive variant preferred for desktop)
+    const v = image.variants || image.sources || image.media_details?.sizes || {};
+    // Priority: explicit version > modified timestamp > fallback
+    const imgVersion = image.version || image.v || (image.modified ? image.modified : null);
+    
+    // Look for plugin-specific numeric variants first
+    const responsiveSrc = getUrl(v['1280'] || v['768'] || v['480']);
+    
+    // If no numeric variants, search sources for a high-res (but not too high) variant
+    let fallbackVariant = null;
+    if (!responsiveSrc) {
+        // Find smallest source that is at least 1200w, excluding the likely master/main
+        fallbackVariant = sourceList.find(s => (s.width || 0) >= 1200 && s.key !== 'main' && s.key !== 'original');
+        // If still nothing, take the largest available source that isn't the absolute master
+        if (!fallbackVariant) {
+            fallbackVariant = sourceList.find(s => (s.width || 0) >= 800 && s.key !== 'main' && s.key !== 'original');
+        }
+    }
 
-    const src =
-        preferredSource?.url ||
-        image.src ||
-        image.url ||
-        image.source_url ||
-        '';
+    const canonicalSrc = responsiveSrc || getUrl(fallbackVariant);
 
-    const width = Number(image.width) || preferredSource?.width || undefined;
-    const height = Number(image.height) || preferredSource?.height || undefined;
+    // Final src: Prioritize responsive variant, fallback sequentially to master only as last resort
+    // CRITICAL: We avoid unversioned naked URLs as primary src if a better responsive variant exists.
+    const hasResponsive = !!(v['1280'] || v['768'] || v['480']);
+    const nakedMaster = getUrl(v['original'] || image.full || image.original) || image.src || image.url || image.source_url || '';
+    const isNakedUnversioned = nakedMaster && !nakedMaster.includes('?v=') && !/-(1280|768|480)\./.test(nakedMaster);
 
-    const srcSet =
-        image.srcSet ||
-        image.srcset ||
-        sourceList
-            .map((entry) => `${entry.url} ${entry.width}w`)
-            .join(', ');
+    const rawSrc = canonicalSrc || 
+                ((isNakedUnversioned && hasResponsive) ? canonicalSrc : nakedMaster) || 
+                nakedMaster;
+    
+    const src = buildVersionedUrl(rawSrc, imgVersion);
+
+    // 2. Build canonical srcSet
+    // We prefer the API's provided srcset if it exists, as it typically includes versioning (?v=).
+    // CRITICAL: We sanitize it to remove ANY unversioned naked master URL that might 404.
+    const rawApiSrcSet = image.srcSet || image.srcset || '';
+    
+    const sanitizeSrcSet = (str) => {
+        if (!str) return '';
+        const entries = str.split(',').map(s => s.trim()).filter(Boolean);
+        const hasVariants = entries.some(e => /-(1280|768|480)\./.test(e));
+        
+        const filtered = entries.filter(entry => {
+            const urlPart = entry.split(' ')[0];
+            const isNakedMaster = !/-(1280|768|480)\./.test(urlPart);
+            const isVersioned = urlPart.includes('?v=');
+            return !isNakedMaster || isVersioned || !hasVariants;
+        });
+        
+        // Ensure every remaining URL in the srcset is versioned
+        return filtered.map(entry => {
+            const parts = entry.split(' ');
+            if (parts.length < 2) return buildVersionedUrl(parts[0], imgVersion);
+            return `${buildVersionedUrl(parts[0], imgVersion)} ${parts[1]}`;
+        }).join(', ');
+    };
+
+    const apiSrcSet = sanitizeSrcSet(rawApiSrcSet);
+
+    const srcSet = apiSrcSet || sourceList
+        .filter(s => {
+            const isNakedMaster = !/-(1280|768|480)\./.test(s.url);
+            const isVersioned = s.url.includes('?v=');
+            const hasResponsive = sourceList.some(o => /-(1280|768|480)\./.test(o.url));
+            return !isNakedMaster || isVersioned || !hasResponsive;
+        })
+        .map((entry) => `${buildVersionedUrl(entry.url, imgVersion)} ${entry.width}w`)
+        .join(', ');
+
+    // 3. Metadata & Attributes
+    const width = Number(image.width) || (fallbackVariant?.width) || undefined;
+    const height = Number(image.height) || (fallbackVariant?.height) || undefined;
 
     return {
         ...image,
         src,
-        url: image.url || src,
         srcSet,
-        sizes: image.sizes || '',
+        // Default sizes to 100vw to ensure browser picks from srcset
+        sizes: (image.sizes && typeof image.sizes === 'string' && image.sizes !== '') ? image.sizes : '100vw',
         alt: image.alt || image.title?.rendered || '',
         width,
         height,
-        full: image.full || (src ? { url: src, width, height } : null),
-        sources: image.sources || {},
-        fallback: image.fallback || (src ? { url: src, width, height } : null),
+        variants: v
     };
 }
 
@@ -185,30 +289,18 @@ export function getCmsImageProps(image, options = {}) {
     const normalized = normalizeCmsImage(image);
     if (!normalized?.src) return null;
 
-    // Use preferences as a hint for the initial fallback 'src' attribute.
-    // This is useful for pre-hydration or no-JS scenarios, but should NOT
-    // prevent the browser from using the full srcset.
-    const preferredMediumSource =
-        normalized.sources?.cc_medium ||
-        normalized.sources?.cc_large ||
-        normalized.full ||
-        normalized.fallback ||
-        null;
-    const preferredMobileSource =
-        normalized.sources?.cc_small ||
-        normalized.fallback ||
-        normalized.full ||
+    // Hints for the initial 'src' attribute.
+    // preferSmallSource/preferMediumSource allow a component to force a specific variant for the 'src' fallback.
+    const v = normalized.variants || {};
+    const hintSource = 
+        (options.preferSmall && (v['480'] || v['768'])) ||
+        (options.preferMedium && (v['768'] || v['1280'])) ||
         null;
 
-    const useMediumFallback = Boolean(options.preferMedium && preferredMediumSource?.url);
-    const useSmallFallback = Boolean(options.preferSmall && preferredMobileSource?.url);
-
-    const activeFallback = useSmallFallback 
-        ? preferredMobileSource 
-        : (useMediumFallback ? preferredMediumSource : normalized);
+    const fallbackSrc = getUrl(hintSource) || normalized.src;
 
     const props = {
-        src: activeFallback.url || activeFallback.src || normalized.src,
+        src: fallbackSrc,
         alt: options.alt ?? normalized.alt ?? '',
     };
 
@@ -218,10 +310,11 @@ export function getCmsImageProps(image, options = {}) {
         props.sizes = options.sizes || normalized.sizes;
     }
 
-    if (activeFallback.width || normalized.width) props.width = activeFallback.width || normalized.width;
-    if (activeFallback.height || normalized.height) props.height = activeFallback.height || normalized.height;
+    if (normalized.width) props.width = normalized.width;
+    if (normalized.height) props.height = normalized.height;
     
-    if (options.loading) props.loading = options.loading;
+    // Default to 'lazy' for optimal performance, unless explicitly overridden (e.g. Hero sections)
+    props.loading = options.loading || 'lazy';
     if (options.decoding) props.decoding = options.decoding;
     if (options.fetchPriority) props.fetchPriority = options.fetchPriority;
 
@@ -268,7 +361,7 @@ function getAbsoluteCmsRootApiBase() {
  * @param {AbortSignal} [signal]
  */
 export async function fetchFromCMS(endpoint, language = 'DE', signal = null) {
-    const langCode = PLLCode[language] ?? 'de';
+    const langCode = PLLCode[language] ?? (language ? String(language).toLowerCase() : 'de');
 
     /**
      * Determine the correct API base.
@@ -276,15 +369,21 @@ export async function fetchFromCMS(endpoint, language = 'DE', signal = null) {
      * register their namespaces at the root level of /wp-json/.
      */
     const isRootNamespace = endpoint.startsWith('/content-core') || endpoint.startsWith('/polylang');
-    const apiBase = isRootNamespace
-        ? CMS_API_BASE.replace('/wp/v2', '') 
-        : CMS_API_BASE;
-    const separator = endpoint.includes('?') ? '&' : '?';
-    const languageParam = `language=${encodeURIComponent(langCode)}`;
-    const legacyLangParam = isRootNamespace ? '' : `&lang=${encodeURIComponent(langCode)}`;
+    let apiBase = String(CMS_API_BASE).replace(/\/+$/, '');
+    if (isRootNamespace) {
+        // Strip the standard WP namespace to reach the root /wp-json level
+        apiBase = apiBase.replace(/\/wp\/v2\/?$/, '');
+    }
 
+    const separator = endpoint.includes('?') ? '&' : '?';
     // Content Core expects `language`, while legacy WP endpoints still rely on `lang`.
-    const url = `${apiBase}${endpoint}${separator}${languageParam}${legacyLangParam}`;
+    // We provide BOTH to ensure maximum compatibility across different plugins.
+    const languageParam = `language=${encodeURIComponent(langCode)}&lang=${encodeURIComponent(langCode)}`;
+
+    // Normalize endpoint to ensuring leading slash
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+    const url = `${apiBase}${cleanEndpoint}${separator}${languageParam}`;
 
     const now = Date.now();
     const cached = cmsResponseCache.get(url);
@@ -570,8 +669,17 @@ export async function getTestimonials(language = 'DE') {
                 customFields: t.customFields || t.acf || t.meta || {}
             }));
         }
+        
+        // Fallback to standard WP REST
+        const fallback = await fetchFromCMS('/kundenstimmen?_embed=1&per_page=50', language);
+        if (Array.isArray(fallback)) {
+             return fallback.map(t => ({
+                ...t,
+                customFields: t.customFields || t.acf || t.meta || {}
+            }));
+        }
     } catch (err) {
-        console.warn('[CMS] getTestimonials from CMS failed:', err?.message);
+        console.warn('[CMS] getTestimonials failed:', err?.message);
     }
     return [];
 }
@@ -597,7 +705,7 @@ async function fetchReferencesFromCMS(queryParams, language, signal = null, isSi
 
         // Second attempt: if core returned nothing, try standard references
         if (isCore) {
-            const fallbackUrl = `/references${queryParams}`;
+            const fallbackUrl = `/referenzen${queryParams}`;
             const fallback = await fetchFromCMS(fallbackUrl, language, signal);
             return fallback || (isSingle ? null : []);
         }
@@ -610,7 +718,7 @@ async function fetchReferencesFromCMS(queryParams, language, signal = null, isSi
 
         // Fallback to standard WP REST on hard failure
         try {
-            const fallbackPath = isSingle ? `/references${queryParams}` : `/references${queryParams}`;
+            const fallbackPath = isSingle ? `/referenzen${queryParams}` : `/referenzen${queryParams}`;
             const fallback = await fetchFromCMS(fallbackPath, language, signal);
             return fallback || (isSingle ? null : []);
         } catch (fallbackError) {
@@ -719,31 +827,54 @@ export async function prefetchReferenceDetail(idOrSlug, language = 'DE') {
 export async function resolveMedia(idOrUrl) {
     if (!idOrUrl) return null;
     
-    // If it's already a normalized object, return it
+    // 1. If it's already a normalized object with rich data, return as-is
+    if (typeof idOrUrl === 'object' && !Array.isArray(idOrUrl)) {
+        if (idOrUrl.srcSet || idOrUrl.variants || idOrUrl.sources) {
+            return normalizeCmsImage(idOrUrl);
+        }
+    }
+
+    // 2. Normalize whatever we have (ID, string, or partial object)
     const normalized = normalizeCmsImage(idOrUrl);
-    if (normalized?.srcSet && typeof idOrUrl === 'object') {
-        return normalized;
-    }
-
-    // If it's a raw URL string, we can't easily get the srcset without an extra fetch,
-    // so we return the normalized object (which might have limited srcset if it's just a string).
-    if (typeof idOrUrl === 'string') {
-        return normalized;
-    }
-
-    try {
-        // Use the same proxy path — strips /wp/v2 to hit /wp-json/wp/v2/media
-        const base = CMS_API_BASE.replace(/\/wp\/v2$/, '');
-        const res = await fetch(`${base}/wp/v2/media/${idOrUrl}`);
-        if (!res.ok) return null;
-        const media = await res.json();
-        
-        // Return normalized object to preserve srcset
-        return normalizeCmsImage(media);
-    } catch (error) {
-        console.error(`[CMS] Failed to resolve media ID ${idOrUrl}:`, error);
+    
+    // 3. Extract the numeric ID if any
+    const getMediaId = (val) => {
+        if (typeof val === 'number') return val;
+        if (typeof val === 'string' && /^\d+$/.test(val)) return parseInt(val, 10);
+        if (typeof val === 'object' && val !== null) {
+            return val.id || val.ID || val.media_id;
+        }
         return null;
+    };
+    
+    // 4. Deciding when to fetch:
+    // We fetch IF we have a valid ID AND either the object is just a shell or it lacks rich sources.
+    const mediaId = normalized.id;
+    const isShellOnly = mediaId && !normalized.src && !normalized.srcSet;
+    const hasRichSources = normalized && (normalized.srcSet || (normalized.variants && Object.keys(normalized.variants).length > 1));
+    
+    if (mediaId && (isShellOnly || !hasRichSources)) {
+        try {
+            const base = getAbsoluteCmsRootApiBase();
+            // Important: Use BOTH lang and language if possible
+            const url = `${base}/wp/v2/media/${mediaId}`;
+            const res = await fetch(url);
+            if (res.ok) {
+                const media = await res.json();
+                // When resolving from standard WP REST, preserve the modified timestamp for versioning
+                const normalizedWithVersion = normalizeCmsImage({
+                    ...media,
+                    modified: media.modified || media.date || null
+                });
+                return normalizedWithVersion;
+            }
+        } catch (error) {
+            console.warn(`[CMS] Failed to resolve media ID ${mediaId}:`, error?.message);
+        }
     }
+
+    // Fallback: return what we have
+    return normalized;
 }
 
 // ─── Data mapper ──────────────────────────────────────────────────────────────
@@ -759,9 +890,13 @@ export function mapReferenceCard(item, catMap = {}) {
     const cf = item.customFields || item.acf || item.meta || {};
     const thumbnail =
         item.featured_image ||
-        item._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
-        item._embedded?.['wp:featuredmedia']?.[0]?.guid?.rendered ||
+        item._embedded?.['wp:featuredmedia']?.[0] ||
         '';
+
+    // Inject versioning into the thumbnail object if possible
+    if (thumbnail && typeof thumbnail === 'object' && item.modified) {
+        thumbnail.modified = item.modified;
+    }
 
     const tax = item.taxonomies || item.taxonomy || {};
     const embeddedTerms = item._embedded?.['wp:term']?.flat() || [];

@@ -17,7 +17,7 @@ const cmsConfigSrc = readFileSync(
 const cmsHostMatch = cmsConfigSrc.match(/export\s+const\s+CMS_HOST\s*=\s*['"]([^'"]+)['"]/)
 const CMS_HOST = cmsHostMatch
   ? cmsHostMatch[1]
-  : 'http://cms.fabry-baumpflege.be' // fallback — keep in sync with cmsConfig.js
+  : 'https://cms.fabry-baumpflege.be' // fallback — keep in sync with cmsConfig.js
 
 const MAPPINGS_SRC = path.resolve(import.meta.dirname, 'src/cms/config/mappings.json');
 
@@ -73,6 +73,8 @@ export default defineConfig({
       '/cms': {
         target: CMS_HOST,
         changeOrigin: true,
+        secure: true,
+        followRedirects: true,
         rewrite: (path) => path.replace(/^\/cms/, '/wp-json'),
       },
     },

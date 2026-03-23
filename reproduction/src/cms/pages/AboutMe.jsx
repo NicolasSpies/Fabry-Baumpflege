@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
 import { ROUTES } from '@/cms/i18n/routes';
-import { getPage, mapPageContent, PAGE_IDS } from '@/cms/lib/cms';
+import { getPage, mapPageContent, resolveMedia, PAGE_IDS } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
 import PhilosophySection from '@/cms/sections/PhilosophySection';
 import ValuesSection from '@/cms/sections/ValuesSection';
 import SignatureSection from '@/cms/sections/SignatureSection';
-import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
+import { resolveInstanceProps, resolveInstancePropsAsync, awaitMappings } from '@/cms/bridge-resolver';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
 
 
@@ -64,6 +64,7 @@ const AboutMe = () => {
 
     const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);
+    const [hydratedProps, setHydratedProps] = useState({});
     useScrollReveal([rawPage]);
 
     useEffect(() => {
@@ -79,9 +80,23 @@ const AboutMe = () => {
                     const mappedAbout = mapPageContent(page, getInitialContent(), 'AboutMe');
                     setPageData(prev => ({ ...prev, ...mappedAbout }));
 
-                    // Register alternates for API-driven routing
                     if (page.cc_alternates || page.pll_translations) {
                         setAlternates(page.cc_alternates || page.pll_translations);
+                    }
+
+                    // ─── Hydration ───
+                    const [philosophy, values, signature] = await Promise.all([
+                        resolveInstancePropsAsync('AboutMe', 'PhilosophySection', mappedAbout.philosophy, page),
+                        resolveInstancePropsAsync('AboutMe', 'ValuesSection', mappedAbout.values, page),
+                        resolveInstancePropsAsync('AboutMe', 'SignatureSection', mappedAbout.signature, page)
+                    ]);
+
+                    if (!cancelled) {
+                        setHydratedProps({
+                            PhilosophySection: philosophy,
+                            ValuesSection: values,
+                            SignatureSection: signature
+                        });
                     }
                 }
             } catch (err) {
@@ -97,11 +112,12 @@ const AboutMe = () => {
 
 
     const getProps = (instanceName, localProps) => {
+        if (hydratedProps[instanceName]) return hydratedProps[instanceName];
         return resolveInstanceProps('AboutMe', instanceName, localProps, rawPage);
     };
 
     return (
-        <main className="pt-24 md:pt-32 lg:pt-40">
+        <main className="pt-24 md:pt-32 lg:pt-0">
             {/* Page: AboutMe → Section: PhilosophySection */}
             <PhilosophySection 
                 {...getProps('PhilosophySection', pageData.philosophy)} 

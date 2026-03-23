@@ -189,7 +189,7 @@ const ReferenceDetail = () => {
                 const cf = ref.customFields || ref.acf || ref.meta || {};
 
                 // Phase 1: Only resolve hero image
-                const thumbnail = await resolveMedia(ref.featured_image || ref._embedded?.['wp:featuredmedia']?.[0]?.source_url || null);
+                const thumbnail = await resolveMedia(ref.featured_image || ref._embedded?.['wp:featuredmedia']?.[0] || null);
 
                 if (controller.signal.aborted) return;
 

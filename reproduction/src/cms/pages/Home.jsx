@@ -2,7 +2,7 @@ import React, { startTransition, useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { getLocalizedPath } from '@/cms/i18n/routes';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, getLatestReferences, getReferences, getTestimonials, mapReferenceCard, mapPageContent, PAGE_IDS, decodeHtmlEntities } from '@/cms/lib/cms';
+import { getPage, getLatestReferences, getReferences, getReferenceCategories, getTestimonials, mapReferenceCard, mapPageContent, resolveMedia, PAGE_IDS, decodeHtmlEntities } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
@@ -14,7 +14,7 @@ const ReferencesSection = React.lazy(() => import('@/cms/sections/ReferencesSect
 const TestimonialsSection = React.lazy(() => import('@/cms/sections/TestimonialsSection'));
 const AboutSection = React.lazy(() => import('@/cms/sections/AboutSection'));
 
-import { resolveInstanceProps, awaitMappings } from '@/cms/bridge-resolver';
+import { resolveInstanceProps, resolveInstancePropsAsync, awaitMappings } from '@/cms/bridge-resolver';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
 import { Suspense } from 'react';
 
@@ -160,8 +160,7 @@ const Home = () => {
     const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);
     const [refsLoading, setRefsLoading] = useState(true);
-    // Tracks whether runtime mappings have been fetched; triggers a re-render
-    // so resolveInstanceProps uses the latest manifest, not the bundled fallback.
+    const [hydratedProps, setHydratedProps] = useState({});
     const [mappingsReady, setMappingsReady] = useState(false);
     useScrollReveal([rawPage, pageData.references.items.length, pageData.testimonials.items.length]);
 
@@ -175,7 +174,6 @@ const Home = () => {
         let cancelled = false;
         async function loadPageContent() {
             try {
-                // Ensure runtime mappings are loaded before applying them
                 await awaitMappings();
                 if (cancelled) return;
                 setMappingsReady(true);
@@ -185,11 +183,49 @@ const Home = () => {
                 if (page) {
                     setRawPage(page);
                     const mappedHome = mapPageContent(page, getFallbackContent(), 'Home');
-                    setPageData(prev => ({ ...prev, ...mappedHome }));
+                    
+                    setPageData(prev => {
+                        const next = { ...prev, ...mappedHome };
+                        // Conservative merge for sections that have critical runtime items
+                        next.references = {
+                            ...prev.references,
+                            ...mappedHome.references,
+                            items: (prev.references.items && prev.references.items.length > 0) 
+                                ? prev.references.items 
+                                : mappedHome.references.items
+                        };
+                        next.testimonials = {
+                            ...prev.testimonials,
+                            ...mappedHome.testimonials,
+                            items: (prev.testimonials.items && prev.testimonials.items.length > 0) 
+                                ? prev.testimonials.items 
+                                : mappedHome.testimonials.items
+                        };
+                        return next;
+                    });
 
-                    // Register alternates for API-driven routing
                     if (page.cc_alternates || page.pll_translations) {
                         setAlternates(page.cc_alternates || page.pll_translations);
+                    }
+
+                    // ─── Async Hydration ───
+                    // Resolve sections that may contain images asynchronously to ensure IDs are handled.
+                    const [hero, about, services, stats, intro] = await Promise.all([
+                        resolveInstancePropsAsync('Home', 'HeroSection', mappedHome.hero, page),
+                        resolveInstancePropsAsync('Home', 'AboutSection', mappedHome.about, page),
+                        resolveInstancePropsAsync('Home', 'ServicesSection', mappedHome.services, page),
+                        resolveInstancePropsAsync('Home', 'StatsSection', mappedHome.stats, page),
+                        resolveInstancePropsAsync('Home', 'HomeIntroSection', mappedHome.intro, page)
+                    ]);
+
+                    if (!cancelled) {
+                        setHydratedProps({
+                            HeroSection: hero,
+                            AboutSection: about,
+                            ServicesSection: services,
+                            StatsSection: stats,
+                            HomeIntroSection: intro
+                        });
                     }
                 }
             } catch (err) {
@@ -220,12 +256,15 @@ const Home = () => {
             ]);
                 if (cancelled) return;
 
-                const mappedRefs = (rawRefs || []).map(item => {
+                const mappedRefs = await Promise.all((rawRefs || []).map(async (item) => {
                     const mapped = mapReferenceCard(item);
-                    return mapped ? { ...mapped, data: item } : null;
-                }).filter(Boolean);
+                    if (!mapped) return null;
+                    const resolvedThumbnail = await resolveMedia(mapped.thumbnailImage);
+                    return { ...mapped, thumbnailImage: resolvedThumbnail || mapped.thumbnailImage, data: item };
+                }));
+                const filteredRefs = mappedRefs.filter(Boolean);
                 
-                const mappedTestimonials = (rawTestimonials || []).slice(0, 3).map(item => {
+                const mappedTestimonials = await Promise.all((rawTestimonials || []).slice(0, 3).map(async (item) => {
                     if (!item) return null;
                     const cf = item.customFields || item.acf || item.meta || {};
                     const name = decodeHtmlEntities(
@@ -236,20 +275,25 @@ const Home = () => {
                         item.post_title || 
                         ''
                     );
+                    
+                    const avatar = await resolveMedia(cf.kunden_avatar || cf.avatar || null);
+
                     return {
                         author: name || t('common.client'),
                         text: decodeHtmlEntities(cf.kundenstimme_text || ''),
                         rating_raw: String(cf.sterne || '5'),
+                        avatar, // Add avatar support if relevant
                         data: item
                     };
-                }).filter(Boolean);
+                }));
+                const filteredTestimonials = mappedTestimonials.filter(Boolean);
 
                 startTransition(() => {
                     setPageData(prev => {
                         let next = {
                             ...prev,
-                            references: { ...prev.references, items: mappedRefs, isLoading: false },
-                            testimonials: { ...prev.testimonials, items: mappedTestimonials, isLoading: false }
+                            references: { ...prev.references, items: filteredRefs, isLoading: false },
+                            testimonials: { ...prev.testimonials, items: filteredTestimonials, isLoading: false }
                         };
                         if (servicesPage) {
                             next = mergeServicePreviewContent(next, servicesPage);
@@ -294,8 +338,10 @@ const Home = () => {
         };
     }, [language]);
 
-    const getProps = (instanceName, localProps) => 
-        resolveInstanceProps('Home', instanceName, localProps, rawPage || globalCmsData);
+    const getProps = (instanceName, localProps) => {
+        if (hydratedProps[instanceName]) return hydratedProps[instanceName];
+        return resolveInstanceProps('Home', instanceName, localProps, rawPage || globalCmsData);
+    };
 
     // No longer blocking the entire page render on rawPage.
     // We render the shell and core sections immediately with localized fallbacks.
