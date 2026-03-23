@@ -178,54 +178,45 @@ const Home = () => {
                 if (cancelled) return;
                 setMappingsReady(true);
 
-                const page = await getPage(PAGE_IDS.home, language);
+                const [page, servicesPage] = await Promise.all([
+                    getPage(PAGE_IDS.home, language),
+                    getPage(PAGE_IDS.services, language)
+                ]);
+
                 if (cancelled) return;
+
                 if (page) {
                     setRawPage(page);
-                    const mappedHome = mapPageContent(page, getFallbackContent(), 'Home');
+                    const mappedWithServices = mergeServicePreviewContent(
+                        mapPageContent(page, getFallbackContent(), 'Home'),
+                        servicesPage
+                    );
                     
-                    setPageData(prev => {
-                        const next = { ...prev, ...mappedHome };
-                        // Conservative merge for sections that have critical runtime items
-                        next.references = {
-                            ...prev.references,
-                            ...mappedHome.references,
-                            items: (prev.references.items && prev.references.items.length > 0) 
-                                ? prev.references.items 
-                                : mappedHome.references.items
-                        };
-                        next.testimonials = {
-                            ...prev.testimonials,
-                            ...mappedHome.testimonials,
-                            items: (prev.testimonials.items && prev.testimonials.items.length > 0) 
-                                ? prev.testimonials.items 
-                                : mappedHome.testimonials.items
-                        };
-                        return next;
-                    });
+                    setPageData(prev => ({ ...prev, ...mappedWithServices }));
 
                     if (page.cc_alternates || page.pll_translations) {
                         setAlternates(page.cc_alternates || page.pll_translations);
                     }
 
-                    // ─── Async Hydration ───
-                    // Resolve sections that may contain images asynchronously to ensure IDs are handled.
-                    const [hero, about, services, stats, intro] = await Promise.all([
-                        resolveInstancePropsAsync('Home', 'HeroSection', mappedHome.hero, page),
-                        resolveInstancePropsAsync('Home', 'AboutSection', mappedHome.about, page),
-                        resolveInstancePropsAsync('Home', 'ServicesSection', mappedHome.services, page),
-                        resolveInstancePropsAsync('Home', 'StatsSection', mappedHome.stats, page),
-                        resolveInstancePropsAsync('Home', 'HomeIntroSection', mappedHome.intro, page)
+                    // ─── Async Hydration (Primary Content) ───
+                    // These sections are critical for immediate render or soon-after visibility.
+                    const [hero, stats, intro, services, about] = await Promise.all([
+                        resolveInstancePropsAsync('Home', 'HeroSection', mappedWithServices.hero, page),
+                        resolveInstancePropsAsync('Home', 'StatsSection', mappedWithServices.stats, page),
+                        resolveInstancePropsAsync('Home', 'HomeIntroSection', mappedWithServices.intro, page),
+                        resolveInstancePropsAsync('Home', 'ServicesSection', mappedWithServices.services, page),
+                        resolveInstancePropsAsync('Home', 'AboutSection', mappedWithServices.about, page)
                     ]);
 
                     if (!cancelled) {
-                        setHydratedProps({
+                        setHydratedProps(prev => ({
+                            ...prev,
                             HeroSection: hero,
-                            AboutSection: about,
-                            ServicesSection: services,
                             StatsSection: stats,
-                            HomeIntroSection: intro
-                        });
+                            HomeIntroSection: intro,
+                            ServicesSection: services,
+                            AboutSection: about
+                        }));
                     }
                 }
             } catch (err) {
@@ -249,19 +240,21 @@ const Home = () => {
         async function loadDeferredContent() {
             try {
                 setRefsLoading(true);
-            const [rawRefs, rawTestimonials, servicesPage] = await Promise.all([
-                getLatestReferences(3, language),
-                getTestimonials(language),
-                getPage(PAGE_IDS.services, language)
-            ]);
+                const [rawRefs, rawTestimonials] = await Promise.all([
+                    getLatestReferences(3, language),
+                    getTestimonials(language)
+                ]);
+                
                 if (cancelled) return;
 
+                // Map references and resolve their media IDs
                 const mappedRefs = await Promise.all((rawRefs || []).map(async (item) => {
                     const mapped = mapReferenceCard(item);
                     if (!mapped) return null;
                     const resolvedThumbnail = await resolveMedia(mapped.thumbnailImage);
                     return { ...mapped, thumbnailImage: resolvedThumbnail || mapped.thumbnailImage, data: item };
                 }));
+
                 const filteredRefs = mappedRefs.filter(Boolean);
                 
                 const mappedTestimonials = await Promise.all((rawTestimonials || []).slice(0, 3).map(async (item) => {
@@ -288,19 +281,15 @@ const Home = () => {
                 }));
                 const filteredTestimonials = mappedTestimonials.filter(Boolean);
 
-                startTransition(() => {
-                    setPageData(prev => {
-                        let next = {
-                            ...prev,
-                            references: { ...prev.references, items: filteredRefs, isLoading: false },
-                            testimonials: { ...prev.testimonials, items: filteredTestimonials, isLoading: false }
-                        };
-                        if (servicesPage) {
-                            next = mergeServicePreviewContent(next, servicesPage);
-                        }
-                        return next;
-                    });
-                });
+                if (!cancelled) {
+                    setPageData(prev => ({
+                        ...prev,
+                        references: { ...prev.references, items: filteredRefs, isLoading: false },
+                        testimonials: { ...prev.testimonials, items: filteredTestimonials, isLoading: false }
+                    }));
+                    
+                    setRefsLoading(false);
+                }
             } catch (err) {
                 if (!cancelled) {
                     console.error('[Home] Deferred CMS load failed:', err);
