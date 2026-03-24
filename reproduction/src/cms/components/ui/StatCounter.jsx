@@ -45,7 +45,10 @@ const StatCounter = ({ statValue, statLabel, className = "", compact = false, da
 
     return (
         <div ref={countRef} className={`text-center px-2 md:px-3 font-sans ${className}`}>
-            <div className={`${compact ? 'text-[2.35rem] md:text-[3rem] mb-1' : 'text-4xl md:text-5xl mb-2'} font-serif text-primary leading-none`}>
+            <div 
+                className={`${compact ? 'text-[2.35rem] md:text-[3rem] mb-1' : 'text-4xl md:text-5xl mb-2'} font-serif text-primary leading-none tabular-nums`}
+                style={{ minHeight: compact ? '2.5rem' : '3.5rem' }}
+            >
                 {count}{suffix}
             </div>
             <div className={`${compact ? 'text-[10px] md:text-[12px] tracking-[0.16em] md:tracking-[0.2em]' : 'text-xs md:text-sm tracking-widest'} text-accent-label uppercase font-medium`}>

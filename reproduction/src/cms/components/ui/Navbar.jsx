@@ -76,13 +76,24 @@ const Navbar = ({
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
-        document.body.style.overflow = !isMenuOpen ? 'hidden' : 'unset';
     };
 
     const closeMenu = () => {
         setIsMenuOpen(false);
-        document.body.style.overflow = 'unset';
     };
+
+    useEffect(() => {
+        if (isMenuOpen && isMobileMode) {
+            document.body.style.overflow = 'hidden';
+            // Scroll to top when opening menu to ensure visibility
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isMenuOpen, isMobileMode]);
 
     useEffect(() => {
         if (!isMobileMode && isMenuOpen) {
@@ -142,6 +153,7 @@ const Navbar = ({
                         src={logo}
                         width="130"
                         height="64"
+                        style={{ aspectRatio: '130 / 64' }}
                     />
                 </Link>
 

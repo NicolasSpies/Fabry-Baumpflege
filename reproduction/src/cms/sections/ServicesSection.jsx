@@ -36,7 +36,7 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
         ? 'bg-[#395824] text-white'
         : 'bg-slate-100 dark:bg-slate-800/50 text-[#395824]';
 
-    const cardClassName = `group relative bg-white dark:bg-surface-dark rounded-[2rem] p-8 md:p-10 transition-[transform,box-shadow] duration-500 shadow-lg md:shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full md:hover:-translate-y-2 md:hover:shadow-xl md:hover:shadow-slate-200/60 ${activeState}`;
+    const cardClassName = `group relative bg-white dark:bg-surface-dark rounded-[2rem] p-8 md:p-10 transition-[transform,box-shadow] duration-500 shadow-lg md:shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full md:hover:-translate-y-2 md:hover:shadow-xl md:hover:shadow-slate-200/60 min-h-[22rem] md:min-h-[26rem] ${activeState}`;
 
     const cardInner = (
         <>
@@ -175,6 +175,7 @@ const ServicesSection = ({
             ref={sectionRef}
             className="py-24 md:py-32 px-6 bg-white dark:bg-background-dark relative overflow-hidden"
             id="services"
+            style={{ minHeight: '900px' }}
         >
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
             <div className="max-w-7xl mx-auto">

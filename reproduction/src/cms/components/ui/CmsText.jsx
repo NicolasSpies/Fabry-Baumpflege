@@ -39,7 +39,15 @@ const CmsText = ({
 }) => {
     const paragraphs = normalizeCmsParagraphs(text);
 
-    if (!paragraphs.length) return null;
+    // During cold start / initial hydration, we render the container with a fixed height
+    // placeholder if empty to prevent the section from collapsing to 0px.
+    if (!paragraphs.length) {
+        return (
+            <div className={`${className} min-h-[1em] opacity-0`} aria-hidden="true">
+                <p className={paragraphClassName}>&nbsp;</p>
+            </div>
+        );
+    }
 
     return (
         <div className={className}>

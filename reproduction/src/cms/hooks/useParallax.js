@@ -119,6 +119,7 @@ export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, di
         };
 
         const updateItem = () => {
+            if (!el || !document.body.contains(el)) return;
             const rect = el.getBoundingClientRect();
             item.layout = {
                 top: rect.top + window.pageYOffset,
@@ -130,9 +131,10 @@ export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, di
         registry.add(item);
 
         // Re-calculate after short delays for lazy-loaded images or reveals
-        const t1 = setTimeout(updateItem, 500);
-        const t2 = setTimeout(updateItem, 1500);
-        const t3 = setTimeout(updateItem, 2500);
+        // Only if not already destroyed
+        const t1 = setTimeout(() => updateItem(), 500);
+        const t2 = setTimeout(() => updateItem(), 1500);
+        const t3 = setTimeout(() => updateItem(), 2500);
 
         // Ensure loop starts on first use
         startLoop();

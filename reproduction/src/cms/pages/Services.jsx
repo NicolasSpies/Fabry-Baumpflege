@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, getHomeStats, mapPageContent, resolveMedia, PAGE_IDS } from '@/cms/lib/cms';
+import { getPage, getHomeStats, mapPageContent, resolveMedia, PAGE_IDS, getSSRData } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
@@ -89,21 +89,32 @@ const Services = () => {
         },
     });
 
-    const [pageData, setPageData] = useState(getInitialContent());
-    const [rawPage, setRawPage] = useState(null);
+    const [pageData, setPageData] = useState(() => {
+        const base = getInitialContent();
+        const ssr = getSSRData();
+        return ssr?.page ? mapPageContent(ssr.page, base, 'Services') : base;
+    });
+    const [rawPage, setRawPage] = useState(() => getSSRData()?.page || null);
     const [hydratedProps, setHydratedProps] = useState({});
     useScrollReveal([rawPage, statsCmsData]);
 
+    // Guard to prevent initial state Wipeout during hydration
+    const isFirstMount = useRef(true);
     useEffect(() => {
+        if (isFirstMount.current) {
+            isFirstMount.current = false;
+            return;
+        }
         setPageData(getInitialContent());
         setStatsCmsData(null);
     }, [language, t]);
 
+    // ─── 1. Content Fetching ───
     useEffect(() => {
         let cancelled = false;
         async function loadAllContent() {
             try {
-                // Parallellize both critical page content and secondary stats
+                // Parallelize critical page content and secondary stats
                 const [page, statsData] = await Promise.all([
                     getPage(PAGE_IDS.services, language),
                     getHomeStats(language)
@@ -135,6 +146,13 @@ const Services = () => {
             }
         }
 
+        loadAllContent();
+        return () => { cancelled = true; };
+    }, [language, t, setAlternates]);
+
+    // ─── 2. Data Hydration ───
+    useEffect(() => {
+        let cancelled = false;
         async function hydrate() {
             if (!rawPage) return;
             try {
@@ -155,10 +173,10 @@ const Services = () => {
                 console.error('[Services] Hydration failed:', err);
             }
         }
-
-        loadAllContent().then(() => hydrate());
+        
+        hydrate();
         return () => { cancelled = true; };
-    }, [language, t, rawPage, statsCmsData]);
+    }, [rawPage, statsCmsData, globalCmsData]);
 
     useCmsSeo(rawPage?.seo || globalSeo);
 

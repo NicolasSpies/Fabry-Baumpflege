@@ -427,7 +427,7 @@ const ContactFormSection = ({
     };
 
     return (
-        <div className="lg:col-span-8 reveal stagger-1">
+        <div id="contact-form" className="lg:col-span-8 reveal stagger-1 scroll-margin-top-[120px]">
             <div className="bg-white dark:bg-surface-dark p-6 md:p-9 border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl">
                 <form ref={formRef} className="space-y-6 md:space-y-8" onSubmit={handleSubmit}>
                     <fieldset disabled={isSubmitting} className="space-y-6 md:space-y-8 disabled:opacity-70">

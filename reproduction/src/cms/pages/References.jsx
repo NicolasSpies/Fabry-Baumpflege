@@ -164,28 +164,30 @@ const References = () => {
                 const seenCategoryNames = new Set();
 
                 (Array.isArray(rawCats) ? rawCats : []).forEach(c => {
+                    if (!c) return;
                     const cleanName = decodeHtmlEntities(c.name || '').trim();
                     const n = cleanName.toLowerCase();
                     if (!cleanName || seenCategoryNames.has(n)) return;
 
-                    // 1. Strict metadata match (safest)
+                    // 1. Language matching - if API is already filtered, we trust it by default
                     let matchesLang = true;
-                    if (c.pll_lang) matchesLang = String(c.pll_lang).toLowerCase() === targetLang;
-                    else if (c.language) matchesLang = String(c.language).toLowerCase() === targetLang;
-                    else if (c.lang) matchesLang = String(c.lang).toLowerCase() === targetLang;
-                    // 2. Empirical fallback if meta is stripped
-                    else {
+                    const cLang = (c.pll_lang || c.language || c.lang || '').toLowerCase();
+                    
+                    if (cLang) {
+                        matchesLang = cLang === targetLang;
+                    } else {
+                        // If no language metadata, we only filter out OBVIOUS bleed
                         if (targetLang === 'fr') {
-                            if (n.includes('pflege') || n.includes('fällung') || n.includes('pflanzung') || n.includes('baum')) matchesLang = false;
+                            if (n.includes('pflege') || n.includes('fällung') || n.includes('garten')) matchesLang = false;
                         } else {
-                            if (n.includes('entretien') || n.includes('abattage') || n.includes('jardin') || n.includes('plant') || n.includes('tous')) matchesLang = false;
+                            if (n.includes('entretien') || n.includes('abattage') || n.includes('jardin')) matchesLang = false;
                         }
                     }
 
                     if (matchesLang) {
                         seenCategoryNames.add(n);
                         filteredCats.push({
-                            id: cleanName, // mapReferenceCard coerces IDs to names
+                            id: cleanName,
                             name: cleanName,
                             slug: c.slug || cleanName.replace(/\s+/g, '-')
                         });
@@ -208,8 +210,24 @@ const References = () => {
                     return 999;
                 };
 
-                const finalCats = [...filteredCats]
+                let finalCats = [...filteredCats]
                     .sort((a, b) => getPriorityScore(a) - getPriorityScore(b) || (a?.name || '').localeCompare(b?.name || ''));
+
+                // ─── Emergency Fallback: If cats are empty, extract from references ───
+                if (finalCats.length === 0 && filteredMappedRefs.length > 0) {
+                    const extractedNames = new Set();
+                    filteredMappedRefs.forEach(ref => {
+                        (ref.categories || []).forEach(name => {
+                            if (name) extractedNames.add(name);
+                        });
+                    });
+                    
+                    finalCats = Array.from(extractedNames).map(name => ({
+                        id: name,
+                        name: name,
+                        slug: name.toLowerCase().replace(/\s+/g, '-')
+                    }));
+                }
 
                 setCategories(finalCats);
 

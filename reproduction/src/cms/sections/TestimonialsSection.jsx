@@ -182,7 +182,10 @@ const TestimonialsSection = ({
     };
 
     return (
-        <section className="py-20 md:py-28 bg-white dark:bg-background-dark overflow-hidden">
+        <section 
+            className="py-20 md:py-28 bg-white dark:bg-background-dark overflow-hidden transition-all duration-300"
+            style={{ minHeight: '600px' }}
+        >
             <div className="max-w-7xl mx-auto px-6 mb-12 md:mb-16">
                 <div className="text-center space-y-4">
                     <span className="text-accent-label font-bold tracking-widest uppercase text-xs block">{renderCmsInline(label)}</span>

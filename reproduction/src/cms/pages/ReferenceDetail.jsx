@@ -107,8 +107,8 @@ const ReferenceDetail = () => {
             .filter(Boolean)
     )];
     const ctaLink = preselectedServiceKeys.length
-        ? `${ROUTES[language].contact}?services=${encodeURIComponent(preselectedServiceKeys.join(','))}`
-        : ROUTES[language].contact;
+        ? `${ROUTES[language].contact}?services=${encodeURIComponent(preselectedServiceKeys.join(','))}#contact-form`
+        : `${ROUTES[language].contact}#contact-form`;
     const ctaState = preselectedServiceKeys.length
         ? { preselectedServices: preselectedServiceKeys }
         : undefined;

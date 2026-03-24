@@ -62,7 +62,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
                 <div className={`absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent transition-opacity duration-500 ${isImageReady ? 'opacity-100' : 'opacity-0'}`} />
             </div>
             <div className={`relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-center md:items-center h-full pt-12 md:pt-0 transition-[opacity,transform] duration-700 opacity-100 translate-y-0`}>
-                <div className="w-full md:max-w-2xl space-y-4 md:space-y-7 text-left flex flex-col items-start">
+                <div className="w-full md:max-w-2xl space-y-4 md:space-y-7 text-left flex flex-col items-start min-h-[12rem] md:min-h-0">
                     <h1 className="font-serif text-white leading-[0.95] md:leading-[0.95] reveal">
                         <div className="text-[1.35rem] md:text-[2.25rem] lg:text-[2.5rem] mb-0 md:mb-1 text-white/75 font-light tracking-wide">
                             {renderTextWithBreaks(title_top)}

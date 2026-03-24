@@ -57,8 +57,6 @@ export default async function handler(req, res) {
     const metadata = resolveMetadata({ ...route, path: originalPath, isHome: originalPath === '/' || originalPath === '/fr' }, pageData, globalSeo);
 
     // 3. Asset & Template Discovery
-    // We attempt to load the real built index.html to get the correct production hashes.
-    // If not found (e.g. dev or cold start), we use the embedded PRODUCTION_TEMPLATE.
     let html = PRODUCTION_TEMPLATE;
     try {
         const buildPath = path.resolve(__dirname, '../dist/index.html');
@@ -66,12 +64,22 @@ export default async function handler(req, res) {
             html = fs.readFileSync(buildPath, 'utf8');
         }
     } catch (e) {
-        // Fallback to embedded template if disk resolution fails
+        // Fallback to embedded template
     }
 
-    // Add Production-Level Debug Markers
+    // Capture the state for hydration handoff
+    const ssrState = {
+        // For security and performance, we only pass critical IDs and pre-fetched data
+        page: pageData,
+        global: globalSeo,
+        route: route,
+        timestamp: Date.now()
+    };
+    const ssrScript = `<script id="__SSR_DATA__" type="application/json">${JSON.stringify(ssrState)}</script>`;
+
+    // Add Production-Level Debug Markers and SSR Data
     const debugMarker = `<meta name="x-seo-runtime" content="api-ssr-deterministic">`;
-    html = html.replace('</head>', `  ${debugMarker}\n</head>`);
+    html = html.replace('</head>', `  ${debugMarker}\n  ${ssrScript}\n</head>`);
     
     // Safety: If we're on Vercel but using the fallback template, 
     // remove the dev-only /src/main.jsx script to avoid hydration crashes.
@@ -79,7 +87,7 @@ export default async function handler(req, res) {
         html = html.replace('<script type="module" src="/src/main.jsx"></script>', '');
     }
 
-    // Inject ALL fields (title, description, og, twitter, robots, canonical)
+    // Inject SEO Metadata
     html = injectMetadata(html, metadata);
 
     // 4. Final Response (Force Dynamic)

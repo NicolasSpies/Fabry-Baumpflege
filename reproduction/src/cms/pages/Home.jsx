@@ -1,8 +1,8 @@
-import React, { startTransition, useState, useEffect } from 'react';
+import React, { startTransition, useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { getLocalizedPath } from '@/cms/i18n/routes';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, getLatestReferences, getReferences, getReferenceCategories, getTestimonials, mapReferenceCard, mapPageContent, resolveMedia, PAGE_IDS, decodeHtmlEntities } from '@/cms/lib/cms';
+import { getPage, getLatestReferences, getReferences, getReferenceCategories, getTestimonials, mapReferenceCard, mapPageContent, resolveMedia, PAGE_IDS, decodeHtmlEntities, getSSRData } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
@@ -157,15 +157,39 @@ const Home = () => {
 
     const getFallbackContent = () => getInitialContent();
 
-    const [pageData, setPageData] = useState(getInitialContent());
-    const [rawPage, setRawPage] = useState(null);
+    const [pageData, setPageData] = useState(() => {
+        const base = getInitialContent();
+        try {
+            const ssr = getSSRData();
+            if (ssr && ssr.page) {
+                return mapPageContent(ssr.page, base, 'Home');
+            }
+        } catch (e) {
+            console.warn('[Home] SSR State recovery failed:', e);
+        }
+        return base;
+    });
+
+    const [rawPage, setRawPage] = useState(() => {
+        try {
+            return getSSRData()?.page || null;
+        } catch (e) {
+            return null;
+        }
+    });
+
     const [refsLoading, setRefsLoading] = useState(true);
     const [hydratedProps, setHydratedProps] = useState({});
     const [mappingsReady, setMappingsReady] = useState(false);
     useScrollReveal([rawPage, pageData.references.items.length, pageData.testimonials.items.length]);
 
-    // Re-apply local content on language change
+    // Guard to prevent initial state Wipeout during hydration
+    const isFirstMount = useRef(true);
     useEffect(() => {
+        if (isFirstMount.current) {
+            isFirstMount.current = false;
+            return;
+        }
         setPageData(getInitialContent());
     }, [language, t]);
 

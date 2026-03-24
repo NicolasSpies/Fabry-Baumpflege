@@ -53,6 +53,22 @@ export function decodeHtmlEntities(value) {
         .replace(/&gt;/gi, '>');
 }
 
+/**
+ * Retrieve serialized state from the SSR data script injected by the edge renderer.
+ */
+export function getSSRData() {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return null;
+    try {
+        const script = document.getElementById('__SSR_DATA__');
+        if (script) {
+            const data = JSON.parse(script.textContent);
+            // Verify data exists to avoid poisoned cache
+            if (data?.page || data?.global) return data;
+        }
+    } catch (e) {}
+    return null;
+}
+
 function buildResponsiveSourceList(image) {
     if (!image || typeof image !== 'object') return [];
 
@@ -530,19 +546,7 @@ export async function getPage(pageId, language = 'DE', signal = null) {
     return page;
 }
 
-/**
- * Fetch only the specific stat fields from the Home page.
- */
-export async function getHomeStats(language = 'DE', signal = null) {
-    const fields = 'customFields.stat1_value,customFields.stat1_label,customFields.stat2_value,customFields.stat2_label,customFields.stat3_value,customFields.stat3_label,customFields.stat4_value,customFields.stat4_label';
-    try {
-        const stats = await fetchFromCMS(`/content-core/v1/post/page/${PAGE_IDS.home}?fields=${fields}`, language, signal);
-        return stats;
-    } catch (err) {
-        console.warn('[CMS] getHomeStats failed:', err);
-        return null;
-    }
-}
+// Removed duplicate getHomeStats block
 
 
 function isEmptyCmsValue(value) {
@@ -635,23 +639,7 @@ export async function getForm(slug, language = 'DE', signal = null) {
 // ─── Categories ───────────────────────────────────────────────────────────────
 
 /** Fetch all reference_category terms for the given language. */
-export async function getReferenceCategories(language = 'DE') {
-    try {
-        const terms = await fetchFromCMS('/content-core/v1/terms/reference_category?per_page=100', language);
-        if (Array.isArray(terms)) {
-            return terms.map(cat => ({
-                id: cat.id,
-                name: decodeHtmlEntities(cat.name || ''),
-                slug: cat.slug || '',
-                pll_lang: cat.pll_lang || cat.language || cat.lang || null,
-                translations: cat.translations || cat.pll_translations || null,
-            }));
-        }
-    } catch (error) {
-        console.warn('[CMS] getReferenceCategories failed:', error);
-    }
-    return [];
-}
+// Removed duplicate placeholder
 
 
 /** Returns an id→name map built from getReferenceCategories. */
@@ -729,16 +717,23 @@ async function fetchReferencesFromCMS(queryParams, language, signal = null, isSi
     
     try {
         const url = `${base}${queryParams}`;
-        const data = await fetchFromCMS(url, language, signal);
+        const rawData = await fetchFromCMS(url, language, signal);
+        const data = Array.isArray(rawData) ? rawData : (rawData?.items || rawData?.results || rawData?.data || rawData);
         
-        if (data && (!Array.isArray(data) || data.length > 0)) {
+        if (data && (Array.isArray(data) && data.length > 0)) {
+            return data;
+        }
+
+        // Handle case where it's a single object (isSingle: true)
+        if (isSingle && data && typeof data === 'object' && !Array.isArray(data)) {
             return data;
         }
 
         // Second attempt: if core returned nothing, try standard references
         if (isCore) {
             const fallbackUrl = `/referenzen${queryParams}`;
-            const fallback = await fetchFromCMS(fallbackUrl, language, signal);
+            const fallbackRaw = await fetchFromCMS(fallbackUrl, language, signal);
+            const fallback = Array.isArray(fallbackRaw) ? fallbackRaw : (fallbackRaw?.items || fallbackRaw?.results || fallbackRaw?.data || fallbackRaw);
             return fallback || (isSingle ? null : []);
         }
 
@@ -909,36 +904,81 @@ export async function resolveMedia(idOrUrl) {
     return normalized;
 }
 
+/** Fetch homepage-specific statistics (Years of experience, etc.) */
+export async function getHomeStats(language = 'DE', signal = null) {
+    // Note: Homepage fields in the new API use 'startseite_' prefixes.
+    const fields = 'customFields.startseite_anzahl_zufriedene_unden,customFields.startseite_zufriedene_kunden,customFields.startseite_anzahl_gepflegte_baeume,customFields.startseite_gepflegte_baeume,customFields.startseite_anzahl_jahre_erfahrung,customFields.startseite_jahre_erfahrung';
+    try {
+        const stats = await fetchFromCMS(`/content-core/v1/post/page/${PAGE_IDS.home}?fields=${fields}`, language, signal);
+        if (stats?.customFields) {
+            // Map the new startseite_ keys to the generic stat keys used by the Home component
+            return {
+                customFields: {
+                    stat1_value: stats.customFields.startseite_anzahl_zufriedene_unden || '',
+                    stat1_label: stats.customFields.startseite_zufriedene_kunden || '',
+                    stat2_value: stats.customFields.startseite_anzahl_gepflegte_baeume || '',
+                    stat2_label: stats.customFields.startseite_gepflegte_baeume || '',
+                    stat3_value: stats.customFields.startseite_anzahl_jahre_erfahrung || '',
+                    stat3_label: stats.customFields.startseite_jahre_erfahrung || '',
+                    stat4_value: '', // Missing in new API currently
+                    stat4_label: ''
+                }
+            };
+        }
+        return stats;
+    } catch (err) {
+        return null;
+    }
+}
+
+// ─── Categories ───────────────────────────────────────────────────────────────
+
+/** Fetch all reference_category terms for the given language using the public terms endpoint. */
+export async function getReferenceCategories(language = 'DE') {
+    try {
+        const termsResponse = await fetchFromCMS('/content-core/v1/terms/reference_category?per_page=100', language);
+        const terms = Array.isArray(termsResponse) ? termsResponse : (termsResponse?.items || termsResponse?.results || termsResponse?.data || []);
+        
+        if (Array.isArray(terms)) {
+            return terms.map(cat => ({
+                id: cat.id,
+                name: decodeHtmlEntities(cat.name || ''),
+                slug: cat.slug || '',
+                pll_lang: cat.pll_lang || cat.language || cat.lang || null,
+                translations: cat.translations || cat.pll_translations || null,
+            }));
+        }
+    } catch (error) {
+        console.warn('[CMS] getReferenceCategories failed:', error);
+    }
+    return [];
+}
+
 // ─── Data mapper ──────────────────────────────────────────────────────────────
 
 /**
  * Map a raw WordPress reference item to the shape expected by ReferenceCard.
  * Preserves raw language metadata for diagnostics and backward compatibility.
  */
+/**
+ * Map a raw CMS reference item to the shape expected by ReferenceCard.
+ * Supports both nested WP-REST (item.title.rendered) and flat Content-Core (item.title) structures.
+ */
 export function mapReferenceCard(item, catMap = {}) {
     if (!item) return null;
-    // Thumbnail: check 'featured_image' (returned by some WP REST plugins/themes),
-    // then fall back to standard wp:featuredmedia embed.
+    
     const cf = item.customFields || item.acf || item.meta || {};
-    const thumbnail =
-        item.featured_image ||
-        item._embedded?.['wp:featuredmedia']?.[0] ||
-        '';
+    const thumbnail = item.featured_image || item._embedded?.['wp:featuredmedia']?.[0] || '';
 
-    // Inject versioning into the thumbnail object if possible
     if (thumbnail && typeof thumbnail === 'object' && item.modified) {
         thumbnail.modified = item.modified;
     }
 
     const tax = item.taxonomies || item.taxonomy || {};
     const embeddedTerms = item._embedded?.['wp:term']?.flat() || [];
-    
-    // Primary source: Content Core 'taxonomies' object (standard in enhanced API)
-    // Fallback source: Embedded terms from standard WP REST
     const categoryObjects = [];
 
-    // 1. Process Content Core Strings (Highest priority for enhanced API)
-    const ccCats = tax.kategorie || tax.reference_category || item.kategorie || item.reference_category || [];
+    const ccCats = tax.kategorie || tax.reference_category || tax.categories || item.kategorie || item.reference_category || item.categories || [];
     const ccArray = Array.isArray(ccCats) ? ccCats : [ccCats].filter(Boolean);
     ccArray.forEach(cat => {
         if (typeof cat === 'string') {
@@ -949,19 +989,13 @@ export function mapReferenceCard(item, catMap = {}) {
         }
     });
 
-    // 2. Process Embedded Terms (Standard WP REST fallback)
     if (categoryObjects.length === 0) {
         embeddedTerms.forEach(t => {
             if (!t) return;
-            categoryObjects.push({ 
-                id: t.name, 
-                name: decodeHtmlEntities(t.name || ''), 
-                slug: t.slug || t.name 
-            });
+            categoryObjects.push({ id: t.name, name: decodeHtmlEntities(t.name || ''), slug: t.slug || t.name });
         });
     }
 
-    // Deduplicate by Name (since we are now string-based)
     const uniqueCats = [];
     const seenNames = new Set();
     categoryObjects.forEach(c => {
@@ -971,10 +1005,6 @@ export function mapReferenceCard(item, catMap = {}) {
         }
     });
 
-    const catNames = uniqueCats.map(c => c.name);
-    // categoryIds now contains the string names for comparison in filtering
-    const catIds = uniqueCats.map(c => c.name);
-
     const path = stripCmsDomain(item.resolved_path || item.permalink || item.link || '');
     const slug = item.slug || (item.id ? String(item.id) : '');
 
@@ -982,19 +1012,19 @@ export function mapReferenceCard(item, catMap = {}) {
         id: item.id ? String(item.id) : slug,
         slug,
         path,
+        // Priority: Direct title string (Content-Core) -> Rendered object (WP REST) -> Name fallbacks
         title: decodeHtmlEntities(
-            item.title?.rendered ||
-            (typeof item.title === 'string' ? item.title : '') ||
+            (typeof item.title === 'string' ? item.title : item.title?.rendered) ||
             item.post_title ||
             item.name ||
             ''
         ),
-
-        description: decodeHtmlEntities(cf.beschreibung || item.acf?.short_description || ''),
-        location: cf.referenz_ort || item.acf?.location || '',
+        // Priority: Top-level description (Content-Core) -> Custom Field fallback
+        description: decodeHtmlEntities(item.description || cf.beschreibung || item.acf?.short_description || ''),
+        location: decodeHtmlEntities(item.location || cf.referenz_ort || item.acf?.location || ''),
         thumbnailImage: thumbnail,
-        categories: catNames,
-        categoryIds: catIds,
+        categories: uniqueCats.map(c => c.name),
+        categoryIds: uniqueCats.map(c => c.name),
         categoryObjects: uniqueCats,
         pll_lang: item.pll_lang || null,
         pll_translations: item.pll_translations || null,

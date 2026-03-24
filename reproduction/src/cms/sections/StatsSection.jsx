@@ -25,7 +25,11 @@ const StatsSection = ({
             : 'bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800';
 
     return (
-        <section ref={sectionRef} className={`${sectionTone} ${compact ? 'py-7 md:py-9 min-h-[120px] md:min-h-[140px]' : 'py-16 md:py-20 min-h-[300px] md:min-h-[350px]'}`}>
+        <section 
+            ref={sectionRef} 
+            className={`${sectionTone} ${compact ? 'py-7 md:py-9' : 'py-16 md:py-20'} overflow-hidden transition-all duration-300`}
+            style={{ minHeight: compact ? '140px' : '350px' }}
+        >
             <div className="max-w-7xl mx-auto px-6 text-center">
                 <div className={`grid grid-cols-2 md:grid-cols-4 ${compact ? 'gap-y-6 gap-x-4 md:gap-5' : 'gap-12 md:gap-8'}`}>
                     <div className="soft-entrance-item">
