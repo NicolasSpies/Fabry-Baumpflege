@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useParallax } from '@/cms/hooks/useParallax';
 import CmsImage from '@/cms/components/ui/CmsImage';
+import { renderCmsInline } from '@/cms/components/ui/CmsText';
 import { isExternalHref } from '@/cms/bridge-resolver';
 
 function renderTextWithBreaks(text) {
@@ -25,7 +26,13 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
     const heroRef = useRef(null);
     const [isImageReady, setIsImageReady] = useState(false);
     const imageKey = typeof image === 'string' ? image : image?.src || image?.url || image?.full?.url || '';
-    useParallax(heroRef, { speed: 0.08, maxTravel: 40, scale: 1.1 });
+    const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+    useParallax(heroRef, { 
+        speed: 0.08, 
+        maxTravel: 40, 
+        scale: 1.1,
+        desktopOnly: false 
+    });
 
     useEffect(() => {
         setIsImageReady(false);
@@ -44,14 +51,14 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
     const isExternalCta = isExternalHref(ctaHref);
 
     return (
-        <section className="relative h-[60svh] min-h-[26rem] md:h-screen w-full overflow-hidden flex items-center">
+        <section className="relative h-[640px] md:h-screen w-full overflow-hidden flex items-center">
             <div className="absolute inset-0 z-0">
                 <CmsImage
                     image={image}
                     ref={heroRef}
                     alt=""
                     size="1280"
-                    className={`w-full h-[120%] object-cover ${objectPosition === 'object-top' ? 'object-[60%_center] md:object-top' : objectPosition} md:filter md:brightness-[0.80] md:contrast-[1.05]`}
+                    className={`w-full h-full object-cover ${objectPosition === 'object-top' ? 'object-center-top scale-[1.4] md:scale-100 -translate-x-[100px] md:translate-x-0' : objectPosition} md:filter md:brightness-[0.80] md:contrast-[1.05] transition-all duration-700`}
                     sizes="(max-width: 768px) 100vw, 100vw"
                     loading="eager"
                     fetchPriority="high"
@@ -61,20 +68,20 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
 
                 <div className={`absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent transition-opacity duration-500 ${isImageReady ? 'opacity-100' : 'opacity-0'}`} />
             </div>
-            <div className={`relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-center md:items-center h-full pt-12 md:pt-0 transition-[opacity,transform] duration-700 opacity-100 translate-y-0`}>
-                <div className="w-full md:max-w-2xl space-y-4 md:space-y-7 text-left flex flex-col items-start min-h-[12rem] md:min-h-0">
-                    <h1 className="font-serif text-white leading-[0.95] md:leading-[0.95] reveal">
-                        <div className="text-[1.35rem] md:text-[2.25rem] lg:text-[2.5rem] mb-0 md:mb-1 text-white/75 font-light tracking-wide">
-                            {renderTextWithBreaks(title_top)}
+            <div className={`relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-end md:items-center h-full pb-16 md:pb-0 md:pt-0 transition-[opacity,transform] duration-700 opacity-100 translate-y-0`}>
+                <div className="w-full md:max-w-2xl space-y-4 md:space-y-7 text-left flex flex-col items-start">
+                    <h1 className="font-serif text-white leading-tight md:leading-[0.95] reveal">
+                        <div className="text-[1.8rem] md:text-[2.25rem] lg:text-[2.5rem] mb-1 md:mb-1 text-white/85 font-light tracking-wide italic">
+                            {renderCmsInline(title_top)}
                         </div>
-                        <div className="text-[2.5rem] md:text-[5rem] lg:text-[6.5rem] font-bold tracking-tight">
-                            {renderTextWithBreaks(title_main)}
+                        <div className="text-[3.25rem] md:text-[5rem] lg:text-[6.5rem] font-bold tracking-tight">
+                            {renderCmsInline(title_main)}
                         </div>
                     </h1>
                     <p className="text-[0.875rem] md:text-base text-white/75 font-sans font-normal max-w-[250px] md:max-w-md leading-[1.5] md:leading-relaxed reveal stagger-1">
                         {renderTextWithBreaks(description)}
                     </p>
-                    <div className="pt-1 md:pt-4 reveal stagger-2">
+                    <div className="hidden md:block pt-4 reveal stagger-2">
                         {isExternalCta ? (
                             <a
                                 href={ctaHref}
