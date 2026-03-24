@@ -23,7 +23,7 @@ const displayCta = cta || t('aboutme.signature.cta');
 return (
         <section className="py-14 md:py-32 bg-primary/[0.035] dark:bg-surface-dark/30 border-y border-slate-100 dark:border-slate-800">
             <div className="max-w-4xl mx-auto px-6 text-center reveal">
-                <h2 className="text-[2rem] md:text-5xl font-serif text-primary mb-6 md:mb-12">
+                <h2 className="text-4xl md:text-5xl font-serif text-primary mb-6 md:mb-12 leading-[1.15] md:leading-tight reveal">
                     {renderCmsInline(title)}
                 </h2>
                 <div className="mb-8 md:mb-16 reveal stagger-1">

@@ -77,16 +77,15 @@ const HomeIntroSection = ({
             <div className="max-w-7xl mx-auto">
                 <div className="max-w-[72rem] mx-auto">
                     {title && (
-                        <div className="soft-entrance-item mb-12 md:mb-16 grid grid-cols-[2rem_minmax(0,1fr)] gap-5 md:gap-7 max-w-[56rem] mx-auto">
-                            <div aria-hidden="true" />
-                            <h2 className="text-[1.8rem] leading-[1.08] text-primary md:text-[2.2rem] lg:text-[2.4rem] font-serif text-left">
+                        <div className="soft-entrance-item mb-12 md:mb-16 text-center">
+                            <h2 className="text-4xl md:text-5xl font-serif text-primary leading-[1.15] md:leading-tight reveal">
                                 {renderCmsInline(title)}
                             </h2>
                         </div>
                     )}
                     
                     {safeParagraphs.length > 0 && (
-                        <div ref={timelineRef} className="soft-entrance-item relative max-w-[56rem] mx-auto">
+                        <div ref={timelineRef} className="soft-entrance-item relative max-w-[48rem] mx-auto">
                             {/* Guide Track */}
                             <div
                                 className="absolute w-[3px] rounded-full bg-primary/10"
@@ -136,7 +135,7 @@ const HomeIntroSection = ({
                                                 />
                                             </div>
                                             <p
-                                                className={`max-w-[48rem] text-[1.05rem] md:text-[1.1rem] leading-[1.72] transition-all duration-700 ease-out font-normal ${
+                                                className={`max-w-[48rem] text-[0.875rem] md:text-[1.1rem] leading-[1.5] md:leading-[1.72] transition-all duration-700 ease-out font-normal ${
                                                     isActive 
                                                         ? 'text-slate-800 dark:text-slate-100 opacity-100 translate-x-1' 
                                                         : 'text-slate-600 dark:text-slate-400 opacity-85 translate-x-0'

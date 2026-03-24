@@ -11,8 +11,7 @@ const ServicesIntroSection = ({
 
     return (
         <section 
-            className="pt-10 md:pt-16 pb-14 md:pb-24 px-4 md:px-6 text-center bg-white overflow-hidden transition-all duration-300"
-            style={{ minHeight: '350px' }}
+            className="pt-10 md:pt-16 pb-8 md:pb-20 px-4 md:px-6 text-center bg-white overflow-hidden transition-all duration-300"
         >
             <div ref={sectionRef} className="max-w-7xl mx-auto">
                 <div className="space-y-6 md:space-y-10 soft-entrance-item">

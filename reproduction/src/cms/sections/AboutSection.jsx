@@ -52,12 +52,12 @@ const expertiseImgRef = useRef(null);
                     <div className="w-full lg:w-1/2 space-y-10">
                         <div className="space-y-4">
                             <span className="text-accent-label font-bold tracking-widest uppercase text-xs block">{label}</span>
-                            <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight reveal">{title}</h2>
+                            <h2 className="text-4xl md:text-5xl font-serif text-primary leading-[1.15] md:leading-tight reveal">{title}</h2>
                         </div>
                         <CmsText
                             text={description}
                             className="space-y-4 text-slate-600 font-sans"
-                            paragraphClassName="text-base md:text-[1.05rem] leading-[1.7]"
+                            paragraphClassName="text-[0.875rem] md:text-[1.05rem] leading-[1.5] md:leading-[1.7]"
                         />
                         <div className="pt-4">
                             {isExternalCta ? (

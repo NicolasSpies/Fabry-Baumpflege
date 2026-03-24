@@ -36,7 +36,7 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
         ? 'bg-[#395824] text-white'
         : 'bg-slate-100 dark:bg-slate-800/50 text-[#395824]';
 
-    const cardClassName = `group relative bg-white dark:bg-surface-dark rounded-[2rem] p-8 md:p-10 transition-[transform,box-shadow] duration-500 shadow-lg md:shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full md:hover:-translate-y-2 md:hover:shadow-xl md:hover:shadow-slate-200/60 min-h-[22rem] md:min-h-[26rem] ${activeState}`;
+    const cardClassName = `group relative bg-white dark:bg-surface-dark rounded-[2.5rem] p-8 md:p-9 transition-[transform,box-shadow] duration-500 shadow-lg md:shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full md:hover:-translate-y-2 md:hover:shadow-xl md:hover:shadow-slate-200/60 min-h-[18rem] md:min-h-[21rem] md:max-w-[320px] mx-auto ${activeState}`;
 
     const cardInner = (
         <>
@@ -178,10 +178,10 @@ const ServicesSection = ({
             style={{ minHeight: '900px' }}
         >
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-6xl mx-auto relative z-10">
                 <div className="text-center mb-16 md:mb-24 space-y-4 soft-entrance-item">
                     <span className="text-accent-label font-bold tracking-widest uppercase text-xs">{renderCmsInline(label)}</span>
-                    <h2 className="text-4xl md:text-5xl font-serif text-primary leading-tight">{renderCmsInline(title)}</h2>
+                    <h2 className="text-4xl md:text-5xl font-serif text-primary leading-[1.15] md:leading-tight reveal">{renderCmsInline(title)}</h2>
                 </div>
                 <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-6">
                     <div className="soft-entrance-item">

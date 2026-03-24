@@ -47,7 +47,7 @@ const PhilosophySection = ({
                     <CmsText
                         text={text}
                         className="max-w-[34rem] space-y-4 text-slate-600 font-light"
-                        paragraphClassName="text-base md:text-[1.05rem] leading-[1.7]"
+                        paragraphClassName="text-[0.875rem] md:text-[1.05rem] leading-[1.5] md:leading-[1.7]"
                     />
                 </div>
             </div>

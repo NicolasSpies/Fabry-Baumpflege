@@ -26,7 +26,7 @@ const ReferenceContentSection = ({
                     <CmsText
                         text={description}
                         className="text-slate-600 mb-8"
-                        paragraphClassName="text-base md:text-[1.05rem] leading-[1.7]"
+                        paragraphClassName="text-[0.875rem] md:text-[1.05rem] leading-[1.5] md:leading-[1.7]"
                     />
                 )}
             </div>

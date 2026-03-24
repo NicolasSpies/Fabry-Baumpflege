@@ -117,11 +117,20 @@ const Navbar = ({
                     to={resolved.href || resolved.link || item.href}
                     end={item.routeKey === 'home' || item.href === '/' || item.href === '/fr'}
                     onClick={isMobile ? closeMenu : undefined}
-                    className={({ isActive }) =>
-                        isMobile 
-                            ? `text-lg font-serif uppercase tracking-widest transition-colors ${isActive ? 'text-primary' : 'text-muted-accessible hover:text-primary'}`
-                            : `hover:text-primary transition-colors whitespace-nowrap ${isActive ? 'text-primary border-b-2 border-primary pb-1' : ''}`
-                    }
+                    className={({ isActive }) => {
+                        // Custom logic to keep parent route active on sub-pages
+                        const currentPath = location.pathname;
+                        const itemPath = resolved.href || resolved.link || item.href;
+                        
+                        // "Referenzen" should be active if we are on /referenzen OR /referenzen/*
+                        // "Leistungen" should be active if we are on /leistungen OR /leistungen/*
+                        const isSubPathActive = itemPath !== '/' && itemPath !== '/fr' && currentPath.startsWith(itemPath);
+                        const effectivelyActive = isActive || isSubPathActive;
+
+                        return isMobile 
+                            ? `text-lg font-serif uppercase tracking-widest transition-colors ${effectivelyActive ? 'text-primary' : 'text-muted-accessible hover:text-primary'}`
+                            : `hover:text-primary transition-colors whitespace-nowrap ${effectivelyActive ? 'text-primary border-b-2 border-primary pb-1' : ''}`;
+                    }}
                 >
                     {resolved.label || resolved.text || item.label}
                 </NavLink>
@@ -170,16 +179,16 @@ const Navbar = ({
                                 onClick={() => setLanguage('DE')}
                                 aria-label={deLanguageLabel}
                                 aria-pressed={language === 'DE'}
-                                className={`transition-[opacity,color] duration-300 ${language === 'DE' ? 'opacity-100 text-primary' : 'opacity-70 hover:opacity-100 text-muted-accessible'}`}
+                                className={`transition-all duration-300 ${language === 'DE' ? 'opacity-100 text-primary border-b-2 border-primary' : 'opacity-70 hover:opacity-100 text-muted-accessible'}`}
                             >
                                 DE
                             </button>
-                            <span className="opacity-20">|</span>
+                            <span className="opacity-10 mx-1">|</span>
                             <button
                                 onClick={() => setLanguage('FR')}
                                 aria-label={frLanguageLabel}
                                 aria-pressed={language === 'FR'}
-                                className={`transition-[opacity,color] duration-300 ${language === 'FR' ? 'opacity-100 text-primary' : 'opacity-70 hover:opacity-100 text-muted-accessible'}`}
+                                className={`transition-all duration-300 ${language === 'FR' ? 'opacity-100 text-primary border-b-2 border-primary' : 'opacity-70 hover:opacity-100 text-muted-accessible'}`}
                             >
                                 FR
                             </button>

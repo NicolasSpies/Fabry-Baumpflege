@@ -55,7 +55,7 @@ const ReferenceCard = ({
             }}
             onMouseEnter={prefetchDetail}
             onFocus={prefetchDetail}
-            className={`group relative rounded-2xl block shadow-md md:shadow-lg md:hover:shadow-xl transition-[box-shadow,transform] duration-500 overflow-hidden ${animateEntry ? 'animate-entrance' : ''}`}
+            className={`group relative rounded-2xl block shadow-md md:shadow-lg md:hover:shadow-2xl md:hover:-translate-y-1 transition-all duration-500 overflow-hidden ${animateEntry ? 'animate-entrance' : ''}`}
             style={animateEntry ? { animationDelay: `${staggerIndex * 0.1}s` } : {}}
         >
             <div className={`relative w-full overflow-hidden aspect-square md:aspect-[4/5] lg:aspect-square bg-slate-100 dark:bg-slate-900`}>

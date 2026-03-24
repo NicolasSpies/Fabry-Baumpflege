@@ -49,7 +49,7 @@ const ServiceBlockInternal = ({ id, title, description, list, image, reverse, to
         <section
             id={id}
             className={`${isFirst ? 'pt-4 md:pt-14 pb-9 md:pb-28' : 'py-9 md:py-32'} px-4 md:px-6 overflow-hidden ${toneClass}`}
-            style={{ minHeight: isFirst ? '650px' : '750px' }}
+            style={{ minHeight: isFirst ? (typeof window !== 'undefined' && window.innerWidth < 768 ? '400px' : '650px') : '750px' }}
         >
             <div className="max-w-7xl mx-auto">
                 <div
@@ -75,7 +75,7 @@ const ServiceBlockInternal = ({ id, title, description, list, image, reverse, to
                             <CmsText
                                 text={description}
                                 className="max-w-[34rem] space-y-3 text-slate-600 dark:text-slate-400"
-                                paragraphClassName="text-base leading-relaxed"
+                                paragraphClassName="text-[0.875rem] md:text-base leading-[1.5] md:leading-relaxed"
                             />
                         )}
                         <ul className="space-y-1.5 md:space-y-2.5 lg:space-y-3 pt-5 md:pt-4 border-t border-primary/10">

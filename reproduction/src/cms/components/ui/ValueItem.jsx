@@ -34,8 +34,8 @@ import { resolveInstanceProps } from '@/cms/bridge-resolver';
                     </h2>
                     <CmsText
                         text={props.text}
-                        className="text-[1.02rem] sm:text-[1.1rem] text-muted-accessible text-slate-600 dark:text-slate-400 font-light"
-                        paragraphClassName="leading-[1.62]"
+                        className="text-slate-600 dark:text-slate-400 font-light"
+                        paragraphClassName="text-[0.875rem] leading-[1.5]"
                     />
                 </div>
             </div>

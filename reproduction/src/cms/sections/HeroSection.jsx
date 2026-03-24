@@ -71,7 +71,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
                             {renderTextWithBreaks(title_main)}
                         </div>
                     </h1>
-                    <p className="text-[0.9rem] md:text-base text-white/75 font-sans font-normal max-w-[250px] md:max-w-md leading-snug md:leading-relaxed reveal stagger-1">
+                    <p className="text-[0.875rem] md:text-base text-white/75 font-sans font-normal max-w-[250px] md:max-w-md leading-[1.5] md:leading-relaxed reveal stagger-1">
                         {renderTextWithBreaks(description)}
                     </p>
                     <div className="pt-1 md:pt-4 reveal stagger-2">
