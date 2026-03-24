@@ -56,13 +56,29 @@ export default async function handler(req, res) {
     // 2. Resolve Global Metadata Logic
     const metadata = resolveMetadata({ ...route, path: originalPath, isHome: originalPath === '/' || originalPath === '/fr' }, pageData, globalSeo);
 
-    // 3. Transformation: Deterministic Rendering
+    // 3. Asset & Template Discovery
+    // We attempt to load the real built index.html to get the correct production hashes.
+    // If not found (e.g. dev or cold start), we use the embedded PRODUCTION_TEMPLATE.
     let html = PRODUCTION_TEMPLATE;
+    try {
+        const buildPath = path.resolve(__dirname, '../dist/index.html');
+        if (fs.existsSync(buildPath)) {
+            html = fs.readFileSync(buildPath, 'utf8');
+        }
+    } catch (e) {
+        // Fallback to embedded template if disk resolution fails
+    }
 
     // Add Production-Level Debug Markers
     const debugMarker = `<meta name="x-seo-runtime" content="api-ssr-deterministic">`;
     html = html.replace('</head>', `  ${debugMarker}\n</head>`);
     
+    // Safety: If we're on Vercel but using the fallback template, 
+    // remove the dev-only /src/main.jsx script to avoid hydration crashes.
+    if (req.headers['x-vercel-id'] && html.includes('/src/main.jsx')) {
+        html = html.replace('<script type="module" src="/src/main.jsx"></script>', '');
+    }
+
     // Inject ALL fields (title, description, og, twitter, robots, canonical)
     html = injectMetadata(html, metadata);
 

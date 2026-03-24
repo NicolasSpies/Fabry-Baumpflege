@@ -410,58 +410,51 @@ function getAbsoluteCmsRootApiBase() {
  */
 export async function fetchFromCMS(endpoint, language = 'DE', signal = null) {
     const langCode = PLLCode[language] ?? (language ? String(language).toLowerCase() : 'de');
-
-    /**
-     * Determine the correct API base.
-     * Most WP endpoints are under /wp/v2, but custom plugins (like content-core)
-     * register their namespaces at the root level of /wp-json/.
-     */
-    const isRootNamespace = endpoint.startsWith('/content-core') || endpoint.startsWith('/polylang');
+    const isCore = endpoint.startsWith('/content-core') || endpoint.startsWith('/polylang');
     let apiBase = String(CMS_API_BASE).replace(/\/+$/, '');
-    if (isRootNamespace) {
-        // Strip the standard WP namespace to reach the root /wp-json level
+    if (isCore) {
         apiBase = apiBase.replace(/\/wp\/v2\/?$/, '');
     }
 
     const separator = endpoint.includes('?') ? '&' : '?';
-    // Content Core expects `language`, while legacy WP endpoints still rely on `lang`.
-    // We provide BOTH to ensure maximum compatibility across different plugins.
     const languageParam = `language=${encodeURIComponent(langCode)}&lang=${encodeURIComponent(langCode)}`;
-
-    // Normalize endpoint to ensuring leading slash
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-
     const url = `${apiBase}${cleanEndpoint}${separator}${languageParam}`;
 
     const now = Date.now();
     const cached = cmsResponseCache.get(url);
-    if (cached && cached.expiresAt > now) {
-        return cloneCmsPayload(cached.data);
-    }
-    if (cached) {
-        cmsResponseCache.delete(url);
-    }
+    if (cached && cached.expiresAt > now) return cloneCmsPayload(cached.data);
+    if (cached) cmsResponseCache.delete(url);
 
     if (!signal) {
         const inflight = cmsInflightCache.get(url);
-        if (inflight) {
-            return cloneCmsPayload(await inflight);
-        }
+        if (inflight) return cloneCmsPayload(await inflight);
     }
 
     const requestPromise = (async () => {
-        const response = await fetch(url, signal ? { signal } : undefined);
+        try {
+            const response = await fetch(url, signal ? { signal } : undefined);
+            
+            // Critical: If the endpoint is protected (401/403), we return a safe empty result
+            // to avoid crashing the frontend hydration entirely.
+            if (response.status === 401 || response.status === 403) {
+                console.warn(`[CMS] Access restricted for ${url}. Returning empty fallback.`);
+                return endpoint.includes('include=') || endpoint.includes('posts/') || endpoint.includes('v1/terms') ? [] : null;
+            }
 
-        if (!response.ok) {
-            throw new Error(`CMS fetch failed: ${response.status} ${response.statusText} — ${url}`);
+            if (!response.ok) {
+                throw new Error(`CMS fetch failed: ${response.status} ${response.statusText} — ${url}`);
+            }
+
+            return response.json();
+        } catch (err) {
+            if (err.name === 'AbortError') throw err;
+            console.error(`[CMS] Network failure for ${url}:`, err.message);
+            return endpoint.includes('include=') || endpoint.includes('posts/') || endpoint.includes('v1/terms') ? [] : null;
         }
-
-        return response.json();
     })();
 
-    if (!signal) {
-        cmsInflightCache.set(url, requestPromise);
-    }
+    if (!signal) cmsInflightCache.set(url, requestPromise);
 
     try {
         const payload = await requestPromise;
@@ -643,28 +636,19 @@ export async function getForm(slug, language = 'DE', signal = null) {
 
 /** Fetch all reference_category terms for the given language. */
 export async function getReferenceCategories(language = 'DE') {
-    const endpoints = [
-        '/kategorie', 
-        '/reference_category', 
-        '/reference-category', 
-        '/referenzen_category',
-        '/content-core/v1/terms/reference_category'
-    ];
-    for (const endpoint of endpoints) {
-        try {
-            const terms = await fetchFromCMS(`${endpoint}?per_page=100`, language);
-            if (Array.isArray(terms) && terms.length > 0) {
-                return terms.map(cat => ({
-                    id: cat.id,
-                    name: decodeHtmlEntities(cat.name || ''),
-                    slug: cat.slug || '',
-                    pll_lang: cat.pll_lang || cat.language || cat.lang || null,
-                    translations: cat.translations || cat.pll_translations || null,
-                }));
-            }
-        } catch (error) {
-            // Silently try next endpoint
+    try {
+        const terms = await fetchFromCMS('/content-core/v1/terms/reference_category?per_page=100', language);
+        if (Array.isArray(terms)) {
+            return terms.map(cat => ({
+                id: cat.id,
+                name: decodeHtmlEntities(cat.name || ''),
+                slug: cat.slug || '',
+                pll_lang: cat.pll_lang || cat.language || cat.lang || null,
+                translations: cat.translations || cat.pll_translations || null,
+            }));
         }
+    } catch (error) {
+        console.warn('[CMS] getReferenceCategories failed:', error);
     }
     return [];
 }
@@ -689,7 +673,7 @@ export async function getTermsByIds(ids, language = 'DE', signal = null) {
     try {
         const include = ids.map(Number).filter(Boolean).join(',');
         const terms = await fetchFromCMS(
-            `/reference_category?include=${include}&per_page=${ids.length}`,
+            `/content-core/v1/terms/reference_category?include=${include}&per_page=${ids.length}`,
             language,
             signal
         );
