@@ -14,53 +14,40 @@ export const PAGE_IDS = {
     references: 28
 };
 
-export const DEFAULT_SEO = {
-    DE: {
-        title: 'Fabry Baumpflege | Fachgerechte Baumpflege & Erhaltung',
-        description: 'Professionelle Baumpflege, Baumerhaltung und sichere Baumfällung in Ostbelgien und Umgebung. Ihre Experten für gesunde Wälder und Gärten.',
-        ogImage: 'https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/fabry-baumpflege-leistung-baumfaellung.webp',
-        url: 'https://fabry-baumpflege.be',
-        locale: 'de_DE'
-    },
-    FR: {
-        title: 'Fabry Baumpflege | Soins des arbres et élagage professionnel',
-        description: 'Votre expert pour les soins des arbres, la conservation et l\'abattage sécurisé en Communauté germanophone et environs.',
-        ogImage: 'https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/fabry-baumpflege-leistung-baumfaellung.webp',
-        url: 'https://fabry-baumpflege.be/fr',
-        locale: 'fr_FR'
-    }
-};
+export const DEFAULT_SEO = {}; // Legacy - No longer used in conduit mode
 
 /**
- * Resolves properties about the route
+ * Path Resolver: Pure Conduit Protocol
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Maps the public URL to a route context for the CMS API.
+ * The root '/' is mapped to an empty slug to fetch the Front Page naturally.
  */
 export function resolveRouteContext(path) {
-    const p = path.toLowerCase().replace(/\/$/, '') || '/';
-    
-    // Explicit Language
+    const p = path.toLowerCase().split('?')[0].split('#')[0].replace(/\/$/, '') || '/';
     const lang = p.startsWith('/fr') ? 'FR' : 'DE';
-    const cleanPath = p.replace(/^\/fr(\/|$)/, '/').replace(/^\/de(\/|$)/, '/').replace(/\/$/, '') || '/';
     
-    // Exact Matches
-    if (cleanPath === '/') return { type: 'page', slug: 'home', lang, isHome: true };
-    if (cleanPath === '/services' || cleanPath === '/leistungen') return { type: 'page', slug: cleanPath.substring(1), lang };
-    if (cleanPath === '/a-propos' || cleanPath === '/ueber-mich') return { type: 'page', slug: cleanPath.substring(1), lang };
-    if (cleanPath === '/contact' || cleanPath === '/kontakt') return { type: 'page', slug: cleanPath.substring(1), lang };
-    if (cleanPath === '/references' || cleanPath === '/referenzen') return { type: 'page', slug: cleanPath.substring(1), lang };
+    // Normalize path (Removes /fr/, /de/, index.html, and slashes)
+    let cleanPath = p.replace(/^\/fr(\/|$)/, '/').replace(/^\/de(\/|$)/, '/');
+    cleanPath = cleanPath.replace(/\/index\.html$/, '/').replace(/\/$/, '') || '/';
     
-    // Reference Details
-    if (cleanPath.startsWith('/references/') || cleanPath.startsWith('/referenzen/')) {
-        const slug = cleanPath.split('/').filter(Boolean).pop();
-        return { type: 'reference', slug, lang };
+    // Type Detection
+    let route = { type: 'page', lang, isDetail: false };
+
+    // 1. Reference Details Pattern: /referenzen/slug or /fr/references/slug
+    if (cleanPath.startsWith('/referenzen/') || cleanPath.startsWith('/references/')) {
+        route.type = 'reference';
+        route.slug = cleanPath.split('/').pop();
+        route.isDetail = true;
+    } else if (cleanPath === '/') {
+        // 2. Homepage Detection: Map to explicit detail slugs
+        route.slug = lang === 'FR' ? 'page-daccueil' : 'startseite';
+        route.isDetail = true;
+    } else {
+        // 3. Everything else is a Page (Slug is the URL segment)
+        route.slug = cleanPath.split('/').filter(Boolean)[0];
     }
 
-    // Generic fallback: Treat as a page with its slug
-    const parts = cleanPath.split('/').filter(Boolean);
-    if (parts.length === 1) {
-        return { type: 'page', slug: parts[0], lang };
-    }
-
-    return { type: 'unknown', lang };
+    return route;
 }
 
 export function getImageVariant(image, size = '768') {
@@ -78,53 +65,34 @@ export function getImageVariant(image, size = '768') {
 }
 
 /**
- * Shared Metadata Resolver: Prioritizes translated content over generic fallbacks
+ * Shared Metadata Resolver: Pure Conduit Protocol
+ * ─────────────────────────────────────────────────────────────────────────────
+ * All content-level SEO (titles, descriptions, images) are delivered 1:1 from 
+ * the CMS API. The frontend only maintains authority over canonical URLs
+ * to ensure they are relative to the production domain.
  */
 export function resolveMetadata(route, apiData, globalSeo) {
     const seo = apiData?.seo || {};
-    const defaults = DEFAULT_SEO[route.lang];
 
-    // Priority 1: Page-level SEO Title
-    // Priority 2: Page-level Native Title
-    // Priority 3: Global Site SEO Title
-    // Priority 4: Static Default
-    let title = seo.title || apiData?.title || globalSeo?.title || defaults.title;
-    
-    // Safety: If FR but title is German, prefer Native Post Title or Defaults
-    if (route.lang === 'FR' && (title.includes('Baumpflege') || title.includes('Gartenpflege'))) {
-        title = apiData?.title || defaults.title;
+    // 1. Direct API Conduit (Zero Transformation)
+    const title = seo.title || '';
+    const description = seo.description || '';
+    const ogImage = seo.og_image_url || globalSeo?.default_og_image_url || '';
+
+    // 2. Canonical Logic (Frontend Authority)
+    // Enforce public domain and trailing slashes for indexing consistency
+    let cleanPath = (route.path || '/').split('?')[0].split('#')[0];
+    if (!cleanPath.endsWith('/')) {
+        cleanPath += '/';
     }
-
-    // Append Site Name if missing and not Home
-    if (title && !title.includes('Fabry Baumpflege') && !route.isHome) {
-        title = `${title} | Fabry Baumpflege`;
-    }
-
-    // Priority 1: Page-level SEO Description
-    // Priority 2: Page-level Native Excerpt
-    // Priority 3: Global Site SEO Description
-    // Priority 4: Static Default
-    let description = seo.description || apiData?.excerpt || globalSeo?.description || defaults.description;
-
-    // Safety: If FR but description is German, prefer Post Excerpt or Default FR
-    if (route.lang === 'FR' && (description.includes('Baumpflege') || description.includes('Fachgerechte'))) {
-        description = apiData?.excerpt || defaults.description;
-    }
-
-    // OG Image Priority: SEO Image -> Featured 1280 -> Global Default
-    let ogImage = seo.og_image_url;
-    if (!ogImage && apiData) {
-        ogImage = getImageVariant(apiData.featured_image || apiData, '1280');
-    }
-
-    const currentUrl = `https://fabry-baumpflege.be${route.path || '/'}`;
+    const currentUrl = `https://fabry-baumpflege.be${cleanPath}`;
 
     const metadata = {
         lang: route.lang.toLowerCase(),
-        locale: defaults.locale,
+        locale: route.lang === 'FR' ? 'fr_FR' : 'de_DE',
         title: title,
         description: description,
-        ogImage: ogImage || globalSeo?.default_og_image_url || defaults.ogImage,
+        ogImage: ogImage,
         ogTitle: seo.og_title || title,
         ogDescription: seo.og_description || description,
         url: currentUrl,

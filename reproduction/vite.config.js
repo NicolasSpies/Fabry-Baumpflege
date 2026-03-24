@@ -42,7 +42,7 @@ const cbMappingsPlugin = {
   },
 };
 
-import { resolveRouteContext, injectMetadata, resolveMetadata, getImageVariant, CMS_HOST, DEFAULT_SEO } from './src/cms/lib/seo-logic.mjs';
+import { resolveRouteContext, injectMetadata, resolveMetadata, CMS_HOST, DEFAULT_SEO } from './src/cms/lib/seo-logic.mjs';
 
 /**
  * SEO Injection Plugin for Vite (Dev and Build)
@@ -63,14 +63,23 @@ const seoVitePlugin = {
         ];
 
         if (route.type === 'page') {
-            const pageSlug = route.isHome ? 'home' : route.slug;
-            fetchers.push(fetch(`${CMS_HOST}/wp-json/content-core/v1/posts/page?slug=${pageSlug}&lang=${route.lang.toLowerCase()}&per_page=1`)
+            const apiPath = route.isDetail 
+                ? `${CMS_HOST}/wp-json/content-core/v1/post/page/slug/${route.slug}?lang=${route.lang.toLowerCase()}`
+                : `${CMS_HOST}/wp-json/content-core/v1/posts/page?slug=${route.slug}&lang=${route.lang.toLowerCase()}&per_page=1`;
+
+            fetchers.push(fetch(apiPath)
                 .then(r => r.json())
-                .then(arr => Array.isArray(arr) ? arr[0] : null));
+                .then(data => {
+                    if (Array.isArray(data)) return data[0] || null;
+                    return data || null;
+                }));
         } else if (route.type === 'reference') {
-            fetchers.push(fetch(`${CMS_HOST}/wp-json/content-core/v1/posts/referenzen?slug=${route.slug}&lang=${route.lang.toLowerCase()}&per_page=1`)
+            fetchers.push(fetch(`${CMS_HOST}/wp-json/content-core/v1/post/referenzen/slug/${route.slug}?lang=${route.lang.toLowerCase()}`)
                 .then(r => r.json())
-                .then(arr => Array.isArray(arr) ? arr[0] : null));
+                .then(data => {
+                    if (Array.isArray(data)) return data[0] || null;
+                    return data || null;
+                }));
         }
 
         const [globalResult, pageResult] = await Promise.all(fetchers);
@@ -78,11 +87,11 @@ const seoVitePlugin = {
         apiData = pageResult;
 
         // Debug Logs
-        console.log(`[SEO-VITE] Route: ${route.lang} ${route.type} /${route.slug || 'home'}`);
-        console.log(`[SEO-VITE] API:   ${apiData?.language || '??'} ${apiData?.type || '??'} /${apiData?.slug || '??'}`);
+        console.log(`[SEO-VITE] Route: ${route.lang} ${route.type} /${route.slug}`);
+        console.log(`[SEO-VITE] API:   ${apiData?.language || '??'} /${apiData?.slug || '??'}`);
 
-        // Strict mismatch handling: If non-home route returned no data or wrong slug, alert
-        const isMismatched = !route.isHome && (!apiData || apiData.slug !== (route.slug || 'home'));
+        // Strict mismatch handling: Ensure we have data for the requested slug
+        const isMismatched = !apiData || (route.slug !== '' && apiData.slug !== route.slug);
         if (isMismatched) {
             console.error(`[SEO-VITE] MISMATCH/MISSING for ${ctx.originalUrl || ctx.path}`);
         }

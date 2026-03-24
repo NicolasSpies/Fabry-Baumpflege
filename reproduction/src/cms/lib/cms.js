@@ -221,10 +221,10 @@ export function normalizeCmsImage(image) {
     // Priority: explicit version > modified timestamp > fallback
     const imgVersion = image.version || image.v || (image.modified ? image.modified : null);
     
-    // Standardized variant selection via helper
+    // Standardized variant selection via helper: default to performance variant
     const responsiveSrc = getImageVariant(image, '768');
     
-    // If no numeric variants, search sources for a medium variant
+    // If no numeric variants provided in the JSON, search responsive sources (wp-v2 sizes)
     let fallbackVariant = null;
     if (!responsiveSrc) {
         // Find smallest source that is at least 700w (medium fallback)
@@ -255,11 +255,11 @@ export function normalizeCmsImage(image) {
     const sanitizeSrcSet = (str) => {
         if (!str) return '';
         const entries = str.split(',').map(s => s.trim()).filter(Boolean);
-        const hasVariants = entries.some(e => /-(1280|768|480)\./.test(e));
+        const hasVariants = entries.some(e => /-(1280|768|480)(x\d+)?\./.test(e));
         
         const filtered = entries.filter(entry => {
             const urlPart = entry.split(' ')[0];
-            const isNakedMaster = !/-(1280|768|480)\./.test(urlPart);
+            const isNakedMaster = !/-(1280|768|480)(x\d+)?\./.test(urlPart);
             const isVersioned = urlPart.includes('?v=');
             return !isNakedMaster || isVersioned || !hasVariants;
         });
@@ -274,17 +274,31 @@ export function normalizeCmsImage(image) {
 
     const apiSrcSet = sanitizeSrcSet(rawApiSrcSet);
 
+    // Parse apiSrcSet back into entries for rawSrcSetEntries to ensure consistency
+    const apiSrcSetEntries = apiSrcSet.split(',').map(s => {
+        const parts = s.trim().split(' ');
+        if (parts.length < 2) return null;
+        const widthMatch = parts[1].match(/^(\d+)w$/);
+        return {
+            url: parts[0],
+            width: widthMatch ? parseInt(widthMatch[1]) : undefined
+        };
+    }).filter(e => e && e.url);
+
     const srcSetObject = sourceList
         .filter(s => {
-            const isNakedMaster = !/-(1280|768|480)\./.test(s.url);
+            const isNakedMaster = !/-(1280|768|480)(x\d+)?\./.test(s.url);
             const isVersioned = s.url.includes('?v=');
-            const hasResponsive = sourceList.some(o => /-(1280|768|480)\./.test(o.url));
+            const hasResponsive = sourceList.some(o => /-(1280|768|480)(x\d+)?\./.test(o.url));
             return !isNakedMaster || isVersioned || !hasResponsive;
         });
 
     const srcSet = apiSrcSet || srcSetObject
         .map((entry) => `${buildVersionedUrl(entry.url, imgVersion)} ${entry.width}w`)
         .join(', ');
+
+    // Use API entries if available, fallback to object mappings
+    const finalSrcSetEntries = apiSrcSetEntries.length > 0 ? apiSrcSetEntries : srcSetObject.map(s => ({ ...s, url: buildVersionedUrl(s.url, imgVersion) }));
 
     // 3. Metadata & Attributes
     const width = Number(image.width) || (fallbackVariant?.width) || undefined;
@@ -294,7 +308,7 @@ export function normalizeCmsImage(image) {
         ...image,
         src,
         srcSet,
-        rawSrcSetEntries: srcSetObject.map(s => ({ ...s, url: buildVersionedUrl(s.url, imgVersion) })),
+        rawSrcSetEntries: finalSrcSetEntries,
         sizes: (image.sizes && typeof image.sizes === 'string' && image.sizes !== '') ? image.sizes : '100vw',
         alt: image.alt || image.title?.rendered || '',
         width,
@@ -317,6 +331,7 @@ export function getCmsImageProps(image, options = {}) {
     
     const hintSource = 
         explicitSrc ||
+        (options.preferDesktopSharpness && v['768']) ||
         (options.preferSmall && (v['480'] || v['768'])) ||
         (options.preferMedium && (v['768'] || v['1280'])) ||
         null;
@@ -330,7 +345,7 @@ export function getCmsImageProps(image, options = {}) {
         if (filteredEntries.length > 0) {
             srcSet = filteredEntries.map(s => `${s.url} ${s.width}w`).join(', ');
             // If the current src is larger than maxWidth, downgrade it to the best available
-            const currentWidthMatch = src.match(/-(\d+)\./);
+            const currentWidthMatch = src.match(/-(\d+)(x\d+)?\./);
             const currentWidth = currentWidthMatch ? parseInt(currentWidthMatch[1]) : 9999;
             if (currentWidth > options.maxWidth) {
                 src = filteredEntries[filteredEntries.length - 1].url;

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { resolveRouteContext, resolveMetadata, injectMetadata, getImageVariant, CMS_HOST } from '../src/cms/lib/seo-logic.mjs';
+import { resolveRouteContext, resolveMetadata, injectMetadata, CMS_HOST } from '../src/cms/lib/seo-logic.mjs';
 import { PRODUCTION_TEMPLATE } from '../src/cms/lib/template.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -26,14 +26,14 @@ export default async function handler(req, res) {
         ];
 
         if (route.type === 'page') {
-            const pageSlug = (originalPath === '/' || originalPath === '/fr') ? 'home' : route.slug;
-            fetchers.push(fetch(`${CMS_HOST}/wp-json/content-core/v1/posts/page?slug=${pageSlug}&lang=${route.lang.toLowerCase()}&per_page=1`)
-                .then(r => r.json())
-                .then(arr => Array.isArray(arr) ? arr[0] : null));
+            const isHome = originalPath === '/' || originalPath === '/fr';
+            const pageSlug = isHome 
+                ? (route.lang === 'FR' ? 'page-daccueil' : 'startseite') 
+                : route.slug;
+            
+            fetchers.push(fetch(`${CMS_HOST}/wp-json/content-core/v1/post/page/slug/${pageSlug}?lang=${route.lang.toLowerCase()}`).then(r => r.json()));
         } else if (route.type === 'reference') {
-            fetchers.push(fetch(`${CMS_HOST}/wp-json/content-core/v1/posts/referenzen?slug=${route.slug}&lang=${route.lang.toLowerCase()}&per_page=1`)
-                .then(r => r.json())
-                .then(arr => Array.isArray(arr) ? arr[0] : null));
+            fetchers.push(fetch(`${CMS_HOST}/wp-json/content-core/v1/post/referenzen/slug/${route.slug}?lang=${route.lang.toLowerCase()}`).then(r => r.json()));
         }
 
         const [globalResult, pageResult] = await Promise.all(fetchers);

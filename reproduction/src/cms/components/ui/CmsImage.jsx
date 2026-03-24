@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getCmsImageProps } from '@/cms/lib/cms';
 
 const CmsImage = React.forwardRef(function CmsImage(
-    { image, alt, sizes, size, className = '', loading, decoding = 'async', fetchPriority, preferSmallSource, preferMediumSource, ...props },
+    { image, alt, sizes, size, className = '', loading, decoding = 'async', fetchPriority, preferSmallSource, preferMediumSource, maxWidth, ...props },
     ref
 ) {
     const [preferSmall, setPreferSmall] = useState(() => {
@@ -35,7 +35,8 @@ const CmsImage = React.forwardRef(function CmsImage(
         fetchPriority,
         preferSmall: typeof preferSmallSource === 'boolean' ? preferSmallSource : preferSmall,
         preferMedium: Boolean(preferMediumSource),
-        maxWidth: props.maxWidth,
+        preferDesktopSharpness: !preferSmall,
+        maxWidth,
     });
 
     if (!imageProps?.src) return null;

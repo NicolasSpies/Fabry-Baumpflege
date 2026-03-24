@@ -1,0 +1,135 @@
+Fetching DE Homepage... Done.
+Fetching FR Homepage... Done.
+Fetching DE Services... Done.
+Fetching FR Services... Done.
+Fetching DE Reference Detail... Done.
+Fetching FR Reference Detail... Done.
+Fetching Overview (Referenzen)... Done.
+[
+  {
+    "name": "DE Homepage",
+    "url": "/",
+    "layer3": {
+      "title": "Fabry Baumpflege | Fachgerechte Baumpflege & Erhaltung",
+      "description": "Professionelle Baumpflege, Baumerhaltung und sichere Baumfällung in Ostbelgien und Umgebung. Ihre Experten für gesunde Wälder und Gärten.",
+      "canonical": "https://fabry-baumpflege.be/",
+      "ogTitle": "Fabry Baumpflege | Fachgerechte Baumpflege & Erhaltung",
+      "ogDescription": "Professionelle Baumpflege, Baumerhaltung und sichere Baumfällung in Ostbelgien und Umgebung. Ihre Experten für gesunde Wälder und Gärten.",
+      "ogUrl": "https://fabry-baumpflege.be/",
+      "ogImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "twitterTitle": "Fabry Baumpflege | Fachgerechte Baumpflege & Erhaltung",
+      "twitterDescription": "Professionelle Baumpflege, Baumerhaltung und sichere Baumfällung in Ostbelgien und Umgebung. Ihre Experten für gesunde Wälder und Gärten.",
+      "twitterImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "locale": "de_DE",
+      "lang": "de"
+    }
+  },
+  {
+    "name": "FR Homepage",
+    "url": "/fr",
+    "layer3": {
+      "title": "Fabry Baumpflege | Soins des arbres et élagage professionnel",
+      "description": "Votre expert pour les soins des arbres, la conservation et l'abattage sécurisé en Communauté germanophone et environs.",
+      "canonical": "https://fabry-baumpflege.be/fr",
+      "ogTitle": "Fabry Baumpflege | Soins des arbres et élagage professionnel",
+      "ogDescription": "Votre expert pour les soins des arbres, la conservation et l'abattage sécurisé en Communauté germanophone et environs.",
+      "ogUrl": "https://fabry-baumpflege.be/fr",
+      "ogImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "twitterTitle": "Fabry Baumpflege | Soins des arbres et élagage professionnel",
+      "twitterDescription": "Votre expert pour les soins des arbres, la conservation et l'abattage sécurisé en Communauté germanophone et environs.",
+      "twitterImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "locale": "fr_FR",
+      "lang": "fr"
+    }
+  },
+  {
+    "name": "DE Services",
+    "url": "/leistungen",
+    "layer3": {
+      "title": "Fabry Baumpflege | Leistungen für Baum und Garten",
+      "description": "Alle Leistungen rund um Baumpflege, Baumfällung, Gartenpflege und Bepflanzung in Ostbelgien und Umgebung. Sauber geplant und direkt vor Ort umgesetzt.",
+      "canonical": "https://fabry-baumpflege.be/leistungen",
+      "ogTitle": "Fabry Baumpflege | Leistungen für Baum und Garten",
+      "ogDescription": "Alle Leistungen rund um Baumpflege, Baumfällung, Gartenpflege und Bepflanzung in Ostbelgien und Umgebung. Sauber geplant und direkt vor Ort umgesetzt.",
+      "ogUrl": "https://fabry-baumpflege.be/leistungen",
+      "ogImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "twitterTitle": "Fabry Baumpflege | Leistungen für Baum und Garten",
+      "twitterDescription": "Alle Leistungen rund um Baumpflege, Baumfällung, Gartenpflege und Bepflanzung in Ostbelgien und Umgebung. Sauber geplant und direkt vor Ort umgesetzt.",
+      "twitterImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "locale": "de_DE",
+      "lang": "de"
+    }
+  },
+  {
+    "name": "FR Services",
+    "url": "/fr/services",
+    "layer3": {
+      "title": "Services | Fabry Baumpflege",
+      "description": "Toutes les prestations liées à l’élagage, l’abattage, l’entretien des jardins et la plantation en Communauté germanophone et aux alentours. Planifiées avec précision et réalisées directement sur place.",
+      "canonical": "https://fabry-baumpflege.be/fr/services",
+      "ogTitle": "Services | Fabry Baumpflege",
+      "ogDescription": "Toutes les prestations liées à l’élagage, l’abattage, l’entretien des jardins et la plantation en Communauté germanophone et aux alentours. Planifiées avec précision et réalisées directement sur place.",
+      "ogUrl": "https://fabry-baumpflege.be/fr/services",
+      "ogImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "twitterTitle": "Services | Fabry Baumpflege",
+      "twitterDescription": "Toutes les prestations liées à l’élagage, l’abattage, l’entretien des jardins et la plantation en Communauté germanophone et aux alentours. Planifiées avec précision et réalisées directement sur place.",
+      "twitterImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "locale": "fr_FR",
+      "lang": "fr"
+    }
+  },
+  {
+    "name": "DE Reference Detail",
+    "url": "/referenzen/hier-die-dritte-referenz",
+    "layer3": {
+      "title": "Fabry Baumpflege | Hier die dritte Referenz",
+      "description": "Lorem Ipsum ist ein einfacher Demo-Text für die Print- und Schriftindustrie. Lorem Ipsum ist in der Industrie bereits der Standard Demo-Text seit 1500, als ein unbekannter Schriftsteller eine Hand voll Wörter nahm und diese durcheinander warf um ein Musterbuch zu erstellen. Es hat nicht nur 5 Jahrhunderte überlebt, sondern auch in Spruch in die elektronische Schriftbearbeitung geschafft (bemerke, nahezu unverändert). Bekannt wurde es 1960, mit dem erscheinen von ",
+      "canonical": "https://fabry-baumpflege.be/referenzen/hier-die-dritte-referenz",
+      "ogTitle": "Fabry Baumpflege | Hier die dritte Referenz",
+      "ogDescription": "Lorem Ipsum ist ein einfacher Demo-Text für die Print- und Schriftindustrie. Lorem Ipsum ist in der Industrie bereits der Standard Demo-Text seit 1500, als ein unbekannter Schriftsteller eine Hand voll Wörter nahm und diese durcheinander warf um ein Musterbuch zu erstellen. Es hat nicht nur 5 Jahrhunderte überlebt, sondern auch in Spruch in die elektronische Schriftbearbeitung geschafft (bemerke, nahezu unverändert). Bekannt wurde es 1960, mit dem erscheinen von ",
+      "ogUrl": "https://fabry-baumpflege.be/referenzen/hier-die-dritte-referenz",
+      "ogImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "twitterTitle": "Fabry Baumpflege | Hier die dritte Referenz",
+      "twitterDescription": "Lorem Ipsum ist ein einfacher Demo-Text für die Print- und Schriftindustrie. Lorem Ipsum ist in der Industrie bereits der Standard Demo-Text seit 1500, als ein unbekannter Schriftsteller eine Hand voll Wörter nahm und diese durcheinander warf um ein Musterbuch zu erstellen. Es hat nicht nur 5 Jahrhunderte überlebt, sondern auch in Spruch in die elektronische Schriftbearbeitung geschafft (bemerke, nahezu unverändert). Bekannt wurde es 1960, mit dem erscheinen von ",
+      "twitterImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "locale": "de_DE",
+      "lang": "de"
+    }
+  },
+  {
+    "name": "FR Reference Detail",
+    "url": "/fr/references/ici-la-3e-reference",
+    "layer3": {
+      "title": "Ici la 3e Référence | Fabry Baumpflege",
+      "description": "e Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression. Le Lorem Ipsum est le faux texte standard de l'imprimerie depuis les années 1500, quand un imprimeur anonyme assembla ensemble des morceaux de texte pour réaliser un livre spécimen de polices de texte. Il n'a pas fait que survivre cinq siècles, mais s'est aussi adapté à la bureautique informatique, sans que son contenu n'en soit modifié. Il a été popularisé dans les années 1960 grâce à la vente de feuilles Letraset contenant des passages du Lorem Ipsum, et, plus récemment, par son inclusion dans des applications de mise en page de texte, comme Aldus PageMaker.",
+      "canonical": "https://fabry-baumpflege.be/fr/references/ici-la-3e-reference",
+      "ogTitle": "Ici la 3e Référence | Fabry Baumpflege",
+      "ogDescription": "e Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression. Le Lorem Ipsum est le faux texte standard de l'imprimerie depuis les années 1500, quand un imprimeur anonyme assembla ensemble des morceaux de texte pour réaliser un livre spécimen de polices de texte. Il n'a pas fait que survivre cinq siècles, mais s'est aussi adapté à la bureautique informatique, sans que son contenu n'en soit modifié. Il a été popularisé dans les années 1960 grâce à la vente de feuilles Letraset contenant des passages du Lorem Ipsum, et, plus récemment, par son inclusion dans des applications de mise en page de texte, comme Aldus PageMaker.",
+      "ogUrl": "https://fabry-baumpflege.be/fr/references/ici-la-3e-reference",
+      "ogImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "twitterTitle": "Ici la 3e Référence | Fabry Baumpflege",
+      "twitterDescription": "e Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression. Le Lorem Ipsum est le faux texte standard de l'imprimerie depuis les années 1500, quand un imprimeur anonyme assembla ensemble des morceaux de texte pour réaliser un livre spécimen de polices de texte. Il n'a pas fait que survivre cinq siècles, mais s'est aussi adapté à la bureautique informatique, sans que son contenu n'en soit modifié. Il a été popularisé dans les années 1960 grâce à la vente de feuilles Letraset contenant des passages du Lorem Ipsum, et, plus récemment, par son inclusion dans des applications de mise en page de texte, comme Aldus PageMaker.",
+      "twitterImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "locale": "fr_FR",
+      "lang": "fr"
+    }
+  },
+  {
+    "name": "Overview (Referenzen)",
+    "url": "/referenzen",
+    "layer3": {
+      "title": "Fabry Baumpflege | Referenzen und Projekte",
+      "description": "Einblicke in Projekte rund um Baumpflege, Baumfällung und Gartenpflege in Ostbelgien. Echte Arbeiten aus der Praxis.",
+      "canonical": "https://fabry-baumpflege.be/referenzen",
+      "ogTitle": "Fabry Baumpflege | Referenzen und Projekte",
+      "ogDescription": "Einblicke in Projekte rund um Baumpflege, Baumfällung und Gartenpflege in Ostbelgien. Echte Arbeiten aus der Praxis.",
+      "ogUrl": "https://fabry-baumpflege.be/referenzen",
+      "ogImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "twitterTitle": "Fabry Baumpflege | Referenzen und Projekte",
+      "twitterDescription": "Einblicke in Projekte rund um Baumpflege, Baumfällung und Gartenpflege in Ostbelgien. Echte Arbeiten aus der Praxis.",
+      "twitterImage": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/vincent-fabry-baumpflege-og.jpg",
+      "locale": "de_DE",
+      "lang": "de"
+    }
+  }
+]
