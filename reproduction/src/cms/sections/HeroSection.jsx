@@ -51,14 +51,14 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
     const isExternalCta = isExternalHref(ctaHref);
 
     return (
-        <section className="relative h-[640px] md:h-screen w-full overflow-hidden flex items-center">
+        <section className="relative h-[580px] md:h-screen w-full overflow-hidden flex items-center">
             <div className="absolute inset-0 z-0">
                 <CmsImage
                     image={image}
                     ref={heroRef}
                     alt=""
                     size="1280"
-                    className={`w-full h-full object-cover ${objectPosition === 'object-top' ? 'object-center-top scale-[1.4] md:scale-100 -translate-x-[100px] md:translate-x-0' : objectPosition} md:filter md:brightness-[0.80] md:contrast-[1.05] transition-all duration-700`}
+                    className={`w-full h-full object-cover ${objectPosition === 'object-top' ? 'object-center-top scale-[1.4] md:scale-100 origin-left -translate-x-[100px] md:translate-x-0' : objectPosition} md:filter md:brightness-[0.80] md:contrast-[1.05] transition-all duration-700`}
                     sizes="(max-width: 768px) 100vw, 100vw"
                     loading="eager"
                     fetchPriority="high"

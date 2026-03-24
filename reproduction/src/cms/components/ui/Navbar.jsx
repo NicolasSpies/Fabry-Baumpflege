@@ -128,7 +128,7 @@ const Navbar = ({
                         const effectivelyActive = isActive || isSubPathActive;
 
                         return isMobile 
-                            ? `text-lg font-serif uppercase tracking-widest transition-colors ${effectivelyActive ? 'text-primary' : 'text-muted-accessible hover:text-primary'}`
+                            ? `text-[1.1rem] font-sans font-medium uppercase tracking-[0.2em] transition-colors ${effectivelyActive ? 'text-primary' : 'text-muted-accessible hover:text-primary'}`
                             : `hover:text-primary transition-colors whitespace-nowrap ${effectivelyActive ? 'text-primary border-b-2 border-primary pb-1' : ''}`;
                     }}
                 >
