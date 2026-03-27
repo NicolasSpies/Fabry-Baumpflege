@@ -81,7 +81,10 @@ export function resolveMetadata(route, apiData, globalSeo) {
 
     // 2. Canonical Logic (Frontend Authority)
     // Enforce public domain and trailing slashes for indexing consistency
+    // Normalize path (Removes any trailing index.html from the technical path)
     let cleanPath = (route.path || '/').split('?')[0].split('#')[0];
+    cleanPath = cleanPath.replace(/\/index\.html$/, '').replace(/index\.html$/, '');
+    
     if (!cleanPath.endsWith('/')) {
         cleanPath += '/';
     }
