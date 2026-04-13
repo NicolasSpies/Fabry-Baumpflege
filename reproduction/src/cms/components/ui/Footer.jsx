@@ -94,7 +94,7 @@ const Footer = ({
                     </ul>
                 </div>
             </div>
-            <div className="max-w-7xl mx-auto mt-10 pt-4 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] text-white/90 uppercase tracking-[0.3em]">
+            <div className="max-w-7xl mx-auto mt-10 pt-4 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] text-white/90 uppercase tracking-[0.3em] text-center md:text-left">
                 <p>© {new Date().getFullYear()} Fabry Baumpflege. {t('footer.rights')}</p>
                 <div className="flex gap-8 items-center">
                     <Link className="hover:text-white transition-colors no-underline" to={getLocalizedPath('imprint', language)}>{t('footer.imprint')}</Link>

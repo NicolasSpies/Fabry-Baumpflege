@@ -116,12 +116,12 @@ const HomeIntroSection = ({
                                             key={`intro-paragraph-${index}`}
                                             className="grid grid-cols-[2rem_minmax(0,1fr)] items-start gap-5 md:gap-7"
                                         >
-                                            <div className="relative flex justify-center pt-[0.7rem]">
-                                                {/* Active Glow Ring */}
-                                                <div 
-                                                    className={`absolute top-[0.68rem] h-4 w-4 rounded-full border border-primary transition-all duration-700 ease-out ${
+                                            <div className="relative flex items-center justify-center pt-[0.7rem]">
+                                                {/* Active Glow Ring — centered on the dot */}
+                                                <div
+                                                    className={`absolute h-4 w-4 rounded-full border border-primary transition-all duration-700 ease-out ${
                                                         isActive ? 'opacity-100 scale-150' : 'opacity-0 scale-50'
-                                                    }`} 
+                                                    }`}
                                                 />
                                                 {/* Solid Dot */}
                                                 <span
