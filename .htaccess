@@ -44,6 +44,7 @@
   # Serve static files directly (sitemap, robots, assets)
   RewriteRule ^sitemap\.xml$ - [L]
   RewriteRule ^robots\.txt$ - [L]
+  RewriteRule ^humans\.txt$ - [L]
 
   # React Router Fallback
   RewriteCond %{REQUEST_FILENAME} !-f

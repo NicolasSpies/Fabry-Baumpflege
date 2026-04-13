@@ -6,6 +6,7 @@
 !.htaccess
 !robots.txt
 !sitemap.xml
+!humans.txt
 !assets/
 !assets/**
 !Baumpflege-Fabry-Logo.svg

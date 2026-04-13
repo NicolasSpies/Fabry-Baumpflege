@@ -1,0 +1,17 @@
+/* TEAM */
+
+Designer & Developer: Nicolas Spies
+Site: https://laconis.be
+Instagram: https://instagram.com/laconis.be
+Location: Ostbelgien, Belgium
+
+/* SITE */
+
+Standards: HTML5, CSS3, JavaScript ES2024
+Components: React, Vite, Tailwind CSS
+CMS: WordPress (Headless)
+Fonts: Playfair Display, Inter, Mrs Saint Delafield
+
+/* THANKS */
+
+Client: Vincent Fabry — Fabry Baumpflege
