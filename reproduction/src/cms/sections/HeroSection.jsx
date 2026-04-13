@@ -59,7 +59,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
                     alt=""
                     size="1280"
                     className={`w-full h-full object-cover ${objectPosition === 'object-top' ? 'object-center-top scale-[1.4] md:scale-100 origin-left -translate-x-[100px] md:translate-x-0' : objectPosition} md:filter md:brightness-[0.80] md:contrast-[1.05] transition-all duration-700`}
-                    sizes="(max-width: 768px) 100vw, 100vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 1280px, 100vw"
                     loading="eager"
                     fetchPriority="high"
                     onLoad={() => setIsImageReady(true)}
@@ -69,7 +69,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
                 <div className={`absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent transition-opacity duration-500 ${isImageReady ? 'opacity-100' : 'opacity-0'}`} />
             </div>
             <div className={`relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-end md:items-center h-full pb-16 md:pb-0 md:pt-0 transition-[opacity,transform] duration-700 opacity-100 translate-y-0`}>
-                <div className="w-full md:max-w-2xl space-y-4 md:space-y-7 text-left flex flex-col items-start">
+                <div className="w-full md:max-w-2xl space-y-4 md:space-y-7 text-left flex flex-col items-start min-h-[200px] md:min-h-[280px]">
                     <h1 className="font-serif text-white leading-tight md:leading-[0.95] reveal">
                         <div className="text-[1.8rem] md:text-[2.25rem] lg:text-[2.5rem] mb-1 md:mb-1 text-white/85 font-light tracking-wide italic">
                             {renderCmsInline(title_top)}

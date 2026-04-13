@@ -124,9 +124,30 @@ const seoVitePlugin = {
 
     console.log(`[SEO-VITE] Serving ${route.lang} ${route.type}: ${metadata.title}`);
 
-    // Add Debug Marker
+    // 3. LCP Hero Image Preload (Homepage only)
+    let heroPreload = '';
+    if (apiData && (route.slug === 'startseite' || route.slug === 'page-daccueil')) {
+        const cf = apiData.customFields || apiData.acf || {};
+        const heroImage = cf.startseite_headerbild;
+        if (heroImage && typeof heroImage === 'object') {
+            // API returns full image object with variants — use 1280 for desktop LCP
+            const heroUrl = heroImage.variants?.['1280']?.url || heroImage.full?.url || heroImage.url;
+            const srcset = heroImage.srcSet || heroImage.srcset;
+            if (heroUrl) {
+                // Use imagesrcset + imagesizes for responsive preload
+                if (srcset) {
+                    heroPreload = `  <link rel="preload" as="image" href="${heroUrl}" imagesrcset="${srcset}" imagesizes="(max-width: 768px) 100vw, (max-width: 1280px) 1280px, 100vw" fetchpriority="high" />\n`;
+                } else {
+                    heroPreload = `  <link rel="preload" as="image" href="${heroUrl}" fetchpriority="high" />\n`;
+                }
+                console.log(`[SEO-VITE] Hero preload: ${heroUrl}`);
+            }
+        }
+    }
+
+    // Add Debug Marker + Hero Preload
     const debugMarker = `<meta name="x-seo-runtime" content="api-vite-${route.lang}-${route.type}">`;
-    const markedHtml = html.replace(/<\/head>/i, `  ${debugMarker}\n</head>`);
+    const markedHtml = html.replace(/<\/head>/i, `  ${debugMarker}\n${heroPreload}</head>`);
 
     return injectMetadata(markedHtml, metadata);
   }

@@ -32,7 +32,7 @@ const PageHeroSection = ({ title, image }) => {
                 alt=""
                 preferMediumSource
                 className="absolute inset-0 w-full h-full object-cover"
-                sizes="100vw"
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 1280px, 100vw"
                 loading="eager"
                 fetchPriority="high"
                 onLoad={() => setIsImageReady(true)}
