@@ -37,7 +37,7 @@ export const previewData = definePreview({
 });
 
 const AboutMe = () => {
-    const { language, t, globalCmsData, globalSeo, setAlternates } = useLanguage();
+    const { language, t, globalCmsData, globalSeo, setAlternates, setPageReady } = useLanguage();
 
     const getInitialContent = () => ({
         philosophy: {
@@ -97,6 +97,7 @@ const AboutMe = () => {
                             ValuesSection: values,
                             SignatureSection: signature
                         });
+                        setPageReady(true);
                     }
                 }
             } catch (err) {

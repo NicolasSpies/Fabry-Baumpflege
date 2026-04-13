@@ -46,7 +46,7 @@ export const previewData = definePreview({
 });
 
 const Services = () => {
-    const { language, t, globalCmsData, globalSeo, setAlternates } = useLanguage();
+    const { language, t, globalCmsData, globalSeo, setAlternates, setPageReady } = useLanguage();
 
     const [statsCmsData, setStatsCmsData] = useState(null);
 
@@ -168,6 +168,7 @@ const Services = () => {
                         ServicesBlocksSection: blocks,
                         StatsSection: stats
                     });
+                    setPageReady(true);
                 }
             } catch (err) {
                 console.error('[Services] Hydration failed:', err);

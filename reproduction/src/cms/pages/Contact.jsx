@@ -31,7 +31,7 @@ export const previewData = definePreview({
 });
 
 const Contact = () => {
-    const { language, t, globalCmsData, globalSeo, setAlternates } = useLanguage();
+    const { language, t, globalCmsData, globalSeo, setAlternates, setPageReady } = useLanguage();
 
     const getInitialContent = () => ({
         hero: {
@@ -103,6 +103,7 @@ const Contact = () => {
                             ContactSidebarSection: sidebar,
                             ContactFormSection: form
                         });
+                        setPageReady(true);
                     }
                 }
                 if (form) {

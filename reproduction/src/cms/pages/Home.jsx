@@ -83,7 +83,7 @@ export const previewData = definePreview({
 // ─────────────────────────────────────────────────────────────────────────────
 
 const Home = () => {
-    const { language, t, globalCmsData, globalSeo, setAlternates } = useLanguage();
+    const { language, t, globalCmsData, globalSeo, setAlternates, setPageReady } = useLanguage();
 
     const mergeServicePreviewContent = (content, servicesPage) => {
         if (!servicesPage) return content;
@@ -241,6 +241,7 @@ const Home = () => {
                             ServicesSection: services,
                             AboutSection: about
                         }));
+                        setPageReady(true);
                     }
                 }
             } catch (err) {

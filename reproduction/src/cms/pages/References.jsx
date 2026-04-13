@@ -34,7 +34,7 @@ export const previewData = definePreview({
 });
 
 const References = () => {
-    const { language, t, globalCmsData, globalSeo, setAlternates } = useLanguage();
+    const { language, t, globalCmsData, globalSeo, setAlternates, setPageReady } = useLanguage();
 
 
     const [allRefs, setAllRefs] = useState([]);
@@ -235,7 +235,10 @@ const References = () => {
                 if (cancelled) return;
                 setError(true);
             } finally {
-                if (!cancelled) setIsLoading(false);
+                if (!cancelled) {
+                    setIsLoading(false);
+                    setPageReady(true);
+                }
             }
         }
         loadCollection();

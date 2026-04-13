@@ -46,7 +46,7 @@ export const previewData = definePreview({
 });
 
 function App() {
-  const { language, setGlobalCmsData, setGlobalSeo } = useLanguage();
+  const { language, setGlobalCmsData, setGlobalSeo, pageReady } = useLanguage();
   const [initialLoading, setInitialLoading] = useState(true);
   const [globalReady, setGlobalReady] = useState(false);
   const handleLoaderComplete = useCallback(() => setInitialLoading(false), []);
@@ -106,7 +106,7 @@ function App() {
 
   return (
     <>
-      {initialLoading && <PageLoader ready={globalReady} onComplete={handleLoaderComplete} fullScreen={isHome} />}
+      {initialLoading && <PageLoader ready={globalReady && pageReady} onComplete={handleLoaderComplete} fullScreen={isHome} />}
       <ScrollToTop />
         <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
         <Navbar {...getShellProps('Navbar', globalData.navbar)} />

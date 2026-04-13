@@ -4,9 +4,12 @@ import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
 
 const Imprint = () => {
-    const { language, t, globalCmsData, globalSeo } = useLanguage();
+    const { language, t, globalCmsData, globalSeo, setPageReady } = useLanguage();
     useScrollReveal([language]);
     useCmsSeo(globalSeo);
+
+    // Imprint uses only global data, so it's ready immediately
+    React.useEffect(() => { setPageReady(true); }, [setPageReady]);
 
     const opts = globalCmsData?.options || {};
     const name = opts.contact_person || 'Vincent Fabry';

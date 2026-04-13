@@ -86,7 +86,7 @@ const renderContent = (text) => {
 };
 
 const Privacy = () => {
-    const { language, t, globalCmsData, globalSeo } = useLanguage();
+    const { language, t, globalCmsData, globalSeo, setPageReady } = useLanguage();
     const [content, setContent] = useState('');
     const [rawPage, setRawPage] = useState(null);
     useScrollReveal([rawPage]);
@@ -102,6 +102,7 @@ const Privacy = () => {
                     const datenschutz = page.customFields?.new_field_datenschutz || page.content || '';
                     const opts = globalCmsData?.options || {};
                     setContent(replacePlaceholders(datenschutz, opts));
+                    setPageReady(true);
                 }
             } catch (err) {
                 console.error('[Privacy] CMS load failed:', err);

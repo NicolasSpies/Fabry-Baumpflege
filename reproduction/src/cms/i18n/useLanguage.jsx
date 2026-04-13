@@ -92,6 +92,9 @@ export function LanguageProvider({ children }) {
     // Context-aware alternates (populated by the active page component)
     const [alternates, setAlternates] = useState(null);
 
+    // Page-ready signal: pages set this when their critical above-fold content is loaded
+    const [pageReady, setPageReady] = useState(false);
+
     // Sync state whenever the URL changes (e.g., browser back/fwd, external navigate)
     useEffect(() => {
         const newLang = getLangFromPath(location.pathname);
@@ -100,6 +103,7 @@ export function LanguageProvider({ children }) {
         }
         // Clear alternates on route change so a new page doesn't inherit old redirects
         setAlternates(null);
+        setPageReady(false);
     }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // t(key) — look up a string in the active locale, fall back to DE
@@ -127,7 +131,9 @@ export function LanguageProvider({ children }) {
             globalSeo,
             setGlobalSeo,
             alternates,
-            setAlternates
+            setAlternates,
+            pageReady,
+            setPageReady
         }}>
 
             {children}

@@ -44,7 +44,7 @@ export const previewData = definePreview({
 const ReferenceDetail = () => {
     const { slug } = useParams();
     const location = useLocation();
-    const { language, t, globalSeo, setAlternates } = useLanguage();
+    const { language, t, globalSeo, setAlternates, setPageReady } = useLanguage();
 
 
     // ─── State ───────────────────────────────────────────────────────────────
@@ -265,6 +265,7 @@ const ReferenceDetail = () => {
                 });
 
                 setStatus('ready');
+                setPageReady(true);
 
                 // ─── Phase 2: Deferred Full Data & Asset Loading ───────────────────────────────
                 // We load the full reference (with _embed=1) and heavy images after the core is visible

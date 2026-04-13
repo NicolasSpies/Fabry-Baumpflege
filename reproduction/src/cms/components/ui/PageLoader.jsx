@@ -30,6 +30,14 @@ const PageLoader = ({ ready, onComplete, fullScreen = true }) => {
     const [phase, setPhase] = useState('filling'); // 'filling' | 'done' | 'exiting'
     const startTime = useRef(Date.now());
 
+    // Safety timeout: dismiss after 4s even if data hasn't loaded
+    useEffect(() => {
+        const t = setTimeout(() => {
+            if (phase === 'filling') setPhase('done');
+        }, 4000);
+        return () => clearTimeout(t);
+    }, []);
+
     useEffect(() => {
         if (ready && phase === 'filling') {
             // Data is ready — ensure minimum display time of 600ms so animation is visible
