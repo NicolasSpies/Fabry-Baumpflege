@@ -304,18 +304,18 @@ const References = () => {
                     <h1 className="text-4xl md:text-5xl font-serif text-primary mb-4">
                         {t('nav.references')}
                     </h1>
-                    {headerProps?.intro && (
+                    <div className={`min-h-[2em] ${headerProps?.intro ? '' : 'invisible'}`}>
                         <CmsText
-                            text={headerProps.intro}
+                            text={headerProps?.intro || ''}
                             className="max-w-2xl mx-auto text-slate-700"
                             paragraphClassName="text-[1.05rem] md:text-lg leading-[1.75]"
                         />
-                    )}
+                    </div>
                 </div>
             </section>
 
             {/* Page: References → Section: ReferencesCategoryFilter */}
-            <section className="relative z-10 bg-background-light dark:bg-background-dark border-y border-slate-100 dark:border-slate-800 py-3 md:py-4">
+            <section className="relative z-10 bg-background-light dark:bg-background-dark border-y border-slate-100 dark:border-slate-800 py-3 md:py-4 min-h-[52px] md:min-h-[56px]">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-wrap items-center justify-center gap-2 md:gap-8 px-4 md:px-6">
                         <button
@@ -346,9 +346,9 @@ const References = () => {
                         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 animate-filter-in"
                     >
                         {isLoading && filteredRefs.length === 0 ? (
-                            // Stable Skeleton Grid - Updated for overlay style
+                            // Stable Skeleton Grid - matches card aspect ratio
                             [...Array(6)].map((_, i) => (
-                                <div key={`skeleton-${i}`} className="aspect-square rounded-2xl" />
+                                <div key={`skeleton-${i}`} className="aspect-square md:aspect-[4/5] lg:aspect-square rounded-2xl bg-slate-100" />
                             ))
                         ) : (
                             visibleRefs.map((project, index) => (

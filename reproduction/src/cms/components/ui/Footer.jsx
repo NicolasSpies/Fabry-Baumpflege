@@ -43,7 +43,7 @@ const Footer = ({
                         width="65"
                         height="32"
                     />
-                    <p className="text-white leading-relaxed text-xs">
+                    <p className="text-white leading-relaxed text-xs min-h-[3.5em]">
                         {renderCmsInline(actualDescription)}
                     </p>
                 </div>
@@ -74,24 +74,22 @@ const Footer = ({
                     <ul className="space-y-2 text-white/95 text-xs flex flex-col items-center md:items-start text-center md:text-left">
                         <li className="flex items-start gap-3 justify-center md:justify-start">
                             <Icon name="location_on" className="text-white text-sm shrink-0" />
-                            {actualAddress && (
-                                <a
-                                    href="https://maps.app.goo.gl/syziuAu3hqbNM2tP6"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:text-white transition-colors"
-                                >
-                                    {renderCmsInline(actualAddress)}
-                                </a>
-                            )}
+                            <a
+                                href="https://maps.app.goo.gl/syziuAu3hqbNM2tP6"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`hover:text-white transition-colors ${actualAddress ? '' : 'invisible'}`}
+                            >
+                                {actualAddress ? renderCmsInline(actualAddress) : '\u00A0'}
+                            </a>
                         </li>
                         <li className="flex items-center gap-3 justify-center md:justify-start">
                             <Icon name="phone" className="text-white/80 text-sm shrink-0" />
-                            {actualPhone && <a href={`tel:${actualPhone.replace(/\s/g, '')}`} className="hover:text-white transition-colors">{actualPhone}</a>}
+                            <a href={actualPhone ? `tel:${actualPhone.replace(/\s/g, '')}` : '#'} className={`hover:text-white transition-colors ${actualPhone ? '' : 'invisible'}`}>{actualPhone || '\u00A0'}</a>
                         </li>
                         <li className="flex items-center gap-3 justify-center md:justify-start">
                             <Icon name="mail" className="text-white/80 text-sm shrink-0" />
-                            {actualEmail && <a href={`mailto:${actualEmail}`} className="hover:text-white transition-colors no-underline">{actualEmail}</a>}
+                            <a href={actualEmail ? `mailto:${actualEmail}` : '#'} className={`hover:text-white transition-colors no-underline ${actualEmail ? '' : 'invisible'}`}>{actualEmail || '\u00A0'}</a>
                         </li>
                     </ul>
                 </div>
