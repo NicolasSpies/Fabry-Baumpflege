@@ -275,20 +275,31 @@ export function normalizeCmsImage(image) {
         if (!str) return '';
         const entries = str.split(',').map(s => s.trim()).filter(Boolean);
         const hasVariants = entries.some(e => /-(1280|768|480)(x\d+)?\./.test(e));
-        
+
         const filtered = entries.filter(entry => {
             const urlPart = entry.split(' ')[0];
             const isNakedMaster = !/-(1280|768|480)(x\d+)?\./.test(urlPart);
             const isVersioned = urlPart.includes('?v=');
             return !isNakedMaster || isVersioned || !hasVariants;
         });
-        
-        // Ensure every remaining URL in the srcset is versioned
+
+        // Ensure every remaining URL in the srcset is versioned and has a valid width descriptor
         return filtered.map(entry => {
             const parts = entry.split(' ');
-            if (parts.length < 2) return buildVersionedUrl(parts[0], imgVersion);
-            return `${buildVersionedUrl(parts[0], imgVersion)} ${parts[1]}`;
-        }).join(', ');
+            const url = buildVersionedUrl(parts[0], imgVersion);
+            const descriptor = parts[1];
+
+            // Valid descriptor must be like "480w" or "2x"
+            if (descriptor && /^\d+w$/.test(descriptor)) return `${url} ${descriptor}`;
+            if (descriptor && /^\d+(\.\d+)?x$/.test(descriptor)) return `${url} ${descriptor}`;
+
+            // Try to extract width from filename (e.g. "image-1280.webp" or "image-768x512.webp")
+            const widthMatch = parts[0].match(/-(\d{3,4})(x\d+)?\.\w+/);
+            if (widthMatch) return `${url} ${widthMatch[1]}w`;
+
+            // No valid descriptor — skip this entry
+            return null;
+        }).filter(Boolean).join(', ');
     };
 
     const apiSrcSet = sanitizeSrcSet(rawApiSrcSet);
@@ -302,7 +313,7 @@ export function normalizeCmsImage(image) {
             url: parts[0],
             width: widthMatch ? parseInt(widthMatch[1]) : undefined
         };
-    }).filter(e => e && e.url);
+    }).filter(e => e && e.url && e.width);
 
     const srcSetObject = sourceList
         .filter(s => {
