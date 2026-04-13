@@ -45,9 +45,7 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
                     <div className={`absolute inset-x-0 bottom-0 top-1/2 transition-opacity duration-700 ${imageState} md:opacity-0 md:group-hover:opacity-10`}>
                          <CmsImage image={image} size="768" className="w-full h-full object-cover grayscale" alt="" sizes="(max-width: 1024px) 100vw, 25vw" loading="lazy" maxWidth={768} />
                     </div>
-                ) : (
-                    <div className={`absolute top-0 right-0 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 transition-colors duration-500 ${isActive ? 'bg-primary/10' : ''} md:group-hover:bg-primary/10`}></div>
-                )}
+                ) : null}
                 
                 <div className="relative z-10 flex flex-col flex-grow">
                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 ${iconContainerState} md:group-hover:bg-[#395824] md:group-hover:text-white`}>

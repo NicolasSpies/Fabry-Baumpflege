@@ -104,13 +104,20 @@ function App() {
   const getShellProps = (instanceName, localProps) => 
     resolveInstanceProps('Global', instanceName, localProps, rawGlobal);
 
+  // Transition overlay for SPA navigation (not initial load)
+  const showTransition = !initialLoading && !pageReady;
+
   return (
     <>
       {initialLoading && <PageLoader ready={globalReady && pageReady} onComplete={handleLoaderComplete} fullScreen={isHome} />}
       <ScrollToTop />
         <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
         <Navbar {...getShellProps('Navbar', globalData.navbar)} />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col relative">
+          {/* Light overlay during SPA page transitions */}
+          {showTransition && (
+            <div className="absolute inset-0 bg-white dark:bg-background-dark z-10 transition-opacity duration-300" />
+          )}
           <Suspense fallback={<div className="flex-1" />}>
             <Routes>
               {/* German Routes */}
