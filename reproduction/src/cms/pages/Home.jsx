@@ -281,7 +281,7 @@ const Home = () => {
 
                 const filteredRefs = mappedRefs.filter(Boolean);
                 
-                const mappedTestimonials = await Promise.all((rawTestimonials || []).slice(0, 3).map(async (item) => {
+                const mappedTestimonials = await Promise.all((rawTestimonials || []).map(async (item) => {
                     if (!item) return null;
                     const cf = item.customFields || item.acf || item.meta || {};
                     const name = decodeHtmlEntities(

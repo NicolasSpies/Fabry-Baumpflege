@@ -29,6 +29,35 @@ const cmsInflightCache = new Map();
 const mediaCache = new Map();
 const mediaInflight = new Map();
 
+// ─── Persistent SessionStorage Cache ─────────────────────────────────────────
+const SS_PREFIX = 'cms_';
+const SS_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+function ssGet(key) {
+    try {
+        const raw = sessionStorage.getItem(SS_PREFIX + key);
+        if (!raw) return null;
+        const { data, exp } = JSON.parse(raw);
+        if (Date.now() > exp) { sessionStorage.removeItem(SS_PREFIX + key); return null; }
+        return data;
+    } catch { return null; }
+}
+
+function ssSet(key, data) {
+    try {
+        sessionStorage.setItem(SS_PREFIX + key, JSON.stringify({ data, exp: Date.now() + SS_TTL_MS }));
+    } catch {
+        // Storage full — clear old CMS entries and retry once
+        try {
+            for (let i = sessionStorage.length - 1; i >= 0; i--) {
+                const k = sessionStorage.key(i);
+                if (k?.startsWith(SS_PREFIX)) sessionStorage.removeItem(k);
+            }
+            sessionStorage.setItem(SS_PREFIX + key, JSON.stringify({ data, exp: Date.now() + SS_TTL_MS }));
+        } catch { /* give up */ }
+    }
+}
+
 function cloneCmsPayload(payload) {
     if (payload === undefined || payload === null) return payload;
     if (typeof structuredClone === 'function') {
@@ -459,6 +488,14 @@ export async function fetchFromCMS(endpoint, language = 'DE', signal = null) {
     if (cached && cached.expiresAt > now) return cloneCmsPayload(cached.data);
     if (cached) cmsResponseCache.delete(url);
 
+    // Check persistent sessionStorage cache (survives page navigations)
+    const ssKey = cleanEndpoint + '|' + langCode;
+    const ssCached = ssGet(ssKey);
+    if (ssCached !== null) {
+        cmsResponseCache.set(url, { data: ssCached, expiresAt: now + CMS_CACHE_TTL_MS });
+        return cloneCmsPayload(ssCached);
+    }
+
     if (!signal) {
         const inflight = cmsInflightCache.get(url);
         if (inflight) return cloneCmsPayload(await inflight);
@@ -497,6 +534,10 @@ export async function fetchFromCMS(endpoint, language = 'DE', signal = null) {
                 data: payload,
                 expiresAt: Date.now() + CMS_CACHE_TTL_MS,
             });
+            // Persist to sessionStorage (skip large media arrays and null results)
+            if (payload !== null && payload !== undefined) {
+                ssSet(ssKey, payload);
+            }
         }
         return cloneCmsPayload(payload);
     } finally {
@@ -903,6 +944,14 @@ export async function resolveMedia(idOrUrl) {
         const cached = mediaCache.get(mediaId);
         if (cached) return cloneCmsPayload(cached);
 
+        // Check persistent sessionStorage for media
+        const ssMediaKey = `media|${mediaId}`;
+        const ssCachedMedia = ssGet(ssMediaKey);
+        if (ssCachedMedia) {
+            mediaCache.set(mediaId, ssCachedMedia);
+            return cloneCmsPayload(ssCachedMedia);
+        }
+
         // Deduplicate inflight requests for the same media ID
         const inflight = mediaInflight.get(mediaId);
         if (inflight) return cloneCmsPayload(await inflight);
@@ -919,6 +968,7 @@ export async function resolveMedia(idOrUrl) {
                         modified: media.modified || media.date || null
                     });
                     mediaCache.set(mediaId, normalizedWithVersion);
+                    ssSet(`media|${mediaId}`, normalizedWithVersion);
                     return normalizedWithVersion;
                 }
             } catch (error) {
