@@ -47,9 +47,13 @@ export const previewData = definePreview({
 
 function App() {
   const { language, setGlobalCmsData, setGlobalSeo, pageReady } = useLanguage();
-  const [initialLoading, setInitialLoading] = useState(true);
+  const hasSeenLoader = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('loaderSeen');
+  const [initialLoading, setInitialLoading] = useState(!hasSeenLoader);
   const [globalReady, setGlobalReady] = useState(false);
-  const handleLoaderComplete = useCallback(() => setInitialLoading(false), []);
+  const handleLoaderComplete = useCallback(() => {
+    setInitialLoading(false);
+    try { sessionStorage.setItem('loaderSeen', '1'); } catch {}
+  }, []);
   const location = useLocation();
   const isHome = location.pathname === '/' || location.pathname === '/fr' || location.pathname === '/fr/';
   const [globalData, setGlobalData] = useState({
