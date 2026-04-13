@@ -177,6 +177,8 @@ function getUrl(val) {
 // Helper to ensure URL has a ?v= versioning parameter
 const buildVersionedUrl = (url, v) => {
     if (!url || typeof url !== 'string') return url;
+    // Encode spaces in URLs (CMS sometimes returns unencoded filenames like "Internetseite 02.webp")
+    url = url.replace(/ /g, '%20');
     if (url.includes('?v=')) return url; // Already versioned from backend
     if (!v) return url; // Do NOT add static fallback if no version available
     const sep = url.includes('?') ? '&' : '?';
@@ -276,25 +278,30 @@ export function normalizeCmsImage(image) {
         const entries = str.split(',').map(s => s.trim()).filter(Boolean);
         const hasVariants = entries.some(e => /-(1280|768|480)(x\d+)?\./.test(e));
 
+        // Split each entry into URL + descriptor, handling spaces in filenames.
+        // The descriptor is always the last token matching /^\d+w$/ or /^\d+(\.\d+)?x$/.
+        const parseEntry = (entry) => {
+            const match = entry.match(/^(.+)\s+(\d+w|\d+(?:\.\d+)?x)$/);
+            if (match) return { rawUrl: match[1], descriptor: match[2] };
+            return { rawUrl: entry, descriptor: null };
+        };
+
         const filtered = entries.filter(entry => {
-            const urlPart = entry.split(' ')[0];
-            const isNakedMaster = !/-(1280|768|480)(x\d+)?\./.test(urlPart);
-            const isVersioned = urlPart.includes('?v=');
+            const { rawUrl } = parseEntry(entry);
+            const isNakedMaster = !/-(1280|768|480)(x\d+)?\./.test(rawUrl);
+            const isVersioned = rawUrl.includes('?v=');
             return !isNakedMaster || isVersioned || !hasVariants;
         });
 
         // Ensure every remaining URL in the srcset is versioned and has a valid width descriptor
         return filtered.map(entry => {
-            const parts = entry.split(' ');
-            const url = buildVersionedUrl(parts[0], imgVersion);
-            const descriptor = parts[1];
+            const { rawUrl, descriptor } = parseEntry(entry);
+            const url = buildVersionedUrl(rawUrl, imgVersion);
 
-            // Valid descriptor must be like "480w" or "2x"
-            if (descriptor && /^\d+w$/.test(descriptor)) return `${url} ${descriptor}`;
-            if (descriptor && /^\d+(\.\d+)?x$/.test(descriptor)) return `${url} ${descriptor}`;
+            if (descriptor) return `${url} ${descriptor}`;
 
             // Try to extract width from filename (e.g. "image-1280.webp" or "image-768x512.webp")
-            const widthMatch = parts[0].match(/-(\d{3,4})(x\d+)?\.\w+/);
+            const widthMatch = rawUrl.match(/-(\d{3,4})(x\d+)?\.\w+/);
             if (widthMatch) return `${url} ${widthMatch[1]}w`;
 
             // No valid descriptor — skip this entry
@@ -306,13 +313,9 @@ export function normalizeCmsImage(image) {
 
     // Parse apiSrcSet back into entries for rawSrcSetEntries to ensure consistency
     const apiSrcSetEntries = apiSrcSet.split(',').map(s => {
-        const parts = s.trim().split(' ');
-        if (parts.length < 2) return null;
-        const widthMatch = parts[1].match(/^(\d+)w$/);
-        return {
-            url: parts[0],
-            width: widthMatch ? parseInt(widthMatch[1]) : undefined
-        };
+        const match = s.trim().match(/^(.+)\s+(\d+)w$/);
+        if (!match) return null;
+        return { url: match[1], width: parseInt(match[2]) };
     }).filter(e => e && e.url && e.width);
 
     const srcSetObject = sourceList
