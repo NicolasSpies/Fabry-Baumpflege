@@ -55,8 +55,6 @@ const References = () => {
         items: []
     });
 
-    const getFallbackContent = () => getInitialContent();
-
     const [pageData, setPageData] = useState(getInitialContent());
 
     useEffect(() => {
@@ -314,8 +312,6 @@ const References = () => {
                                     language={language}
                                     animateEntry={isInitialRender}
                                     staggerIndex={index % 12} // Stagger only current batch
-                                    forceSquare={false} 
-                                    compactMobileOverlay={true}
                                     loading="lazy"
                                     fetchPriority="low"
                                     sizes="(max-width: 768px) 95vw, (max-width: 1200px) 45vw, 30vw"

@@ -33,7 +33,7 @@ const ReferencesSection = ({
                                 <ReferenceCard
                                     {...project}
                                     language={language}
-                                    forceSquare={true}
+
                                     data={project.data}
                                     page={page}
                                     section={section}

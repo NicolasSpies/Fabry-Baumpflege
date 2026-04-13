@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
 import { ROUTES } from '@/cms/i18n/routes';
-import { getPage, mapPageContent, resolveMedia, PAGE_IDS } from '@/cms/lib/cms';
+import { getPage, mapPageContent, PAGE_IDS } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
@@ -59,8 +59,6 @@ const AboutMe = () => {
             ctaHref: ROUTES[language].contact,
         },
     });
-
-    const getFallbackContent = () => getInitialContent();
 
     const [pageData, setPageData] = useState(getInitialContent());
     const [rawPage, setRawPage] = useState(null);

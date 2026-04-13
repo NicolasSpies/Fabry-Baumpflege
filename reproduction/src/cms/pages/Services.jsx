@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, getHomeStats, mapPageContent, resolveMedia, PAGE_IDS, getSSRData } from '@/cms/lib/cms';
+import { getPage, getHomeStats, mapPageContent, PAGE_IDS, getSSRData } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────

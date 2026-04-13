@@ -15,7 +15,7 @@ const preloadReferenceDetailPage = () => import('@/cms/pages/ReferenceDetail');
  */
 const ReferenceCard = ({ 
     id, slug, path, title, description, location, thumbnailImage, 
-    animateEntry, staggerIndex, forceSquare, compactMobileOverlay = false, 
+    animateEntry, staggerIndex,
     language, data, page = 'Home', section = 'ReferencesSection', loading 
 }) => {
     const props = resolveInstanceProps(page, `${section}/ReferenceCard`, {

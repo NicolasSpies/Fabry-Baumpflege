@@ -605,7 +605,6 @@ export async function getPage(pageId, language = 'DE', signal = null) {
     return page;
 }
 
-// Removed duplicate getHomeStats block
 
 
 function isEmptyCmsValue(value) {
