@@ -124,6 +124,9 @@ export default defineConfig({
     // Prevent inlining assets (like fonts) as base64 in CSS.
     // This reduces the initial render-blocking CSS size significantly.
     assetsInlineLimit: 0,
+    // Output to repo root for Hostinger git deployment
+    outDir: path.resolve(import.meta.dirname, '..'),
+    emptyOutDir: false,
   },
   base: '/',
   server: {
