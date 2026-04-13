@@ -17,55 +17,55 @@ const HomeIntroSection = ({
     const safeParagraphs = useMemo(() => paragraphs.slice(0, 4), [paragraphs]);
 
     useEffect(() => {
-        const sectionNode = sectionRef.current;
         const timelineNode = timelineRef.current;
-        if (!sectionNode || !timelineNode) return;
+        if (!timelineNode) return;
+
+        let rafId = null;
+        let ticking = false;
 
         const updateData = () => {
+            ticking = false;
             const timelineRect = timelineNode.getBoundingClientRect();
             const validDots = dotRefs.current.filter(Boolean);
             if (validDots.length < 2) return;
-            
+
             const firstRect = validDots[0].getBoundingClientRect();
             const lastRect = validDots[validDots.length - 1].getBoundingClientRect();
-            
+
             const top = (firstRect.top - timelineRect.top) + (firstRect.height / 2);
             const bottom = (lastRect.top - timelineRect.top) + (lastRect.height / 2);
             setLineMetrics({ top, height: Math.max(0, bottom - top) });
 
-            // Precise Progress Calculation
-            const viewportHeight = window.innerHeight;
-            const activationPoint = viewportHeight * 0.5; // Focus point: 50% down the screen (Center)
-            
+            const activationPoint = window.innerHeight * 0.5;
             const firstPixel = firstRect.top + firstRect.height / 2;
             const lastPixel = lastRect.top + lastRect.height / 2;
             const totalTravel = lastPixel - firstPixel;
-            
+
             if (totalTravel > 0) {
                 const travelled = activationPoint - firstPixel;
                 const progress = Math.max(0, Math.min(1, travelled / totalTravel));
                 setLineProgress(Number(progress.toFixed(4)));
-
-                // Calculate which index is NEWLY active
-                const currentIdx = Math.floor(progress * safeParagraphs.length);
-                if (currentIdx !== activeIndex) setActiveIndex(currentIdx);
+                setActiveIndex(Math.floor(progress * safeParagraphs.length));
             }
         };
 
-        const handleScroll = () => updateData();
-        const handleResize = () => updateData();
+        const onScroll = () => {
+            if (!ticking) {
+                ticking = true;
+                rafId = requestAnimationFrame(updateData);
+            }
+        };
 
         updateData();
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        window.addEventListener('resize', handleResize, { passive: true });
-        const timer = setTimeout(updateData, 100);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll, { passive: true });
 
         return () => {
-            window.removeEventListener('scroll', handleScroll);
-            window.removeEventListener('resize', handleResize);
-            clearTimeout(timer);
+            window.removeEventListener('scroll', onScroll);
+            window.removeEventListener('resize', onScroll);
+            if (rafId) cancelAnimationFrame(rafId);
         };
-    }, [safeParagraphs.length, activeIndex]);
+    }, [safeParagraphs.length]);
 
 
 
@@ -97,13 +97,12 @@ const HomeIntroSection = ({
                             />
                             {/* Actual Growing Line */}
                             <div
-                                className="absolute w-[3px] rounded-full bg-primary origin-top transition-transform duration-200 ease-out will-change-transform"
+                                className="absolute w-[3px] rounded-full bg-primary origin-top will-change-transform"
                                 style={{
                                     top: `${lineMetrics.top}px`,
                                     height: `${lineMetrics.height}px`,
                                     left: 'calc(1rem - 1.5px)',
                                     transform: `scaleY(${lineProgress})`,
-                                    boxShadow: lineProgress > 0 ? '0 0 10px rgba(62, 95, 37, 0.4)' : 'none'
                                 }}
                             />
                             
