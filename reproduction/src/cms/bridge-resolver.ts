@@ -51,11 +51,15 @@ const _initPromise: Promise<void> = (typeof window !== 'undefined' && !isBridgeD
             );
           }
         } else {
-          console.warn('[Bridge] /cb-mappings.json had no pages key — using bundled fallback.');
+          if ((import.meta as any).env?.DEV) {
+            console.warn('[Bridge] /cb-mappings.json had no pages key — using bundled fallback.');
+          }
         }
       })
       .catch(err => {
-        console.warn('[Bridge] Could not load /cb-mappings.json:', err?.message ?? err, '— using bundled fallback.');
+        if ((import.meta as any).env?.DEV) {
+          console.warn('[Bridge] Could not load /cb-mappings.json:', err?.message ?? err, '— using bundled fallback.');
+        }
       })
   : Promise.resolve();
 

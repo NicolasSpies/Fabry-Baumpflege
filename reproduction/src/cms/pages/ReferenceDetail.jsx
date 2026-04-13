@@ -9,7 +9,6 @@ import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
 
 import { definePreview } from '@/cms/lib/preview';
-import { ReferenceDetailSkeleton } from '@/cms/components/ui/PageSkeleton';
 import Icon from '@/cms/components/ui/Icon';
 import CmsImage from '@/cms/components/ui/CmsImage';
 
@@ -364,7 +363,7 @@ const ReferenceDetail = () => {
     // ─── Render States ────────────────────────────────────────────────────────
     if ((status === 'loading' || status === 'ready') && !project && !rawProject) {
         // Still waiting for initial shell data
-        return <ReferenceDetailSkeleton />;
+        return <main className="flex-1 pt-28 pb-24 bg-background-light dark:bg-background-dark"><div className="max-w-7xl mx-auto min-h-screen" /></main>;
     }
 
     if (status === 'notfound') {
