@@ -60,7 +60,7 @@ const renderContent = (text) => {
             const blockText = currentBlock.join('\n').trim();
             if (blockText) {
                 elements.push(
-                    <p key={elements.length} className="whitespace-pre-line">
+                    <p key={elements.length} className="whitespace-pre-line break-words">
                         {blockText}
                     </p>
                 );
