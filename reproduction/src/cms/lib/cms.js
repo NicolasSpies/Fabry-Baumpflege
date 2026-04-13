@@ -26,6 +26,8 @@ export const PAGE_IDS = {
 const CMS_CACHE_TTL_MS = import.meta.env.DEV ? 2000 : 5 * 60 * 1000;
 const cmsResponseCache = new Map();
 const cmsInflightCache = new Map();
+const mediaCache = new Map();
+const mediaInflight = new Map();
 
 function cloneCmsPayload(payload) {
     if (payload === undefined || payload === null) return payload;
@@ -882,22 +884,40 @@ export async function resolveMedia(idOrUrl) {
     const hasRichSources = normalized && (normalized.srcSet || (normalized.variants && Object.keys(normalized.variants).length > 1));
     
     if (mediaId && (isShellOnly || !hasRichSources)) {
-        try {
-            const base = getAbsoluteCmsRootApiBase();
-            // Important: Use BOTH lang and language if possible
-            const url = `${base}/wp/v2/media/${mediaId}`;
-            const res = await fetch(url);
-            if (res.ok) {
-                const media = await res.json();
-                // When resolving from standard WP REST, preserve the modified timestamp for versioning
-                const normalizedWithVersion = normalizeCmsImage({
-                    ...media,
-                    modified: media.modified || media.date || null
-                });
-                return normalizedWithVersion;
+        // Check media cache first (media is language-independent)
+        const cached = mediaCache.get(mediaId);
+        if (cached) return cloneCmsPayload(cached);
+
+        // Deduplicate inflight requests for the same media ID
+        const inflight = mediaInflight.get(mediaId);
+        if (inflight) return cloneCmsPayload(await inflight);
+
+        const fetchPromise = (async () => {
+            try {
+                const base = getAbsoluteCmsRootApiBase();
+                const url = `${base}/wp/v2/media/${mediaId}`;
+                const res = await fetch(url);
+                if (res.ok) {
+                    const media = await res.json();
+                    const normalizedWithVersion = normalizeCmsImage({
+                        ...media,
+                        modified: media.modified || media.date || null
+                    });
+                    mediaCache.set(mediaId, normalizedWithVersion);
+                    return normalizedWithVersion;
+                }
+            } catch (error) {
+                console.warn(`[CMS] Failed to resolve media ID ${mediaId}:`, error?.message);
             }
-        } catch (error) {
-            console.warn(`[CMS] Failed to resolve media ID ${mediaId}:`, error?.message);
+            return null;
+        })();
+
+        mediaInflight.set(mediaId, fetchPromise);
+        try {
+            const result = await fetchPromise;
+            if (result) return cloneCmsPayload(result);
+        } finally {
+            mediaInflight.delete(mediaId);
         }
     }
 
