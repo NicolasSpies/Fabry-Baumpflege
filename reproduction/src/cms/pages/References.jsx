@@ -250,10 +250,10 @@ const References = () => {
             {/* Page: References → Section: ReferencesHeaderSection */}
             <section className="pt-6 md:pt-8 pb-6 md:pb-8 px-4 md:px-6 text-center">
                 <div className="max-w-7xl mx-auto space-y-6">
-                    <h1 className="text-4xl md:text-5xl font-serif text-primary mb-4">
+                    <h1 className="text-4xl md:text-5xl font-serif text-primary mb-4 hero-enter hero-enter-1">
                         {t('nav.references')}
                     </h1>
-                    <div className={`min-h-[2em] ${headerProps?.intro ? '' : 'invisible'}`}>
+                    <div className={`min-h-[2em] hero-enter hero-enter-2 ${headerProps?.intro ? '' : 'invisible'}`}>
                         <CmsText
                             text={headerProps?.intro || ''}
                             className="max-w-2xl mx-auto text-slate-700"

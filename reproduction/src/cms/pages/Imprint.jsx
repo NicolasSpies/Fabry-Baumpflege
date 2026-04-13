@@ -28,7 +28,7 @@ const Imprint = () => {
     return (
         <main className="bg-white dark:bg-background-dark">
             <div className="max-w-3xl mx-auto px-6 pt-32 pb-24">
-                <h1 className="text-4xl md:text-5xl font-serif text-primary mb-12">
+                <h1 className="text-4xl md:text-5xl font-serif text-primary mb-12 hero-enter hero-enter-1">
                     {t('footer.imprint')}
                 </h1>
                 <div className="prose prose-slate dark:prose-invert max-w-none text-sm leading-relaxed space-y-8">

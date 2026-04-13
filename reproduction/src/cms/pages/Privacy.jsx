@@ -124,7 +124,7 @@ const Privacy = () => {
     return (
         <main className="bg-white dark:bg-background-dark">
             <div className="max-w-3xl mx-auto px-6 pt-32 pb-24">
-                <h1 className="text-4xl md:text-5xl font-serif text-primary mb-12">
+                <h1 className="text-4xl md:text-5xl font-serif text-primary mb-12 hero-enter hero-enter-1">
                     {t('footer.privacy')}
                 </h1>
                 {content ? (

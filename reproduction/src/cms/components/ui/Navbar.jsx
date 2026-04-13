@@ -159,11 +159,11 @@ const Navbar = ({
 
                         if (isMobile) {
                             const isTapped = tappedIdx === idx;
-                            return `text-[1.1rem] font-sans font-medium uppercase tracking-[0.2em] transition-colors duration-150 py-2 px-4 rounded-lg ${
+                            return `relative text-[1.1rem] font-sans font-medium uppercase tracking-[0.2em] transition-colors duration-150 py-2 px-4 rounded-lg ${
                                 isTapped
                                     ? 'text-primary bg-primary/10 scale-[0.97]'
                                     : effectivelyActive
-                                        ? 'text-primary'
+                                        ? 'text-primary mobile-nav-active'
                                         : 'text-muted-accessible active:text-primary active:bg-primary/10'
                             }`;
                         }

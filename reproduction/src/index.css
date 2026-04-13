@@ -127,7 +127,7 @@
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
   }
 
-  .reveal-visible {
+  .page-visible .reveal-visible {
     opacity: 1;
     transform: translateY(0);
   }
@@ -188,6 +188,31 @@
     animation: revealEntrance 0.8s cubic-bezier(0.21, 0.45, 0.32, 0.9) forwards;
   }
 
+  /* Hero entrance animations — staggered slide-up on page appear */
+  @keyframes heroEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hero-enter {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .page-visible .hero-enter {
+    animation: heroEnter 0.5s cubic-bezier(0.21, 0.45, 0.32, 0.9) forwards;
+  }
+
+  .page-visible .hero-enter-1 { animation-delay: 0.05s; }
+  .page-visible .hero-enter-2 { animation-delay: 0.15s; }
+  .page-visible .hero-enter-3 { animation-delay: 0.25s; }
+
   .backface-hidden {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
@@ -204,6 +229,18 @@
     /* IE and Edge */
     scrollbar-width: none;
     /* Firefox */
+  }
+
+  .mobile-nav-active::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 2px;
+    background-color: currentColor;
+    border-radius: 1px;
   }
 
   .marquee-track {

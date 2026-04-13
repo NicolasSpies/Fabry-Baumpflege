@@ -38,34 +38,58 @@ export const useSoftEntrance = (ref, options = {}) => {
             item.style.transition = `opacity ${durationMs}ms ${easing}, transform ${durationMs}ms ${easing}`;
         });
 
-        const observer = new IntersectionObserver((entries) => {
-            const [entry] = entries;
+        const startObserving = () => {
+            const observer = new IntersectionObserver((entries) => {
+                const [entry] = entries;
 
-            if (entry.isIntersecting) {
-                // Trigger staggered reveal
-                items.forEach((item, index) => {
-                    setTimeout(() => {
-                        // Apply final resting state
-                        item.style.opacity = '1';
-                        item.style.transform = 'translateY(0)';
-
-                        // Clean up will-change after transition duration
+                if (entry.isIntersecting) {
+                    // Trigger staggered reveal
+                    items.forEach((item, index) => {
                         setTimeout(() => {
-                            if (item.style) {
-                                item.style.willChange = 'auto';
-                            }
-                        }, durationMs);
+                            // Apply final resting state
+                            item.style.opacity = '1';
+                            item.style.transform = 'translateY(0)';
 
-                    }, index * staggerDelayMs);
-                });
+                            // Clean up will-change after transition duration
+                            setTimeout(() => {
+                                if (item.style) {
+                                    item.style.willChange = 'auto';
+                                }
+                            }, durationMs);
 
-                // Animate exactly once
-                observer.disconnect();
-            }
-        }, { threshold, rootMargin });
+                        }, index * staggerDelayMs);
+                    });
 
-        observer.observe(container);
+                    // Animate exactly once
+                    observer.disconnect();
+                }
+            }, { threshold, rootMargin });
 
-        return () => observer.disconnect();
+            observer.observe(container);
+            return observer;
+        };
+
+        // Wait for .page-visible before starting — prevents animation
+        // from firing while the loader is still covering the page.
+        let activeObserver = null;
+        let mutObs = null;
+
+        if (document.querySelector('.page-visible')) {
+            activeObserver = startObserving();
+        } else {
+            mutObs = new MutationObserver(() => {
+                if (document.querySelector('.page-visible')) {
+                    mutObs.disconnect();
+                    mutObs = null;
+                    activeObserver = startObserving();
+                }
+            });
+            mutObs.observe(document.documentElement, { attributes: true, subtree: true, attributeFilter: ['class'] });
+        }
+
+        return () => {
+            if (activeObserver) activeObserver.disconnect();
+            if (mutObs) mutObs.disconnect();
+        };
     }, [ref, threshold, staggerDelayMs, itemSelector, durationMs, easing]);
 };
