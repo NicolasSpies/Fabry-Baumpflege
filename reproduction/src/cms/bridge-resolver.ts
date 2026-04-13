@@ -31,9 +31,8 @@ export function setBridgeLanguage(lang: string) {
 const isBridgeDisabled = (typeof window !== 'undefined') && 
   (window.location.search.includes('bridge=off') || window.location.search.includes('cb=baseline'));
 
-const _initPromise: Promise<void> = (typeof window !== 'undefined' && !isBridgeDisabled)
+const _initPromise: Promise<void> = (typeof window !== 'undefined' && !isBridgeDisabled && (import.meta as any).env?.DEV)
   ? fetch('/cb-mappings.json', {
-      cache: 'no-store',
       headers: { Accept: 'application/json' },
     })
       .then(r => {
@@ -43,23 +42,17 @@ const _initPromise: Promise<void> = (typeof window !== 'undefined' && !isBridgeD
       .then(data => {
         if (data?.pages) {
           _runtimeMappings = data;
-          if ((import.meta as any).env?.DEV) {
-            console.log(
-              '[Bridge] Runtime mappings loaded from /cb-mappings.json.',
-              `Published: ${data.publishedAt ?? 'unknown'}`,
-              `Pages: [${Object.keys(data.pages).join(', ')}]`
-            );
-          }
+          console.log(
+            '[Bridge] Runtime mappings loaded from /cb-mappings.json.',
+            `Published: ${data.publishedAt ?? 'unknown'}`,
+            `Pages: [${Object.keys(data.pages).join(', ')}]`
+          );
         } else {
-          if ((import.meta as any).env?.DEV) {
-            console.warn('[Bridge] /cb-mappings.json had no pages key — using bundled fallback.');
-          }
+          console.warn('[Bridge] /cb-mappings.json had no pages key — using bundled fallback.');
         }
       })
       .catch(err => {
-        if ((import.meta as any).env?.DEV) {
-          console.warn('[Bridge] Could not load /cb-mappings.json:', err?.message ?? err, '— using bundled fallback.');
-        }
+        console.warn('[Bridge] Could not load /cb-mappings.json:', err?.message ?? err, '— using bundled fallback.');
       })
   : Promise.resolve();
 
