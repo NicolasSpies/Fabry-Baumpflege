@@ -31,7 +31,7 @@ const expertiseImgRef = useRef(null);
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12 md:mb-20 space-y-4">
                     <span className="text-accent-label font-bold tracking-widest uppercase text-xs block">{label}</span>
-                    <h2 className="text-4xl md:text-5xl font-serif text-primary leading-[1.15] md:leading-tight reveal mx-auto max-w-2xl">{title}</h2>
+                    <h2 className="text-4xl md:text-5xl font-serif text-primary leading-[1.15] md:leading-tight reveal mx-auto max-w-3xl">{title}</h2>
                 </div>
                 <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
                     <div className="w-full lg:w-1/2 relative">
