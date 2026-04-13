@@ -198,11 +198,6 @@ const Services = () => {
             <ServicesBlocksSection {...getProps('ServicesBlocksSection', pageData.blocks)} />
 
             {/* Page: Services → Section: StatsSection */}
-            <StatsSection
-                {...resolveInstanceProps('Services', 'StatsSection', pageData.stats, statsCmsData || rawPage || globalCmsData)}
-                page="Services"
-                section="StatsSection"
-            />
         </main>
     );
 };

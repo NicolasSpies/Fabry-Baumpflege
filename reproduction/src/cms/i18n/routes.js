@@ -5,7 +5,9 @@ export const ROUTES = {
         about: '/ueber-mich',
         references: '/referenzen',
         referenceDetail: '/referenzen/:slug',
-        contact: '/kontakt'
+        contact: '/kontakt',
+        imprint: '/impressum',
+        privacy: '/datenschutz'
     },
     FR: {
         home: '/fr',
@@ -13,7 +15,9 @@ export const ROUTES = {
         about: '/fr/a-propos',
         references: '/fr/references',
         referenceDetail: '/fr/references/:slug',
-        contact: '/fr/contact'
+        contact: '/fr/contact',
+        imprint: '/fr/mentions-legales',
+        privacy: '/fr/confidentialite'
     }
 };
 

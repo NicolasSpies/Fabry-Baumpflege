@@ -20,6 +20,7 @@ export const PAGE_IDS = {
     about: 18,
     contact: 22,
     references: 28,
+    privacy: 3,
 };
 
 const CMS_CACHE_TTL_MS = import.meta.env.DEV ? 2000 : 5 * 60 * 1000;

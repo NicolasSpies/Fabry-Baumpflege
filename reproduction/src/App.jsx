@@ -17,6 +17,8 @@ const References = lazy(() => import('@/cms/pages/References'));
 const ReferenceDetail = lazy(() => import('@/cms/pages/ReferenceDetail'));
 const Contact = lazy(() => import('@/cms/pages/Contact'));
 const AboutMe = lazy(() => import('@/cms/pages/AboutMe'));
+const Privacy = lazy(() => import('@/cms/pages/Privacy'));
+const Imprint = lazy(() => import('@/cms/pages/Imprint'));
 
 /**
  * Global Preview Metadata for ContentBridge scanning.
@@ -111,6 +113,8 @@ function App() {
               <Route path={ROUTES.DE.referenceDetail} element={<ReferenceDetail />} />
               <Route path={ROUTES.DE.contact} element={<Contact />} />
               <Route path={ROUTES.DE.about} element={<AboutMe />} />
+              <Route path={ROUTES.DE.imprint} element={<Imprint />} />
+              <Route path={ROUTES.DE.privacy} element={<Privacy />} />
 
               {/* French Routes */}
               <Route path={ROUTES.FR.home} element={<Home />} />
@@ -119,6 +123,8 @@ function App() {
               <Route path={ROUTES.FR.referenceDetail} element={<ReferenceDetail />} />
               <Route path={ROUTES.FR.contact} element={<Contact />} />
               <Route path={ROUTES.FR.about} element={<AboutMe />} />
+              <Route path={ROUTES.FR.imprint} element={<Imprint />} />
+              <Route path={ROUTES.FR.privacy} element={<Privacy />} />
 
               <Route path="/ueber-uns" element={<Navigate to="/ueber-mich" replace />} />
               <Route path="*" element={<Navigate to="/" replace />} />

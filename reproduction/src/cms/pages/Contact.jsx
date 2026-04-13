@@ -44,7 +44,7 @@ const Contact = () => {
             email: globalCmsData?.options?.email || '',
             office_label: t('contact.office') || 'Büro',
             address: globalCmsData?.options?.address || '',
-            address_link: globalCmsData?.options?.address_link || '#',
+            address_link: globalCmsData?.options?.address_link || 'https://maps.app.goo.gl/syziuAu3hqbNM2tP6',
             area_label: t('contact.area') || 'Einsatzgebiet',
             area_text: t('contact.area_text') || '',
         },
