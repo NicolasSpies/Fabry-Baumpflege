@@ -19,6 +19,7 @@ const Contact = lazy(() => import('@/cms/pages/Contact'));
 const AboutMe = lazy(() => import('@/cms/pages/AboutMe'));
 const Privacy = lazy(() => import('@/cms/pages/Privacy'));
 const Imprint = lazy(() => import('@/cms/pages/Imprint'));
+const NotFound = lazy(() => import('@/cms/pages/NotFound'));
 
 /**
  * Global Preview Metadata for ContentBridge scanning.
@@ -155,7 +156,7 @@ function App() {
               <Route path={ROUTES.FR.privacy} element={<Privacy />} />
 
               <Route path="/ueber-uns" element={<Navigate to="/ueber-mich" replace />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </div>
