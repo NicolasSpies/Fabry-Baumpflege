@@ -87,11 +87,14 @@ const References = () => {
                 const page = await pagePromise;
                 if (cancelled) return;
 
+                let pageIntro = '';
+                let mappedPageContent = null;
+
                 if (page) {
                     setRawPage(page);
                     const initial = getInitialContent();
-                    const pageIntro = decodeHtmlEntities(page?.customFields?.referenzen_field_intro || '');
-                    const mappedPageContent = mapPageContent(page, initial, 'References');
+                    pageIntro = decodeHtmlEntities(page?.customFields?.referenzen_field_intro || '');
+                    mappedPageContent = mapPageContent(page, initial, 'References');
                     setPageData(prev => ({ 
                         ...prev, 
                         ...mappedPageContent,
@@ -141,7 +144,11 @@ const References = () => {
                 setPageData(prev => ({ ...prev, items: filteredMappedRefs }));
 
                 // ─── Hydrate Page Header ───
-                const header = await resolveInstancePropsAsync('References', 'ReferencesHeaderSection', pageData.header, page);
+                const updatedHeader = {
+                    ...pageData.header,
+                    intro: pageIntro || mappedPageContent?.header?.intro || pageData.header.intro
+                };
+                const header = await resolveInstancePropsAsync('References', 'ReferencesHeaderSection', updatedHeader, page);
                 if (!cancelled) {
                     setHydratedProps({
                         ReferencesHeaderSection: header
