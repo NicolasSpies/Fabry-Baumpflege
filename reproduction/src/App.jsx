@@ -111,7 +111,7 @@ function App() {
     <>
       {initialLoading && <PageLoader ready={globalReady && pageReady} onComplete={handleLoaderComplete} fullScreen={isHome} />}
       <ScrollToTop />
-        <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
+        <div className={`min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300 ${initialLoading ? 'invisible' : 'visible'}`}>
         <Navbar {...getShellProps('Navbar', globalData.navbar)} />
         <div className="flex-1 flex flex-col relative">
           {/* Light overlay during SPA page transitions */}
