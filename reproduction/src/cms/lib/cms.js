@@ -679,7 +679,7 @@ export async function getTermsByIds(ids, language = 'DE', signal = null) {
     try {
         const include = ids.map(Number).filter(Boolean).join(',');
         const terms = await fetchFromCMS(
-            `/content-core/v1/terms/reference_category?include=${include}&per_page=${ids.length}`,
+            `/content-core/v1/terms/kategorie?include=${include}&per_page=${ids.length}`,
             language,
             signal
         );
@@ -793,7 +793,7 @@ export async function getLatestReferences(limit = 3, language = 'DE') {
 
 /** Fetch references filtered to a single category term id, newest first. */
 export async function getReferencesByCategory(categoryId, language = 'DE') {
-    const result = await fetchReferencesFromCMS(`?_embed=1&per_page=100&reference_category=${categoryId}`, language);
+    const result = await fetchReferencesFromCMS(`?_embed=1&per_page=100&kategorie=${categoryId}`, language);
     if (result && Array.isArray(result)) return result;
     return [];
 }
@@ -972,7 +972,7 @@ export async function getHomeStats(language = 'DE', signal = null) {
 /** Fetch all reference_category terms for the given language using the public terms endpoint. */
 export async function getReferenceCategories(language = 'DE') {
     try {
-        const termsResponse = await fetchFromCMS('/content-core/v1/terms/reference_category?per_page=100', language);
+        const termsResponse = await fetchFromCMS('/content-core/v1/terms/kategorie?per_page=100', language);
         const terms = Array.isArray(termsResponse) ? termsResponse : (termsResponse?.items || termsResponse?.results || termsResponse?.data || []);
         
         if (Array.isArray(terms)) {

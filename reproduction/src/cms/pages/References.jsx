@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
-import { getReferences, getReferenceCategories, mapReferenceCard, getPage, mapPageContent, resolveMedia, PAGE_IDS, decodeHtmlEntities } from '@/cms/lib/cms';
+import { getReferences, mapReferenceCard, getPage, mapPageContent, resolveMedia, PAGE_IDS, decodeHtmlEntities } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 import ReferenceCard from '@/cms/components/ui/ReferenceCard';
 import { resolveInstanceProps, resolveInstancePropsAsync, awaitMappings } from '@/cms/bridge-resolver';
@@ -82,7 +82,6 @@ const References = () => {
                 // 1. Kick off all fetches
                 const pagePromise = getPage(PAGE_IDS.references, language);
                 const refsPromise = getReferences(language);
-                const catsPromise = getReferenceCategories(language);
 
                 // 2. Hydrate Page Header as quickly as possible
                 const page = await pagePromise;
@@ -108,24 +107,17 @@ const References = () => {
                     }
                 }
 
-                // 3. Hydrate Refs and Categories
-                const [refsRes, catsRes] = await Promise.allSettled([refsPromise, catsPromise]);
+                // 3. Hydrate Refs
+                const rawRefs = await refsPromise;
                 if (cancelled) return;
 
-                const rawRefs = Array.isArray(refsRes.status === 'fulfilled' ? refsRes.value : []) 
-                    ? (refsRes.status === 'fulfilled' ? refsRes.value : []) 
-                    : [];
-                const rawCats = Array.isArray(catsRes.status === 'fulfilled' ? catsRes.value : [])
-                    ? (catsRes.status === 'fulfilled' ? catsRes.value : [])
-                    : [];
-
-                if (refsRes.status === 'rejected' && (!rawRefs || rawRefs.length === 0)) {
+                if (!Array.isArray(rawRefs) || rawRefs.length === 0) {
                     setError(true);
                     setIsLoading(false);
                     return;
                 }
 
-                const catMap = (Array.isArray(rawCats) ? rawCats : []).reduce((acc, c) => { if (c?.id) acc[String(c.id)] = c.name; return acc; }, {});
+                const catMap = {};
                 
                 // ─── Resolve Reference Thumbnails asynchronously ───
                 const mappedRefs = await Promise.all((Array.isArray(rawRefs) ? rawRefs : []).map(async (item) => {
@@ -156,44 +148,7 @@ const References = () => {
                     });
                 }
 
-                // 4. Process Categories
-                // The taxonomy API returns all categories regardless of active references.
-                // We filter out cross-language bleed matching Polylang meta tags.
-                const targetLang = String(language).toLowerCase();
-                const filteredCats = [];
-                const seenCategoryNames = new Set();
-
-                (Array.isArray(rawCats) ? rawCats : []).forEach(c => {
-                    if (!c) return;
-                    const cleanName = decodeHtmlEntities(c.name || '').trim();
-                    const n = cleanName.toLowerCase();
-                    if (!cleanName || seenCategoryNames.has(n)) return;
-
-                    // 1. Language matching - if API is already filtered, we trust it by default
-                    let matchesLang = true;
-                    const cLang = (c.pll_lang || c.language || c.lang || '').toLowerCase();
-                    
-                    if (cLang) {
-                        matchesLang = cLang === targetLang;
-                    } else {
-                        // If no language metadata, we only filter out OBVIOUS bleed
-                        if (targetLang === 'fr') {
-                            if (n.includes('pflege') || n.includes('fällung') || n.includes('garten')) matchesLang = false;
-                        } else {
-                            if (n.includes('entretien') || n.includes('abattage') || n.includes('jardin')) matchesLang = false;
-                        }
-                    }
-
-                    if (matchesLang) {
-                        seenCategoryNames.add(n);
-                        filteredCats.push({
-                            id: cleanName,
-                            name: cleanName,
-                            slug: c.slug || cleanName.replace(/\s+/g, '-')
-                        });
-                    }
-                });
-
+                // 4. Extract categories from loaded reference posts
                 const getPriorityScore = (cat) => {
                     const n = (cat?.name || '').toLowerCase();
                     if (language === 'FR') {
@@ -210,24 +165,18 @@ const References = () => {
                     return 999;
                 };
 
-                let finalCats = [...filteredCats]
-                    .sort((a, b) => getPriorityScore(a) - getPriorityScore(b) || (a?.name || '').localeCompare(b?.name || ''));
-
-                // ─── Emergency Fallback: If cats are empty, extract from references ───
-                if (finalCats.length === 0 && filteredMappedRefs.length > 0) {
-                    const extractedNames = new Set();
-                    filteredMappedRefs.forEach(ref => {
-                        (ref.categories || []).forEach(name => {
-                            if (name) extractedNames.add(name);
-                        });
+                const extractedNames = new Set();
+                filteredMappedRefs.forEach(ref => {
+                    (ref.categories || []).forEach(name => {
+                        if (name) extractedNames.add(name);
                     });
-                    
-                    finalCats = Array.from(extractedNames).map(name => ({
-                        id: name,
-                        name: name,
-                        slug: name.toLowerCase().replace(/\s+/g, '-')
-                    }));
-                }
+                });
+
+                const finalCats = Array.from(extractedNames).map(name => ({
+                    id: name,
+                    name: name,
+                    slug: name.toLowerCase().replace(/\s+/g, '-')
+                })).sort((a, b) => getPriorityScore(a) - getPriorityScore(b) || (a?.name || '').localeCompare(b?.name || ''));
 
                 setCategories(finalCats);
 

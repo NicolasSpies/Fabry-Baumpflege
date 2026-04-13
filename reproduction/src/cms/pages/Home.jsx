@@ -2,7 +2,7 @@ import React, { startTransition, useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { getLocalizedPath } from '@/cms/i18n/routes';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, getLatestReferences, getReferences, getReferenceCategories, getTestimonials, mapReferenceCard, mapPageContent, resolveMedia, PAGE_IDS, decodeHtmlEntities, getSSRData } from '@/cms/lib/cms';
+import { getPage, getLatestReferences, getReferences, getTestimonials, mapReferenceCard, mapPageContent, resolveMedia, PAGE_IDS, decodeHtmlEntities, getSSRData } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
