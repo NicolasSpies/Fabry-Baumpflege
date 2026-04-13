@@ -1,9 +1,12 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  
-  # 1. Standard React Router Fallback
-  # If the requested resource is not a file and not a directory, 
-  # send it to index.html
+  RewriteBase /
+
+  # Serve static files directly (sitemap, robots, assets)
+  RewriteRule ^sitemap\.xml$ - [L]
+  RewriteRule ^robots\.txt$ - [L]
+
+  # React Router Fallback
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]
