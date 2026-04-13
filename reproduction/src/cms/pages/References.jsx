@@ -48,7 +48,7 @@ const References = () => {
 
     const getInitialContent = () => ({
         header: {
-            intro: '',
+            intro: t('refs.intro'),
             load_more: t('refs.load_more'),
             all: t('refs.all') || 'Alle',
         },

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 
 export const useSoftEntrance = (ref, options = {}) => {
     const {
@@ -10,7 +10,9 @@ export const useSoftEntrance = (ref, options = {}) => {
         easing = 'cubic-bezier(0.22, 1, 0.36, 1)'
     } = options;
 
-    useEffect(() => {
+    // Set initial hidden state BEFORE browser paints — prevents flash of
+    // unstyled content that then jumps down before animating up.
+    useLayoutEffect(() => {
         const container = ref.current;
         if (!container) return;
 
@@ -30,11 +32,29 @@ export const useSoftEntrance = (ref, options = {}) => {
             return;
         }
 
-        // Initialize state before animation
         items.forEach((item) => {
             item.style.opacity = '0';
             item.style.transform = 'translateY(16px)';
             item.style.willChange = 'transform, opacity';
+            item.style.transition = 'none'; // No transition during init
+        });
+    }, [ref, itemSelector]);
+
+    // Observe and animate after page is visible.
+    useEffect(() => {
+        const container = ref.current;
+        if (!container) return;
+
+        const items = Array.from(container.querySelectorAll(itemSelector));
+        if (items.length === 0) return;
+
+        const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+        if (prefersReducedMotion || isMobile) return;
+
+        // Enable transitions now (after layout effect set initial state without transition)
+        items.forEach((item) => {
             item.style.transition = `opacity ${durationMs}ms ${easing}, transform ${durationMs}ms ${easing}`;
         });
 
@@ -43,14 +63,11 @@ export const useSoftEntrance = (ref, options = {}) => {
                 const [entry] = entries;
 
                 if (entry.isIntersecting) {
-                    // Trigger staggered reveal
                     items.forEach((item, index) => {
                         setTimeout(() => {
-                            // Apply final resting state
                             item.style.opacity = '1';
                             item.style.transform = 'translateY(0)';
 
-                            // Clean up will-change after transition duration
                             setTimeout(() => {
                                 if (item.style) {
                                     item.style.willChange = 'auto';
@@ -60,7 +77,6 @@ export const useSoftEntrance = (ref, options = {}) => {
                         }, index * staggerDelayMs);
                     });
 
-                    // Animate exactly once
                     observer.disconnect();
                 }
             }, { threshold, rootMargin });
@@ -69,8 +85,6 @@ export const useSoftEntrance = (ref, options = {}) => {
             return observer;
         };
 
-        // Wait for .page-visible before starting — prevents animation
-        // from firing while the loader is still covering the page.
         let activeObserver = null;
         let mutObs = null;
 
