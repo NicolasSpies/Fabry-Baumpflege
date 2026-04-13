@@ -8,8 +8,9 @@ const Imprint = () => {
     useScrollReveal([language]);
     useCmsSeo(globalSeo);
 
-    // Imprint uses only global data, so it's ready immediately
-    React.useEffect(() => { setPageReady(true); }, [setPageReady]);
+    // Imprint uses only global data, so it's ready immediately.
+    // Depend on language so it re-fires after SPA navigation resets pageReady.
+    React.useEffect(() => { setPageReady(true); }, [language, setPageReady]);
 
     const opts = globalCmsData?.options || {};
     const name = opts.contact_person || 'Vincent Fabry';
