@@ -33,7 +33,7 @@ const Footer = ({
 
     return (
         <>
-        <footer className="bg-primary text-white py-8 px-6 min-h-[280px] md:min-h-[160px]">
+        <footer className="bg-primary text-white py-8 px-6 min-h-[360px] md:min-h-[220px]">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-10 text-center md:text-left items-center md:items-start">
                 <div className="space-y-4 flex flex-col items-center md:items-start max-w-sm">
                     <img

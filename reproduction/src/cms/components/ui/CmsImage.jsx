@@ -41,6 +41,15 @@ const CmsImage = React.forwardRef(function CmsImage(
 
     if (!imageProps?.src) return null;
 
+    // Final safety: strip any srcSet entries without valid w/x descriptors
+    if (imageProps.srcSet) {
+        imageProps.srcSet = imageProps.srcSet
+            .split(',')
+            .map(e => e.trim())
+            .filter(e => /\s\d+w$/.test(e) || /\s\d+(\.\d+)?x$/.test(e))
+            .join(', ') || undefined;
+    }
+
     return <img ref={ref} className={className} {...imageProps} {...props} />;
 });
 
