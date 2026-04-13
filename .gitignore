@@ -1,8 +1,8 @@
 # Dependencies
 node_modules/
 
-# Build output
-dist/
+# Build output (kept in git for Hostinger deployment)
+# dist/
 
 # Environment
 *.local

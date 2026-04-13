@@ -1,0 +1,656 @@
+{
+  "project": "jio",
+  "publishedAt": "2026-03-18T11:10:10.552Z",
+  "pages": {
+    "Home": {
+      "instances": {
+        "Home": {
+          "component": "Home",
+          "props": {}
+        },
+        "HeroSection": {
+          "component": "HeroSection",
+          "props": {
+            "title_top": {
+              "fieldPath": "customFields.startseite_first_headline_h1",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "title_main": {
+              "fieldPath": "customFields.startseite_second_headline_h1",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "cta": {
+              "fieldPath": "customFields.startseite_header_button.label",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "image": {
+              "fieldPath": "customFields.startseite_headerbild",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "description": {
+              "fieldPath": "customFields.startseite_intro_text_header",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "ctaHref": {
+              "fieldPath": "customFields.startseite_header_button",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
+        "HomeIntroSection": {
+          "component": "HomeIntroSection",
+          "props": {
+            "title": {
+              "fieldPath": "customFields.h2_titel_startseite",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "description": {
+              "fieldPath": "customFields.startseite_intro_beschreibung",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
+        "AboutSection": {
+          "component": "AboutSection",
+          "props": {
+            "label": {
+              "fieldPath": "customFields.startseite_titel_ueber_mich",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "title": {
+              "fieldPath": "customFields.startseite_untertitel_ueber_mich",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "description": {
+              "fieldPath": "customFields.startseite_beschreibung_ueber_mich",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "quote": {
+              "fieldPath": "customFields.new_headline_startseite_uebermich",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "image": {
+              "fieldPath": "customFields.startseite_ueber_mich_bild",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "cta": {
+              "fieldPath": "customFields.startseite_button_ueber_mich.label",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "ctaHref": {
+              "fieldPath": "customFields.startseite_button_ueber_mich",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
+        "StatsSection": {
+          "component": "StatsSection",
+          "props": {
+            "stat1_value": {
+              "fieldPath": "customFields.startseite_anzahl_zufriedene_unden",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat1_label": {
+              "fieldPath": "customFields.startseite_zufriedene_kunden",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat2_value": {
+              "fieldPath": "customFields.startseite_anzahl_gepflegte_baeume",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat2_label": {
+              "fieldPath": "customFields.startseite_gepflegte_baeume",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat3_label": {
+              "fieldPath": "customFields.startseite_jahre_erfahrung",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat3_value": {
+              "fieldPath": "customFields.startseite_anzahl_jahre_erfahrung",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat4_value": {
+              "fieldPath": "customFields.startseite_anzahl_arbeitsunfaelle",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat4_label": {
+              "fieldPath": "customFields.startseite_arbeitsunfaelle",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
+        "ServicesSection": {
+          "component": "ServicesSection",
+          "props": {
+            "title": {
+              "fieldPath": "customFields.startseite_untertitel_leistungen",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s1_title": {
+              "fieldPath": "customFields.titel_leistung_1",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s2_title": {
+              "fieldPath": "customFields.titel_leistung_2",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s3_title": {
+              "fieldPath": "customFields.titel_leistung_3",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s4_title": {
+              "fieldPath": "customFields.titel_leistung_4",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s1_description": {
+              "fieldPath": "customFields.zusammenfassung_baumpflege",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s2_description": {
+              "fieldPath": "customFields.zusammenfassung_baumfllung",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s3_description": {
+              "fieldPath": "customFields.zusammenfassung_gartenpflege",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s4_description": {
+              "fieldPath": "customFields.zusammenfassung_bepflanzung",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "label": {
+              "fieldPath": "customFields.startseite_titel_leistungen",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
+        "ReferencesSection": {
+          "component": "ReferencesSection",
+          "props": {
+            "title": {
+              "fieldPath": "customFields.startseite_titel_referenzen",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "label": {
+              "fieldPath": "customFields.startseite_untertitel_referenzen",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
+        "TestimonialsSection": {
+          "component": "TestimonialsSection",
+          "props": {
+            "label": {
+              "fieldPath": "customFields.startseite_titel_kundenstimmen",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "title": {
+              "fieldPath": "customFields.startseite_untertitel_kundenstimmen",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        }
+      }
+    },
+    "_component": {
+      "instances": {
+        "TestimonialCard": {
+          "component": "TestimonialCard",
+          "props": {
+            "rating_raw": {
+              "fieldPath": "customFields.sterne",
+              "sourceId": "k3car320",
+              "isUnstable": false
+            },
+            "author": {
+              "fieldPath": "title",
+              "sourceId": "k3car320",
+              "isUnstable": false
+            },
+            "text": {
+              "fieldPath": "customFields.kundenstimme_text",
+              "sourceId": "k3car320",
+              "isUnstable": false
+            }
+          }
+        },
+        "Footer": {
+          "component": "Footer",
+          "props": {
+            "phone": {
+              "fieldPath": "data.phone",
+              "sourceId": "39fpj02s",
+              "isUnstable": false
+            },
+            "email": {
+              "fieldPath": "data.email",
+              "sourceId": "39fpj02s",
+              "isUnstable": false
+            },
+            "instaUrl": {
+              "fieldPath": "data.instagram_url",
+              "sourceId": "39fpj02s",
+              "isUnstable": false
+            },
+            "address": {
+              "fieldPath": "data.street",
+              "sourceId": "39fpj02s",
+              "isUnstable": false
+            },
+            "description": {
+              "fieldPath": "data.cc_3x224kp97",
+              "sourceId": "39fpj02s",
+              "isUnstable": false
+            }
+          }
+        }
+      }
+    },
+    "ReferenceDetail": {
+      "instances": {
+        "ReferenceDetail": {
+          "component": "ReferenceDetail",
+          "props": {}
+        },
+        "ReferenceSidebarSection": {
+          "component": "ReferenceSidebarSection",
+          "props": {
+            "dateValue": {
+              "fieldPath": "date",
+              "sourceId": "uk1jxgem",
+              "isUnstable": false
+            },
+            "locationValue": {
+              "fieldPath": "customFields.referenz_ort",
+              "sourceId": "uk1jxgem",
+              "isUnstable": false
+            }
+          }
+        },
+        "ReferenceContentSection": {
+          "component": "ReferenceContentSection",
+          "props": {
+            "challengeTitle": {
+              "fieldPath": "customFields.untertitel_referenz",
+              "sourceId": "uk1jxgem",
+              "isUnstable": false
+            },
+            "description": {
+              "fieldPath": "customFields.beschreibung",
+              "sourceId": "uk1jxgem",
+              "isUnstable": false
+            },
+            "beforeImage": {
+              "fieldPath": "customFields.bild_vorher",
+              "sourceId": "uk1jxgem",
+              "isUnstable": false
+            },
+            "afterImage": {
+              "fieldPath": "customFields.bild_nachher",
+              "sourceId": "uk1jxgem",
+              "isUnstable": false
+            },
+            "gallery": {
+              "fieldPath": "customFields.referenz_galerie",
+              "sourceId": "uk1jxgem",
+              "isUnstable": false
+            }
+          }
+        }
+      }
+    },
+    "Services": {
+      "instances": {
+        "ServicesIntroSection": {
+          "component": "ServicesIntroSection",
+          "props": {
+            "title": {
+              "fieldPath": "customFields.titel_leistung_h1",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "description": {
+              "fieldPath": "customFields.intro_leistungen",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
+        "PageHeroSection": {
+          "component": "PageHeroSection",
+          "props": {
+            "image": {
+              "fieldPath": "customFields.header_leistungen",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
+        "StatsSection": {
+          "component": "StatsSection",
+          "props": {
+            "stat1_value": {
+              "fieldPath": "customFields.startseite_anzahl_zufriedene_unden",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat1_label": {
+              "fieldPath": "customFields.startseite_zufriedene_kunden",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat2_value": {
+              "fieldPath": "customFields.startseite_anzahl_gepflegte_baeume",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat2_label": {
+              "fieldPath": "customFields.startseite_gepflegte_baeume",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat3_value": {
+              "fieldPath": "customFields.startseite_anzahl_jahre_erfahrung",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat3_label": {
+              "fieldPath": "customFields.startseite_jahre_erfahrung",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat4_value": {
+              "fieldPath": "customFields.startseite_anzahl_arbeitsunfaelle",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "stat4_label": {
+              "fieldPath": "customFields.startseite_arbeitsunfaelle",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
+        "ServicesBlocksSection": {
+          "component": "ServicesBlocksSection",
+          "props": {
+            "s1_title": {
+              "fieldPath": "customFields.titel_leistung_1",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s1_image": {
+              "fieldPath": "customFields.bild_leistung_1",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s1_list": {
+              "fieldPath": "customFields.liste_leistung_1",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s1_description": {
+              "fieldPath": "customFields.beschreibung_leistung_1",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s2_description": {
+              "fieldPath": "customFields.beschreibung_leistung_2",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s2_image": {
+              "fieldPath": "customFields.bild_leistung_2",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s2_list": {
+              "fieldPath": "customFields.liste_leistung_2",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s2_title": {
+              "fieldPath": "customFields.titel_leistung_2",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s3_list": {
+              "fieldPath": "customFields.liste_leistung_3",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s3_description": {
+              "fieldPath": "customFields.beschreibung_leistung_3",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s3_image": {
+              "fieldPath": "customFields.bild_leistung_3",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s4_description": {
+              "fieldPath": "customFields.beschreibung_leistung_4",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s4_list": {
+              "fieldPath": "customFields.liste_leistung_4",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s4_image": {
+              "fieldPath": "customFields.bild_leistung_4",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s4_title": {
+              "fieldPath": "customFields.titel_leistung_4",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "s3_title": {
+              "fieldPath": "customFields.titel_leistung_3",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        }
+      }
+    },
+    "AboutMe": {
+      "instances": {
+        "PhilosophySection": {
+          "component": "PhilosophySection",
+          "props": {
+            "label": {
+              "fieldPath": "customFields.titel_ueber_mich",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "quote": {
+              "fieldPath": "customFields.untertitel_ueber_mich",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "text": {
+              "fieldPath": "customFields.beschreibung_ber_mich",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "image": {
+              "fieldPath": "customFields.profil_bild",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
+        "SignatureSection": {
+          "component": "SignatureSection",
+          "props": {
+            "title": {
+              "fieldPath": "customFields.signatur_text",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "name": {
+              "fieldPath": "data.contact_person",
+              "sourceId": "39fpj02s",
+              "isUnstable": false
+            }
+          }
+        },
+        "ValuesSection": {
+          "component": "ValuesSection",
+          "props": {
+            "val1_title": {
+              "fieldPath": "customFields.titel_eigenschaft_1",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "val1_text": {
+              "fieldPath": "customFields.beschreibung_eigenschaft_1",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "val2_title": {
+              "fieldPath": "customFields.titel_eigenschaft_2",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "val2_text": {
+              "fieldPath": "customFields.beschreibung_eigenschaft_2",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "val3_title": {
+              "fieldPath": "customFields.titel_eigenschaft_3",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "val3_text": {
+              "fieldPath": "customFields.beschreibung_eigenschaft_3",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "val2_image": {
+              "fieldPath": "customFields.bild_eigenschaft_2",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "val1_image": {
+              "fieldPath": "customFields.bild_eigenschaft_1",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "val3_image": {
+              "fieldPath": "customFields.bild_eigenschaft_3",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        }
+      }
+    },
+    "Contact": {
+      "instances": {
+        "PageHeroSection": {
+          "component": "PageHeroSection",
+          "props": {
+            "image": {
+              "fieldPath": "customFields.kontakt_header",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            }
+          }
+        },
+        "ContactSidebarSection": {
+          "component": "ContactSidebarSection",
+          "props": {
+            "contact_person": {
+              "fieldPath": "data.contact_person",
+              "sourceId": "39fpj02s",
+              "isUnstable": false
+            },
+            "area_text": {
+              "fieldPath": "customFields.einsatzgebiet_text",
+              "sourceId": "nnnd3pjq",
+              "isUnstable": false
+            },
+            "phone": {
+              "fieldPath": "data.phone",
+              "sourceId": "39fpj02s",
+              "isUnstable": false
+            },
+            "email": {
+              "fieldPath": "data.email",
+              "sourceId": "39fpj02s",
+              "isUnstable": false
+            },
+            "address": {
+              "fieldPath": "data.street",
+              "sourceId": "39fpj02s",
+              "isUnstable": false
+            }
+          }
+        },
+        "ContactFormSection": {
+          "component": "ContactFormSection",
+          "props": {
+            "formSchema": {
+              "fieldPath": "fields",
+              "sourceId": "qsrr5u6y",
+              "isUnstable": false
+            }
+          }
+        }
+      }
+    },
+    "References": {
+      "instances": {
+        "References": {
+          "component": "References",
+          "props": {}
+        }
+      }
+    }
+  }
+}
