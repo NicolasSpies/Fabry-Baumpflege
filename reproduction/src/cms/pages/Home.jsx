@@ -260,7 +260,6 @@ const Home = () => {
     useEffect(() => {
         let cancelled = false;
         let timeoutId = null;
-        let idleId = null;
 
         async function loadDeferredContent() {
             try {
@@ -326,28 +325,14 @@ const Home = () => {
             }
         }
 
-        const scheduleDeferredLoad = () => {
-            if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-                idleId = window.requestIdleCallback(() => {
-                    loadDeferredContent();
-                }, { timeout: 800 });
-                return;
-            }
-
-            timeoutId = window.setTimeout(() => {
-                loadDeferredContent();
-            }, 150);
-        };
-
-        scheduleDeferredLoad();
+        // Short delay so hero/stats render first, but no requestIdleCallback
+        // which can be delayed indefinitely under load
+        timeoutId = window.setTimeout(loadDeferredContent, 100);
 
         return () => {
             cancelled = true;
             if (timeoutId !== null) {
                 window.clearTimeout(timeoutId);
-            }
-            if (idleId !== null && typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
-                window.cancelIdleCallback(idleId);
             }
         };
     }, [language]);
