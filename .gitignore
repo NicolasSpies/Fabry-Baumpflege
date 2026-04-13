@@ -1,24 +1,28 @@
-# Dependencies
-node_modules/
+# Everything ignored by default
+*
 
-# Build output (kept in git for Hostinger deployment)
-# dist/
+# Allow build output (served by Hostinger)
+!index.html
+!.htaccess
+!robots.txt
+!assets/
+!assets/**
+!Baumpflege-Fabry-Logo.svg
+!vite.svg
+!cb-mappings.json
 
-# Environment
-*.local
+# Allow source code
+!reproduction/
+!reproduction/**
+
+# But ignore these inside reproduction
+reproduction/node_modules/
+reproduction/dist/
+reproduction/.claude/
+
+# Allow git essentials
+!.gitignore
+!.gitattributes
 
 # OS
 .DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.sw?
-
-# Claude Code
-.claude/
-
-# Logs
-*.log
-npm-debug.log*
