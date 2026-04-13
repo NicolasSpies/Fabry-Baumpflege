@@ -454,10 +454,11 @@ export async function fetchFromCMS(endpoint, language = 'DE', signal = null) {
         try {
             const response = await fetch(url, signal ? { signal } : undefined);
             
-            // Critical: If the endpoint is protected (401/403), we return a safe empty result
-            // to avoid crashing the frontend hydration entirely.
-            if (response.status === 401 || response.status === 403) {
-                console.warn(`[CMS] Access restricted for ${url}. Returning empty fallback.`);
+            // Non-critical HTTP errors: return safe empty result without noisy console errors
+            if (response.status === 401 || response.status === 403 || response.status === 404) {
+                if (import.meta.env?.DEV) {
+                    console.warn(`[CMS] ${response.status} for ${cleanEndpoint} — returning empty fallback.`);
+                }
                 return endpoint.includes('include=') || endpoint.includes('posts/') || endpoint.includes('v1/terms') ? [] : null;
             }
 
