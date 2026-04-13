@@ -58,10 +58,19 @@ const ContactFormSection = ({
         : (formSchema || {});
 
     const { fields: rawFields = [], submit_label, redirect_url } = normalizedSchema;
-    
-    // Patch typos from CMS data
+
+    // Patch typos and fix field order from CMS data
     const fields = useMemo(() => {
-        return rawFields.map(f => {
+        // Ensure vorname comes before name
+        const sorted = [...rawFields];
+        const vornameIdx = sorted.findIndex(f => f.name === 'vorname_field');
+        const nameIdx = sorted.findIndex(f => f.name === 'name_field');
+        if (vornameIdx > -1 && nameIdx > -1 && vornameIdx > nameIdx) {
+            const [vorname] = sorted.splice(vornameIdx, 1);
+            sorted.splice(nameIdx, 0, vorname);
+        }
+
+        return sorted.map(f => {
             let label = f.label || '';
             let placeholder = f.placeholder || '';
             
