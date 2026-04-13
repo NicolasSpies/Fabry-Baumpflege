@@ -839,16 +839,34 @@ export async function getReferencesByCategory(categoryId, language = 'DE') {
     return [];
 }
 
+/**
+ * Try to find a reference in the cached "all references" list from sessionStorage.
+ * This avoids extra API calls when navigating from the overview to a detail page.
+ */
+function findCachedReference(idOrSlug, language) {
+    const langCode = PLLCode[language] ?? (language ? String(language).toLowerCase() : 'de');
+    // Check the cached full list from getReferences()
+    const listKey = '/content-core/v1/posts/referenzen?_embed=1&per_page=100|' + langCode;
+    const cached = ssGet(listKey);
+    if (!Array.isArray(cached)) return null;
+    const needle = String(idOrSlug);
+    return cached.find(r => r && (String(r.slug) === needle || String(r.id) === needle)) || null;
+}
+
 /** Fetch a single reference by slug or numeric ID with MINIMAL fields (Hero/Title/Meta only). */
 export async function getReferenceCore(idOrSlug, language = 'DE', signal = null) {
+    // Fast path: check if already in cached references list
+    const cached = findCachedReference(idOrSlug, language);
+    if (cached) return cached;
+
     const fields = 'id,slug,title,link,featured_image,customFields,taxonomies,date,cc_alternates,pll_translations';
     const query = `?fields=${fields}&per_page=1`;
-    
+
     if (typeof idOrSlug === 'number' || /^\d+$/.test(String(idOrSlug))) {
         const result = await fetchReferencesFromCMS(`/${idOrSlug}${query}`, language, signal, true);
         if (result && !Array.isArray(result)) return result;
     }
-    
+
     const slugQuery = `?slug=${encodeURIComponent(idOrSlug)}&fields=${fields}`;
     const result = await fetchReferencesFromCMS(slugQuery, language, signal);
     if (Array.isArray(result) && result.length > 0) return result[0];
@@ -867,6 +885,10 @@ export async function getReferenceBySlug(slug, language = 'DE', signal = null) {
 
 /** Fetch a single reference by slug or numeric ID. */
 export async function getReference(idOrSlug, language = 'DE', signal = null) {
+    // Fast path: check if already in cached references list
+    const cached = findCachedReference(idOrSlug, language);
+    if (cached) return cached;
+
     if (typeof idOrSlug === 'number' || /^\d+$/.test(String(idOrSlug))) {
         const result = await fetchReferencesFromCMS(`/${idOrSlug}?_embed=1`, language, signal, true);
         if (result && !Array.isArray(result)) return result;
