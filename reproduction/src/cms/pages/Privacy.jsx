@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
 import { getPage, PAGE_IDS } from '@/cms/lib/cms';
@@ -89,7 +90,14 @@ const Privacy = () => {
     const { language, t, globalCmsData, globalSeo, setPageReady } = useLanguage();
     const [content, setContent] = useState('');
     const [rawPage, setRawPage] = useState(null);
+    const location = useLocation();
     useScrollReveal([rawPage]);
+
+    // Text-only page — signal ready immediately after useLanguage resets
+    // pageReady to false, so no loader/overlay flashes.
+    React.useEffect(() => {
+        queueMicrotask(() => setPageReady(true));
+    }, [location.pathname, setPageReady]);
 
     useEffect(() => {
         let cancelled = false;
@@ -102,7 +110,6 @@ const Privacy = () => {
                     const datenschutz = page.customFields?.new_field_datenschutz || page.content || '';
                     const opts = globalCmsData?.options || {};
                     setContent(replacePlaceholders(datenschutz, opts));
-                    setPageReady(true);
                 }
             } catch (err) {
                 console.error('[Privacy] CMS load failed:', err);

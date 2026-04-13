@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { getLocalizedPath } from '@/cms/i18n/routes';
 import { definePreview } from '@/cms/lib/preview';
@@ -19,6 +19,7 @@ const Navbar = ({
 }) => {
     const { language, setLanguage, t, globalCmsData } = useLanguage();
     const location = useLocation();
+    const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMode, setIsMobileMode] = useState(() => (
@@ -74,18 +75,32 @@ const Navbar = ({
     const deLanguageLabel = language === 'FR' ? 'Passer en allemand' : 'Sprache auf Deutsch wechseln';
     const frLanguageLabel = language === 'FR' ? 'Passer en français' : 'Sprache auf Französisch wechseln';
 
+    const [isClosing, setIsClosing] = useState(false);
+
     const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
+        if (isMenuOpen) {
+            animateClose();
+        } else {
+            setIsMenuOpen(true);
+        }
+    };
+
+    const animateClose = () => {
+        setIsClosing(true);
+        setTimeout(() => {
+            setIsMenuOpen(false);
+            setIsClosing(false);
+        }, 280);
     };
 
     const closeMenu = () => {
         setIsMenuOpen(false);
+        setIsClosing(false);
     };
 
     useEffect(() => {
-        if (isMenuOpen && isMobileMode) {
+        if (isMenuOpen && !isClosing && isMobileMode) {
             document.body.style.overflow = 'hidden';
-            // Scroll to top when opening menu to ensure visibility
             window.scrollTo({ top: 0, behavior: 'instant' });
         } else {
             document.body.style.overflow = 'unset';
@@ -93,7 +108,7 @@ const Navbar = ({
         return () => {
             document.body.style.overflow = 'unset';
         };
-    }, [isMenuOpen, isMobileMode]);
+    }, [isMenuOpen, isClosing, isMobileMode]);
 
     useEffect(() => {
         if (!isMobileMode && isMenuOpen) {
@@ -101,35 +116,58 @@ const Navbar = ({
         }
     }, [isMobileMode, isMenuOpen]);
 
+    const [tappedIdx, setTappedIdx] = useState(null);
+
+    const handleMobileLinkClick = (e, idx) => {
+        e.preventDefault();
+        const href = e.currentTarget.getAttribute('href');
+        setTappedIdx(idx);
+        // Navigate immediately so page starts loading in background
+        navigate(href);
+        // Brief tap highlight, then animate menu closed
+        setTimeout(() => {
+            setTappedIdx(null);
+            animateClose();
+        }, 100);
+    };
+
     const renderLinks = (isMobile = false) => {
         return actualLinks.map((item, idx) => {
             // Support hierarchical resolution for individual NAV items
             const resolved = resolveInstanceProps(
-                page, 
-                `${section}/NavLink`, 
-                item, 
+                page,
+                `${section}/NavLink`,
+                item,
                 globalCmsData
             );
-            
+
             return (
                 <NavLink
                     key={idx}
                     to={resolved.href || resolved.link || item.href}
                     end={item.routeKey === 'home' || item.href === '/' || item.href === '/fr'}
-                    onClick={isMobile ? closeMenu : undefined}
+                    onClick={isMobile ? (e) => handleMobileLinkClick(e, idx) : undefined}
                     className={({ isActive }) => {
                         // Custom logic to keep parent route active on sub-pages
                         const currentPath = location.pathname;
                         const itemPath = resolved.href || resolved.link || item.href;
-                        
+
                         // "Referenzen" should be active if we are on /referenzen OR /referenzen/*
                         // "Leistungen" should be active if we are on /leistungen OR /leistungen/*
                         const isSubPathActive = itemPath !== '/' && itemPath !== '/fr' && currentPath.startsWith(itemPath);
                         const effectivelyActive = isActive || isSubPathActive;
 
-                        return isMobile 
-                            ? `text-[1.1rem] font-sans font-medium uppercase tracking-[0.2em] transition-colors ${effectivelyActive ? 'text-primary' : 'text-muted-accessible hover:text-primary'}`
-                            : `hover:text-primary transition-colors whitespace-nowrap ${effectivelyActive ? 'text-primary border-b-2 border-primary pb-1' : ''}`;
+                        if (isMobile) {
+                            const isTapped = tappedIdx === idx;
+                            return `text-[1.1rem] font-sans font-medium uppercase tracking-[0.2em] transition-colors duration-150 py-2 px-4 rounded-lg ${
+                                isTapped
+                                    ? 'text-primary bg-primary/10 scale-[0.97]'
+                                    : effectivelyActive
+                                        ? 'text-primary'
+                                        : 'text-muted-accessible active:text-primary active:bg-primary/10'
+                            }`;
+                        }
+                        return `hover:text-primary transition-colors whitespace-nowrap ${effectivelyActive ? 'text-primary border-b-2 border-primary pb-1' : ''}`;
                     }}
                 >
                     {resolved.label || resolved.text || item.label}
@@ -223,8 +261,15 @@ const Navbar = ({
                 )}
             </div>
 
-            {(isMenuOpen && isMobileMode) && (
-                <div id="mobile-navigation" className="absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl border-b border-slate-100 dark:border-slate-800 flex flex-col items-center py-8 gap-8 z-[100] animate-in slide-in-from-top duration-300">
+            {((isMenuOpen || isClosing) && isMobileMode) && (
+                <div
+                    id="mobile-navigation"
+                    className={`absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl border-b border-slate-100 dark:border-slate-800 flex flex-col items-center py-8 gap-8 z-[100] transition-[transform,opacity] duration-300 ease-out origin-top ${
+                        isClosing
+                            ? 'opacity-0 -translate-y-4 scale-y-95 pointer-events-none'
+                            : 'opacity-100 translate-y-0 scale-y-100 animate-in slide-in-from-top duration-300'
+                    }`}
+                >
                     <div className="flex flex-col items-center gap-6 w-full px-6">
                         {renderLinks(true)}
                     </div>
@@ -232,7 +277,7 @@ const Navbar = ({
                     <div className="w-full px-6 flex justify-center mt-2">
                         <Link
                             to={getLocalizedPath('contact', language)}
-                            onClick={closeMenu}
+                            onClick={(e) => { e.preventDefault(); navigate(getLocalizedPath('contact', language)); animateClose(); }}
                             className="bg-primary text-white px-8 py-3 rounded-full text-sm uppercase tracking-widest font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-[transform,box-shadow,background-color] text-center w-full max-w-[200px]"
                         >
                             {actualCtaLabel}
@@ -241,7 +286,7 @@ const Navbar = ({
 
                     <div className="flex items-center justify-center gap-6 mt-4 pt-6 border-t border-slate-100 dark:border-slate-800/50 w-full text-sm tracking-[0.3em] font-bold">
                         <button
-                            onClick={() => { setLanguage('DE'); closeMenu(); }}
+                            onClick={() => { setLanguage('DE'); animateClose(); }}
                             aria-label={deLanguageLabel}
                             aria-pressed={language === 'DE'}
                             className={`transition-[opacity,color,transform] duration-300 ${language === 'DE' ? 'opacity-100 text-primary scale-110' : 'opacity-70 hover:opacity-100'}`}
@@ -250,7 +295,7 @@ const Navbar = ({
                         </button>
                         <span className="opacity-20 text-xl font-light">|</span>
                         <button
-                            onClick={() => { setLanguage('FR'); closeMenu(); }}
+                            onClick={() => { setLanguage('FR'); animateClose(); }}
                             aria-label={frLanguageLabel}
                             aria-pressed={language === 'FR'}
                             className={`transition-[opacity,color,transform] duration-300 ${language === 'FR' ? 'opacity-100 text-primary scale-110' : 'opacity-70 hover:opacity-100'}`}

@@ -1,16 +1,20 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
 
 const Imprint = () => {
     const { language, t, globalCmsData, globalSeo, setPageReady } = useLanguage();
+    const location = useLocation();
     useScrollReveal([language]);
     useCmsSeo(globalSeo);
 
-    // Imprint uses only global data, so it's ready immediately.
-    // Depend on language so it re-fires after SPA navigation resets pageReady.
-    React.useEffect(() => { setPageReady(true); }, [language, setPageReady]);
+    // Imprint is pure text — no CMS fetch needed. Signal ready immediately
+    // after useLanguage's own effect resets pageReady to false.
+    React.useEffect(() => {
+        queueMicrotask(() => setPageReady(true));
+    }, [location.pathname, setPageReady]);
 
     const opts = globalCmsData?.options || {};
     const name = opts.contact_person || 'Vincent Fabry';
