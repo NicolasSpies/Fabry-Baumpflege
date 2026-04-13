@@ -8,7 +8,7 @@ import path from 'path'
 // then automatically picks up the new host for the dev proxy.
 import { createRequire } from 'module'
 const _require = createRequire(import.meta.url)
-import { readFileSync, copyFileSync, mkdirSync } from 'fs'
+import { readFileSync, copyFileSync, mkdirSync, readdirSync, unlinkSync, existsSync } from 'fs'
 
 const MAPPINGS_SRC = path.resolve(import.meta.dirname, 'src/cms/config/mappings.json');
 
@@ -39,6 +39,26 @@ const cbMappingsPlugin = {
       mkdirSync(path.resolve(import.meta.dirname, 'dist'), { recursive: true });
       copyFileSync(MAPPINGS_SRC, path.resolve(import.meta.dirname, 'dist/cb-mappings.json'));
     } catch { /* non-fatal — fallback to bundled mappings */ }
+  },
+};
+
+/**
+ * Plugin that cleans old hashed assets from the repo root before each build.
+ * Since outDir is the repo root and emptyOutDir is false, old build artifacts
+ * accumulate indefinitely. This plugin removes them before Vite writes new ones.
+ */
+const cleanOldAssetsPlugin = {
+  name: 'clean-old-assets',
+  buildStart() {
+    const assetsDir = path.resolve(import.meta.dirname, '..', 'assets');
+    if (!existsSync(assetsDir)) return;
+    try {
+      const files = readdirSync(assetsDir);
+      for (const f of files) {
+        try { unlinkSync(path.join(assetsDir, f)); } catch { /* skip */ }
+      }
+      console.log(`[clean-old-assets] Removed ${files.length} old asset files.`);
+    } catch { /* non-fatal */ }
   },
 };
 
@@ -114,7 +134,7 @@ const seoVitePlugin = {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), cbMappingsPlugin, seoVitePlugin],
+  plugins: [react(), cleanOldAssetsPlugin, cbMappingsPlugin, seoVitePlugin],
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),
