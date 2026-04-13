@@ -88,6 +88,9 @@ export const translations = {
         'about.teaser_cta': 'Erfahre mehr über mich',
         'about.quote': '"Sorgfalt bis ins Detail"',
 
+        // Common
+        'common.testimonial': 'Kundenstimme',
+
         // Footer
         'footer.description': 'Zertifizierter Fachbetrieb für Baumpflege und Gartengestaltung in Ostbelgien. Qualität und Nachhaltigkeit für dein Grün.',
         'footer.nav': 'Navigation',
@@ -263,6 +266,9 @@ export const translations = {
         // Footer
         'footer.description': 'Entreprise spécialisée certifiée en arboriculture et aménagement paysager. Qualité et durabilité pour vos espaces verts.',
         'footer.nav': 'Navigation',
+        // Common
+        'common.testimonial': 'Témoignage',
+
         'footer.contact': 'Contact',
         'footer.rights': 'Tous droits réservés.',
         'footer.imprint': 'Mentions légales',

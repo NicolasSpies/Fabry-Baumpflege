@@ -206,15 +206,7 @@ const ContactFormSection = ({
             <div className="lg:col-span-8 reveal stagger-1">
                 <div className="bg-white dark:bg-surface-dark p-6 md:p-9 border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl min-h-[42rem]">
                     {shellHeading}
-                    <div className="space-y-8 animate-pulse">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="h-24 bg-slate-50 dark:bg-slate-800/50 rounded-xl" />
-                            <div className="h-24 bg-slate-50 dark:bg-slate-800/50 rounded-xl" />
-                        </div>
-                        <div className="h-12 bg-slate-50 dark:bg-slate-800/50 rounded-xl w-full" />
-                        <div className="h-12 bg-slate-50 dark:bg-slate-800/50 rounded-xl w-full" />
-                        <div className="h-32 bg-slate-50 dark:bg-slate-800/50 rounded-xl w-full" />
-                    </div>
+                    <div className="min-h-[30rem]" />
                 </div>
             </div>
         );

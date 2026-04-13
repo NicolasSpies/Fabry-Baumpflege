@@ -383,7 +383,7 @@ const Home = () => {
             />
 
             {/* Page: Home → Section: ReferencesSection */}
-            <Suspense fallback={<div className="h-40 animate-pulse bg-slate-50 dark:bg-slate-800/50" />}>
+            <Suspense fallback={<div className="h-40" />}>
                 <ReferencesSection
                     {...getProps('ReferencesSection', pageData.references)}
                     language={language}
@@ -393,7 +393,7 @@ const Home = () => {
             </Suspense>
 
             {/* Page: Home → Section: TestimonialsSection */}
-            <Suspense fallback={<div className="h-40 animate-pulse bg-slate-50 dark:bg-slate-800/50" />}>
+            <Suspense fallback={<div className="h-40" />}>
                 <TestimonialsSection
                     {...getProps('TestimonialsSection', pageData.testimonials)}
                     language={language}
@@ -401,7 +401,7 @@ const Home = () => {
             </Suspense>
 
             {/* Page: Home → Section: AboutSection */}
-            <Suspense fallback={<div className="h-40 animate-pulse bg-slate-50 dark:bg-slate-800/50" />}>
+            <Suspense fallback={<div className="h-40" />}>
                 <AboutSection
                     {...getProps('AboutSection', pageData.about)}
                 />

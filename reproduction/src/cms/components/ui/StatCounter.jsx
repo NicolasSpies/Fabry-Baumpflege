@@ -6,45 +6,92 @@ import { resolveInstanceProps } from '@/cms/bridge-resolver';
  */
 const StatCounter = ({ statValue, statLabel, className = "", compact = false, data, page = 'Home', section = 'StatsSection' }) => {
     const props = resolveInstanceProps(page, `${section}/StatCounter`, { statValue, statLabel }, data);
-    const [count, setCount] = useState(0);
+    const safeVal = String(props.statValue || '0');
+    const target = parseInt(safeVal.replace(/\D/g, '')) || 0;
+    const countDown = target === 0;
+    const startFrom = countDown ? 50 : 0;
+
+    const [count, setCount] = useState(startFrom);
     const countRef = useRef(null);
     const hasAnimated = useRef(false);
+    const animFrameRef = useRef(null);
 
     useEffect(() => {
+        setCount(startFrom);
+        hasAnimated.current = false;
+    }, [startFrom]);
+
+    useEffect(() => {
+        // Cancel any running animation when deps change
+        if (animFrameRef.current) {
+            cancelAnimationFrame(animFrameRef.current);
+            animFrameRef.current = null;
+        }
+        hasAnimated.current = false;
+
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !hasAnimated.current) {
-                const safeVal = String(props.statValue || '0');
-                const target = parseInt(safeVal.replace(/\D/g, '')) || 0;
-                
-                if (target > 0) {
-                    hasAnimated.current = true;
+                const el = countRef.current;
+                const isVisible = el && getComputedStyle(el.closest('.soft-entrance-item') || el).opacity !== '0';
+
+                if (!isVisible) {
+                    const retryInterval = setInterval(() => {
+                        const nowVisible = el && getComputedStyle(el.closest('.soft-entrance-item') || el).opacity !== '0';
+                        if (nowVisible && !hasAnimated.current) {
+                            clearInterval(retryInterval);
+                            startAnimation();
+                        }
+                    }, 100);
+                    setTimeout(() => clearInterval(retryInterval), 5000);
+                    return;
                 }
 
-                const duration = 2000;
-                let startTime = null;
-
-                const animate = (timestamp) => {
-                    if (!startTime) startTime = timestamp;
-                    const progress = Math.min((timestamp - startTime) / duration, 1);
-                    setCount(Math.floor(progress * target));
-                    if (progress < 1) requestAnimationFrame(animate);
-                    else setCount(target);
-                };
-                requestAnimationFrame(animate);
+                startAnimation();
             }
-        }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
+        }, { threshold: 0.05, rootMargin: '0px 0px -5% 0px' });
+
+        function startAnimation() {
+            hasAnimated.current = true;
+            const duration = 2000;
+            let startTime = null;
+
+            const animate = (timestamp) => {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+
+                if (countDown) {
+                    setCount(Math.round(startFrom - eased * startFrom));
+                } else {
+                    setCount(Math.floor(eased * target));
+                }
+
+                if (progress < 1) {
+                    animFrameRef.current = requestAnimationFrame(animate);
+                } else {
+                    setCount(target);
+                    animFrameRef.current = null;
+                }
+            };
+            animFrameRef.current = requestAnimationFrame(animate);
+        }
 
         if (countRef.current) observer.observe(countRef.current);
-        return () => observer.disconnect();
-    }, [props.statValue]);
+        return () => {
+            observer.disconnect();
+            if (animFrameRef.current) {
+                cancelAnimationFrame(animFrameRef.current);
+            }
+        };
+    }, [target, startFrom, countDown]);
 
     const safeValStr = String(props.statValue || '');
     const suffix = safeValStr.includes('+') ? '+' : safeValStr.includes('%') ? '%' : '';
 
-    if (!props.statValue && !props.statLabel) return null;
+    const hasContent = props.statValue || props.statLabel;
 
     return (
-        <div ref={countRef} className={`text-center px-2 md:px-3 font-sans ${className}`}>
+        <div ref={countRef} className={`text-center px-2 md:px-3 font-sans ${className}`} style={hasContent ? undefined : { visibility: 'hidden' }}>
             <div 
                 className={`${compact ? 'text-[2.35rem] md:text-[3rem] mb-1' : 'text-4xl md:text-5xl mb-2'} font-serif text-primary leading-none tabular-nums`}
                 style={{ minHeight: compact ? '2.5rem' : '3.5rem' }}

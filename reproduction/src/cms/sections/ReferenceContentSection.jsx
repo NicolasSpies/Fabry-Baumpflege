@@ -34,9 +34,8 @@ const ReferenceContentSection = ({
             {hasBeforeAfter && (
                 <div className="mt-16">
                     <div className="relative w-full aspect-square md:aspect-[16/10] overflow-hidden rounded-3xl no-select group shadow-2xl bg-slate-100 dark:bg-slate-800">
-                        {/* Placeholder/Skeleton while images load */}
                         {(!beforeImage && !afterImage) && (
-                            <div className="absolute inset-0 flex items-center justify-center animate-pulse">
+                            <div className="absolute inset-0 flex items-center justify-center">
                                 <Icon name="image" className="text-4xl text-slate-200 dark:text-slate-700" />
                             </div>
                         )}

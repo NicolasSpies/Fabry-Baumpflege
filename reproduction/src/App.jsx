@@ -1,8 +1,8 @@
-import React, { lazy, Suspense, useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React, { lazy, Suspense, useState, useEffect, useCallback } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from '@/cms/components/ui/Navbar';
 import Footer from '@/cms/components/ui/Footer';
-import PageSkeleton from '@/cms/components/ui/PageSkeleton';
+import PageLoader from '@/cms/components/ui/PageLoader';
 import ScrollToTop from '@/cms/components/ui/ScrollToTop';
 import { ROUTES } from '@/cms/i18n/routes';
 import { useLanguage } from '@/cms/i18n/useLanguage';
@@ -47,6 +47,11 @@ export const previewData = definePreview({
 
 function App() {
   const { language, setGlobalCmsData, setGlobalSeo } = useLanguage();
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [globalReady, setGlobalReady] = useState(false);
+  const handleLoaderComplete = useCallback(() => setInitialLoading(false), []);
+  const location = useLocation();
+  const isHome = location.pathname === '/' || location.pathname === '/fr' || location.pathname === '/fr/';
   const [globalData, setGlobalData] = useState({
     navbar: {
       ctaLabel: language === 'FR' ? 'Contact' : 'Kontakt'
@@ -86,6 +91,7 @@ function App() {
         setGlobalCmsData(options);
         setGlobalSeo(seo);
         setBridgeGlobalData(options);
+        setGlobalReady(true);
       } catch (err) {
         console.error('[App] Global load failed:', err);
       }
@@ -100,11 +106,12 @@ function App() {
 
   return (
     <>
+      {initialLoading && <PageLoader ready={globalReady} onComplete={handleLoaderComplete} fullScreen={isHome} />}
       <ScrollToTop />
         <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
         <Navbar {...getShellProps('Navbar', globalData.navbar)} />
         <div className="flex-1 flex flex-col">
-          <Suspense fallback={<PageSkeleton />}>
+          <Suspense fallback={<div className="flex-1" />}>
             <Routes>
               {/* German Routes */}
               <Route path={ROUTES.DE.home} element={<Home />} />

@@ -345,7 +345,7 @@ const References = () => {
                         {isLoading && filteredRefs.length === 0 ? (
                             // Stable Skeleton Grid - Updated for overlay style
                             [...Array(6)].map((_, i) => (
-                                <div key={`skeleton-${i}`} className="aspect-square rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+                                <div key={`skeleton-${i}`} className="aspect-square rounded-2xl" />
                             ))
                         ) : (
                             visibleRefs.map((project, index) => (
