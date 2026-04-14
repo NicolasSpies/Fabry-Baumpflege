@@ -216,7 +216,13 @@ const Home = () => {
                         servicesPage
                     );
                     
-                    setPageData(prev => ({ ...prev, ...mappedWithServices }));
+                    setPageData(prev => ({
+                        ...prev,
+                        ...mappedWithServices,
+                        // Preserve already-loaded items from deferred effect
+                        references: { ...mappedWithServices.references, items: prev.references.items },
+                        testimonials: { ...mappedWithServices.testimonials, items: prev.testimonials.items },
+                    }));
 
                     if (page.cc_alternates || page.pll_translations) {
                         setAlternates(page.cc_alternates || page.pll_translations);
