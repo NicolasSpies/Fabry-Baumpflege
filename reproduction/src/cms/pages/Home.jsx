@@ -264,6 +264,8 @@ const Home = () => {
         async function loadDeferredContent() {
             try {
                 setRefsLoading(true);
+                await awaitMappings();
+                if (cancelled) return;
                 const [rawRefs, rawTestimonials] = await Promise.all([
                     getLatestReferences(3, language),
                     getTestimonials(language)
