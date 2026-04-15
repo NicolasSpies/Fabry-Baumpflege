@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
 import { getPage, getHomeStats, mapPageContent, PAGE_IDS, getSSRData } from '@/cms/lib/cms';
@@ -97,17 +97,6 @@ const Services = () => {
     const [rawPage, setRawPage] = useState(() => getSSRData()?.page || null);
     const [hydratedProps, setHydratedProps] = useState({});
     useScrollReveal([rawPage, statsCmsData]);
-
-    // Guard to prevent initial state Wipeout during hydration
-    const isFirstMount = useRef(true);
-    useEffect(() => {
-        if (isFirstMount.current) {
-            isFirstMount.current = false;
-            return;
-        }
-        setPageData(getInitialContent());
-        setStatsCmsData(null);
-    }, [language, t]);
 
     // ─── 1. Content Fetching ───
     useEffect(() => {

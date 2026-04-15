@@ -63,10 +63,6 @@ const Contact = () => {
     useScrollReveal([rawPage, formSchema]);
 
     useEffect(() => {
-        setPageData(getInitialContent());
-    }, [language, t]);
-
-    useEffect(() => {
         let cancelled = false;
         async function loadContent() {
             try {

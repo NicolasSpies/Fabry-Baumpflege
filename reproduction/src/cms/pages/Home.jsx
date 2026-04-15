@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { getLocalizedPath } from '@/cms/i18n/routes';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
@@ -181,16 +181,6 @@ const Home = () => {
     const [hydratedProps, setHydratedProps] = useState({});
     const [mappingsReady, setMappingsReady] = useState(false);
     useScrollReveal([rawPage, pageData.references.items.length, pageData.testimonials.items.length]);
-
-    // Guard to prevent initial state Wipeout during hydration
-    const isFirstMount = useRef(true);
-    useEffect(() => {
-        if (isFirstMount.current) {
-            isFirstMount.current = false;
-            return;
-        }
-        setPageData(getInitialContent());
-    }, [language, t]);
 
     // Fetch CMS content and latest references
     useEffect(() => {

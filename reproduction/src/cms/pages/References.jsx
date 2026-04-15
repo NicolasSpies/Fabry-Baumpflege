@@ -65,10 +65,6 @@ const References = () => {
     useEffect(() => { setActiveCatId(null); }, [language]);
 
     useEffect(() => {
-        setPageData(getInitialContent());
-    }, [language, t]);
-
-    useEffect(() => {
         let cancelled = false;
         async function loadCollection() {
             try {
