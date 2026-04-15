@@ -164,7 +164,7 @@ function App() {
             </Routes>
           </Suspense>
         </div>
-        <footer className={`transition-opacity duration-300 ${pageVisible || initialLoading ? 'opacity-100' : 'opacity-0'}`}>
+        <footer>
           <Footer {...getShellProps('Footer', globalData.footer)} />
         </footer>
       </div>

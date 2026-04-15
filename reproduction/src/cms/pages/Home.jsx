@@ -10,13 +10,12 @@ import HeroSection from '@/cms/sections/HeroSection';
 import StatsSection from '@/cms/sections/StatsSection';
 import HomeIntroSection from '@/cms/sections/HomeIntroSection';
 import ServicesSection from '@/cms/sections/ServicesSection';
-const ReferencesSection = React.lazy(() => import('@/cms/sections/ReferencesSection'));
-const TestimonialsSection = React.lazy(() => import('@/cms/sections/TestimonialsSection'));
-const AboutSection = React.lazy(() => import('@/cms/sections/AboutSection'));
+import ReferencesSection from '@/cms/sections/ReferencesSection';
+import TestimonialsSection from '@/cms/sections/TestimonialsSection';
+import AboutSection from '@/cms/sections/AboutSection';
 
 import { resolveInstanceProps, resolveInstancePropsAsync, awaitMappings } from '@/cms/bridge-resolver';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
-import { Suspense } from 'react';
 
 
 
@@ -377,29 +376,23 @@ const Home = () => {
             />
 
             {/* Page: Home → Section: ReferencesSection */}
-            <Suspense fallback={<div style={{ minHeight: '680px' }} />}>
-                <ReferencesSection
-                    {...getProps('ReferencesSection', pageData.references)}
-                    language={language}
-                    allRefsHref={getLocalizedPath('references', language)}
-                    isLoading={refsLoading}
-                />
-            </Suspense>
+            <ReferencesSection
+                {...getProps('ReferencesSection', pageData.references)}
+                language={language}
+                allRefsHref={getLocalizedPath('references', language)}
+                isLoading={refsLoading}
+            />
 
             {/* Page: Home → Section: TestimonialsSection */}
-            <Suspense fallback={<div style={{ minHeight: '600px' }} />}>
-                <TestimonialsSection
-                    {...getProps('TestimonialsSection', pageData.testimonials)}
-                    language={language}
-                />
-            </Suspense>
+            <TestimonialsSection
+                {...getProps('TestimonialsSection', pageData.testimonials)}
+                language={language}
+            />
 
             {/* Page: Home → Section: AboutSection */}
-            <Suspense fallback={<div style={{ minHeight: '600px' }} />}>
-                <AboutSection
-                    {...getProps('AboutSection', pageData.about)}
-                />
-            </Suspense>
+            <AboutSection
+                {...getProps('AboutSection', pageData.about)}
+            />
         </main>
     );
 };
