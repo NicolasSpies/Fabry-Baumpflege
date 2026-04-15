@@ -281,7 +281,7 @@ const Home = () => {
 
                 // Map references and resolve their media IDs
                 const mappedRefs = await Promise.all((rawRefs || []).map(async (item) => {
-                    const mapped = mapReferenceCard(item);
+                    const mapped = mapReferenceCard(item, {}, language);
                     if (!mapped) return null;
                     const resolvedThumbnail = await resolveMedia(mapped.thumbnailImage);
                     return { ...mapped, thumbnailImage: resolvedThumbnail || mapped.thumbnailImage, data: item };

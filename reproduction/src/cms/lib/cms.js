@@ -23,6 +23,33 @@ export const PAGE_IDS = {
     privacy: 3,
 };
 
+// ─── Taxonomy translation fallback (DE ↔ FR) ────────────────────────────────
+// When a reference has no FR translation, the DE category name is used.
+// This map provides a FR fallback for each known DE taxonomy term.
+const TAXONOMY_TRANSLATIONS = {
+    de: {
+        'Baumpflege': 'Baumpflege',
+        'Baumfällung': 'Baumfällung',
+        'Gartenpflege': 'Gartenpflege',
+        'Bepflanzung': 'Bepflanzung',
+    },
+    fr: {
+        'Baumpflege': "Entretien d'arbres",
+        'Baumfällung': 'Abattage',
+        'Gartenpflege': 'Entretien de jardin',
+        'Bepflanzung': 'Plantation',
+    },
+};
+
+/**
+ * Translate a taxonomy/category name to the target language.
+ * Returns the original name if no translation is found.
+ */
+export function translateTaxonomy(name, language = 'DE') {
+    const langKey = language.toLowerCase();
+    return TAXONOMY_TRANSLATIONS[langKey]?.[name] || name;
+}
+
 const CMS_CACHE_TTL_MS = import.meta.env.DEV ? 2000 : 5 * 60 * 1000;
 const cmsResponseCache = new Map();
 const cmsInflightCache = new Map();
@@ -1071,7 +1098,7 @@ export async function getReferenceCategories(language = 'DE') {
  * Map a raw CMS reference item to the shape expected by ReferenceCard.
  * Supports both nested WP-REST (item.title.rendered) and flat Content-Core (item.title) structures.
  */
-export function mapReferenceCard(item, catMap = {}) {
+export function mapReferenceCard(item, catMap = {}, language = 'DE') {
     if (!item) return null;
     
     const cf = item.customFields || item.acf || item.meta || {};
@@ -1108,7 +1135,9 @@ export function mapReferenceCard(item, catMap = {}) {
     categoryObjects.forEach(c => {
         if (c.name && !seenNames.has(c.name)) {
             seenNames.add(c.name);
-            uniqueCats.push(c);
+            // Apply language fallback translation for taxonomy names
+            const translatedName = translateTaxonomy(c.name, language);
+            uniqueCats.push({ ...c, name: translatedName, originalName: c.name });
         }
     });
 

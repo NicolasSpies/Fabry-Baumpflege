@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { ROUTES } from '@/cms/i18n/routes';
-import { getReference, getReferenceCore, getTermsByIds, resolveMedia, decodeHtmlEntities } from '@/cms/lib/cms';
+import { getReference, getReferenceCore, getTermsByIds, resolveMedia, decodeHtmlEntities, translateTaxonomy } from '@/cms/lib/cms';
 
 import { resolveInstanceProps, resolveInstancePropsAsync } from '@/cms/bridge-resolver';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
@@ -204,6 +204,8 @@ const ReferenceDetail = () => {
                     const rawCatArray = Array.isArray(rawCatData) ? rawCatData : [rawCatData].filter(Boolean);
                     catNames = rawCatArray.map(c => (typeof c === 'object' && c !== null ? c.name : c)).filter(Boolean);
                 }
+                // Apply language fallback for taxonomy names (e.g. "Baumpflege" → "Entretien d'arbres" on FR)
+                catNames = catNames.map(name => translateTaxonomy(name, language));
 
                 // ─── Format Localized Date ───────────────────────────────────────────
                 // Pass the raw date string to the sidebar for formatting

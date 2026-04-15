@@ -124,7 +124,7 @@ const References = () => {
                 const mappedRefs = await Promise.all((Array.isArray(rawRefs) ? rawRefs : []).map(async (item) => {
                     if (!item) return null;
                     try {
-                        const baseMapped = mapReferenceCard(item, catMap);
+                        const baseMapped = mapReferenceCard(item, catMap, language);
                         // Explicitly resolve thumbnail if it's an ID
                         const resolvedThumbnail = await resolveMedia(baseMapped.thumbnailImage);
                         return { 
