@@ -49,8 +49,7 @@ export const previewData = definePreview({
 function App() {
   const { language, setGlobalCmsData, setGlobalSeo, pageReady } = useLanguage();
   const hasSeenLoader = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('loaderSeen');
-  const isBot = typeof navigator !== 'undefined' && navigator.webdriver;
-  const [initialLoading, setInitialLoading] = useState(!hasSeenLoader && !isBot);
+  const [initialLoading, setInitialLoading] = useState(!hasSeenLoader);
   const [globalReady, setGlobalReady] = useState(false);
   const handleLoaderComplete = useCallback(() => {
     setInitialLoading(false);
@@ -127,7 +126,7 @@ function App() {
     <>
       {initialLoading && <PageLoader ready={globalReady && pageReady} onComplete={handleLoaderComplete} fullScreen={isHome} />}
       <ScrollToTop />
-        <div className={`min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans transition-[colors,opacity] duration-300 ${initialLoading ? 'opacity-0' : 'opacity-100'} ${pageVisible ? 'page-visible' : ''}`}>
+        <div className={`min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans transition-[colors,opacity] duration-300 opacity-100 ${pageVisible ? 'page-visible' : ''}`}>
         <Navbar {...getShellProps('Navbar', globalData.navbar)} />
         <div className="flex-1 flex flex-col relative">
           {/* Light overlay during SPA page transitions */}
