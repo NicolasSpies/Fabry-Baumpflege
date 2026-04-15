@@ -170,10 +170,8 @@ const ReferenceDetail = () => {
                         sidebar: getLocalContent().sidebar,
                         content: getLocalContent().content
                     });
-                } else {
-                    setProject(null);
                 }
-                setRawProject(null);
+                // Keep old project data visible until new data arrives (no flash)
 
                 // Phase 1: Core Fetch (Hero, Title, Meta) - no expensive _embed=1 yet
                 const ref = await getReferenceCore(slug, language, controller.signal);
