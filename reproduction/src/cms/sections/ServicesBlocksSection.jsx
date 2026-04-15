@@ -23,7 +23,7 @@ const ServiceImage = ({ src, alt, priority = false }) => {
             alt={alt}
             size="768"
             className="w-full h-full object-cover"
-            sizes="(max-width: 768px) 85vw, 33vw"
+            sizes="(max-width: 768px) 85vw, (max-width: 1024px) 45vw, 40vw"
             loading={priority ? "eager" : "lazy"}
             fetchPriority={priority ? "high" : "low"}
             maxWidth={768}
@@ -53,14 +53,14 @@ const ServiceBlockInternal = ({ id, title, description, list, image, reverse, to
         >
             <div className="max-w-7xl mx-auto">
                 <div
-                    className={`flex flex-col lg:flex-row items-start lg:items-center gap-8 md:gap-16 lg:gap-20 rounded-[1.75rem] md:rounded-none px-4 py-4 md:p-0 ${mobilePanelClass} md:bg-transparent md:border-0 md:shadow-none ${reverse ? 'lg:flex-row-reverse' : ''}`}
+                    className={`flex flex-col md:flex-row items-start md:items-center gap-8 md:gap-10 lg:gap-20 rounded-[1.75rem] md:rounded-none px-4 py-4 md:p-0 ${mobilePanelClass} md:bg-transparent md:border-0 md:shadow-none ${reverse ? 'md:flex-row-reverse' : ''}`}
                 >
-                    <div className="w-full lg:w-1/2">
+                    <div className="w-full md:w-1/2">
                         <div className="relative rounded-[1.35rem] md:rounded-xl overflow-hidden shadow-md md:shadow-2xl reveal h-[17.5rem] sm:h-[21rem] md:h-[500px]">
                             <ServiceImage src={image} alt={title} priority={isFirst} />
                         </div>
                     </div>
-                    <div className="w-full lg:w-1/2 space-y-4 md:space-y-8 lg:space-y-10 reveal stagger-1">
+                    <div className="w-full md:w-1/2 space-y-4 md:space-y-8 lg:space-y-10 reveal stagger-1">
                         <div className="space-y-5 md:space-y-6 lg:space-y-7">
                             <div className="flex items-center gap-3 md:gap-4">
                                 <div className="shrink-0 [&>svg]:w-10 [&>svg]:h-10 md:[&>svg]:w-11 md:[&>svg]:h-11 lg:[&>svg]:w-12 lg:[&>svg]:h-12">

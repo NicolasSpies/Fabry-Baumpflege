@@ -17,7 +17,7 @@ const ValuesSection = ({
     return (
         <section className="pt-12 pb-20 md:py-24 lg:py-32 px-6">
             <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
                     <ValueItem 
                         title={val1_title} 
                         text={val1_text} 

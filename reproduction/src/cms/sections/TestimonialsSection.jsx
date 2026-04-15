@@ -89,7 +89,7 @@ const TestimonialsSection = ({
 
     // Initialize mobile scroll to middle set (without animation)
     useEffect(() => {
-        if (items.length > 1 && scrollRef.current && window.innerWidth < 768) {
+        if (items.length > 1 && scrollRef.current && window.innerWidth < 1024) {
             const container = scrollRef.current;
             const card = container.querySelector('[data-testimonial-card]');
             if (!card) return;
@@ -105,7 +105,7 @@ const TestimonialsSection = ({
     // ── Desktop Marquee Logic ────────────────────────────────────────────────
     useEffect(() => {
         const track = trackRef.current;
-        if (!track || items.length <= 1 || typeof window === 'undefined' || window.innerWidth < 768) return undefined;
+        if (!track || items.length <= 1 || typeof window === 'undefined' || window.innerWidth < 1024) return undefined;
         if (!isInView || !isPageVisible) return undefined;
 
         let rafId = null;
@@ -134,7 +134,7 @@ const TestimonialsSection = ({
 
     // ── Mobile Slider Auto-Advance ───────────────────────────────────────────
     useEffect(() => {
-        if (!items.length || typeof window === 'undefined' || window.innerWidth >= 768) return undefined;
+        if (!items.length || typeof window === 'undefined' || window.innerWidth >= 1024) return undefined;
         
         const interval = setInterval(() => {
             if (!scrollRef.current) return;
@@ -189,13 +189,13 @@ const TestimonialsSection = ({
             <div className="max-w-7xl mx-auto px-6 mb-12 md:mb-16">
                 <div className="text-center space-y-4">
                     <span className="text-accent-label font-bold tracking-widest uppercase text-xs block">{renderCmsInline(label)}</span>
-                    <h2 className="text-4xl md:text-5xl font-serif text-primary reveal leading-[1.2]">{renderCmsInline(title)}</h2>
+                    <h2 className="text-4xl md:text-[2.75rem] lg:text-5xl font-serif text-primary reveal leading-[1.2]">{renderCmsInline(title)}</h2>
                 </div>
             </div>
 
-            {/* Desktop Marquee */}
-            <div className="hidden md:block relative overflow-hidden">
-                <div ref={trackRef} className="flex gap-8 px-8 w-max items-stretch pb-4 will-change-transform">
+            {/* Desktop Marquee (lg+ only — tablets use slider for touch UX) */}
+            <div className="hidden lg:block relative overflow-hidden">
+                <div ref={trackRef} className="flex gap-8 px-8 w-max items-center pb-4 will-change-transform">
                     {displayItems.map((tm, idx) => (
                         <TestimonialCard
                             key={idx}
@@ -210,12 +210,12 @@ const TestimonialsSection = ({
                 </div>
             </div>
 
-            {/* Mobile Slider */}
-            <div className="md:hidden relative">
+            {/* Mobile + Tablet Slider */}
+            <div className="lg:hidden relative">
                 <div 
                     ref={scrollRef}
                     onScroll={handleMobileScroll}
-                    className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar px-[12vw] gap-4 pb-12 cursor-grab active:cursor-grabbing"
+                    className="flex items-center overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar px-[12vw] gap-4 pb-12 cursor-grab active:cursor-grabbing"
                 >
                     {displayItems.map((tm, idx) => (
                         <div key={idx} className="snap-center">

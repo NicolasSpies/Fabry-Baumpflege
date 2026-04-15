@@ -116,7 +116,7 @@ const AboutMe = () => {
     };
 
     return (
-        <main className="pt-24 md:pt-32 lg:pt-0">
+        <main className="pt-24 md:pt-28 lg:pt-0">
             {/* Page: AboutMe → Section: PhilosophySection */}
             <PhilosophySection 
                 {...getProps('PhilosophySection', pageData.philosophy)} 

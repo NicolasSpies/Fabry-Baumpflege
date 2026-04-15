@@ -51,7 +51,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
     const isExternalCta = isExternalHref(ctaHref);
 
     return (
-        <section className="relative h-[580px] md:h-screen w-full overflow-hidden flex items-center">
+        <section className="relative h-[580px] md:h-[75vh] lg:h-screen w-full overflow-hidden flex items-center">
             <div className="absolute inset-0 z-0">
                 <CmsImage
                     image={image}
@@ -75,11 +75,11 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
                             {renderCmsInline(title_top)}
                         </span>
                         {' '}
-                        <span className="block text-[3.25rem] md:text-[5rem] lg:text-[6.5rem] font-bold tracking-tight">
+                        <span className="block text-[3.25rem] md:text-[4rem] lg:text-[5rem] xl:text-[6.5rem] font-bold tracking-tight">
                             {renderCmsInline(title_main)}
                         </span>
                     </h1>
-                    <p className="text-[0.875rem] md:text-base text-white/75 font-sans font-normal max-w-[250px] md:max-w-md leading-[1.5] md:leading-relaxed hero-enter hero-enter-2">
+                    <p className="text-[0.875rem] md:text-[0.9375rem] lg:text-base text-white/75 font-sans font-normal max-w-[250px] md:max-w-sm lg:max-w-md leading-[1.5] md:leading-relaxed hero-enter hero-enter-2">
                         {renderTextWithBreaks(description)}
                     </p>
                     <div className="hidden md:block pt-4 hero-enter hero-enter-3">

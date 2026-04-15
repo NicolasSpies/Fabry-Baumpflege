@@ -79,7 +79,7 @@ const HomeIntroSection = ({
                 <div className="max-w-[72rem] mx-auto">
                     {title && (
                         <div className="soft-entrance-item mb-12 md:mb-16 text-center">
-                            <h2 className="text-4xl md:text-5xl font-serif text-primary leading-[1.15] md:leading-tight reveal">
+                            <h2 className="text-4xl md:text-[2.75rem] lg:text-5xl font-serif text-primary leading-[1.15] md:leading-tight reveal">
                                 {renderCmsInline(title)}
                             </h2>
                         </div>

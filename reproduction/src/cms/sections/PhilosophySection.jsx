@@ -23,16 +23,16 @@ const PhilosophySection = ({
 
     return (
         <section className="relative lg:min-h-screen flex items-center py-10 md:py-20 lg:py-0 lg:pt-24 px-6 overflow-hidden bg-background-light dark:bg-background-dark">
-            <div ref={sectionRef} className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-16 lg:gap-20 items-center w-full">
-                <div className="relative order-2 lg:order-1 soft-entrance-item">
-                    <div className="relative z-10 rounded-xl overflow-hidden shadow-sm md:shadow-2xl aspect-square sm:h-[21rem] md:aspect-auto md:h-[min(78vw,32rem)] lg:h-[38rem]">
+            <div ref={sectionRef} className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 lg:gap-20 items-center w-full">
+                <div className="relative order-2 md:order-1 soft-entrance-item">
+                    <div className="relative z-10 rounded-xl overflow-hidden shadow-sm md:shadow-2xl aspect-square md:aspect-auto md:h-[28rem] lg:h-[38rem]">
                         <CmsImage
                             image={image}
                             ref={heroPortraitRef}
                             alt=""
                             size="768"
                             className="w-full h-full object-cover"
-                            sizes="(max-width: 768px) 85vw, 33vw"
+                            sizes="(max-width: 768px) 85vw, (max-width: 1024px) 45vw, 40vw"
                             loading="eager"
                             fetchPriority="high"
                             style={{ transition: 'none' }}
@@ -40,8 +40,8 @@ const PhilosophySection = ({
                     </div>
                     <div className="absolute -top-10 -left-10 hidden md:block w-40 h-40 bg-primary/10 rounded-full blur-3xl -z-10" />
                 </div>
-                <div className="text-left order-1 lg:order-2 soft-entrance-item">
-                    <h1 className="text-[2.1rem] sm:text-5xl lg:text-6xl font-serif text-primary mb-5 md:mb-12 leading-[1.02] italic">
+                <div className="text-left order-1 md:order-2 soft-entrance-item">
+                    <h1 className="text-[2.1rem] sm:text-5xl md:text-[2.5rem] lg:text-6xl font-serif text-primary mb-5 md:mb-8 lg:mb-12 leading-[1.02] italic">
                         <CmsText text={quote} className="space-y-2" paragraphClassName="leading-[1.02]" />
                     </h1>
                     <CmsText

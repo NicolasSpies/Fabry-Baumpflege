@@ -255,7 +255,7 @@ const References = () => {
             {/* Page: References → Section: ReferencesHeaderSection */}
             <section className="pt-6 md:pt-8 pb-6 md:pb-8 px-4 md:px-6 text-center">
                 <div className="max-w-7xl mx-auto space-y-6">
-                    <h1 className="text-4xl md:text-5xl font-serif text-primary mb-4 hero-enter hero-enter-1">
+                    <h1 className="text-4xl md:text-[2.75rem] lg:text-5xl font-serif text-primary mb-4 hero-enter hero-enter-1">
                         {t('nav.references')}
                     </h1>
                     <div className={`min-h-[2em] hero-enter hero-enter-2 ${headerProps?.intro ? '' : 'invisible'}`}>
@@ -271,7 +271,7 @@ const References = () => {
             {/* Page: References → Section: ReferencesCategoryFilter */}
             <section className="relative z-10 bg-background-light dark:bg-background-dark border-y border-slate-100 dark:border-slate-800 py-3 md:py-4 min-h-[52px] md:min-h-[56px]">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex flex-wrap items-center justify-center gap-2 md:gap-8 px-4 md:px-6">
+                    <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 lg:gap-8 px-4 md:px-6">
                         <button
                             onClick={() => setActiveCatId(null)}
                             className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-full text-[0.65rem] md:text-sm font-medium uppercase tracking-[0.16em] md:tracking-widest transition-[background-color,color,box-shadow] ${activeCatId === null ? 'bg-[#2a411a] text-white shadow-lg' : 'text-muted-accessible hover:text-primary'}`}
@@ -302,7 +302,7 @@ const References = () => {
                         {isLoading && filteredRefs.length === 0 ? (
                             // Stable Skeleton Grid - matches card aspect ratio
                             [...Array(6)].map((_, i) => (
-                                <div key={`skeleton-${i}`} className="aspect-square md:aspect-[4/5] lg:aspect-square rounded-2xl bg-slate-100" />
+                                <div key={`skeleton-${i}`} className="aspect-square rounded-2xl bg-slate-100" />
                             ))
                         ) : (
                             visibleRefs.map((project, index) => (

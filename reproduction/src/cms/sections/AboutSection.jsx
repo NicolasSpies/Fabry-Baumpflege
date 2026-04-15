@@ -31,10 +31,10 @@ const expertiseImgRef = useRef(null);
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12 md:mb-20 space-y-4">
                     <span className="text-accent-label font-bold tracking-widest uppercase text-xs block">{label}</span>
-                    <h2 className="text-4xl md:text-5xl font-serif text-primary leading-[1.15] md:leading-tight reveal mx-auto max-w-3xl">{title}</h2>
+                    <h2 className="text-4xl md:text-[2.75rem] lg:text-5xl font-serif text-primary leading-[1.15] md:leading-tight reveal mx-auto max-w-3xl">{title}</h2>
                 </div>
-                <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
-                    <div className="w-full lg:w-1/2 relative">
+                <div className="flex flex-col md:flex-row items-center gap-10 md:gap-12 lg:gap-24">
+                    <div className="w-full md:w-1/2 relative">
                         <div className="absolute -top-10 -left-10 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -z-10" />
                         <div className="relative rounded-2xl overflow-hidden shadow-lg md:shadow-2xl group">
                             <CmsImage
@@ -43,7 +43,7 @@ const expertiseImgRef = useRef(null);
                                 alt=""
                                 size="768"
                                 className="w-full aspect-square object-cover"
-                                sizes="(max-width: 768px) 85vw, 33vw"
+                                sizes="(max-width: 768px) 85vw, (max-width: 1024px) 70vw, 40vw"
                                 loading="lazy"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent p-10 flex items-end">
@@ -53,7 +53,7 @@ const expertiseImgRef = useRef(null);
                             </div>
                         </div>
                     </div>
-                    <div className="w-full lg:w-1/2 space-y-8">
+                    <div className="w-full md:w-1/2 space-y-8">
                         <CmsText
                             text={description}
                             className="space-y-4 text-slate-600 font-sans"

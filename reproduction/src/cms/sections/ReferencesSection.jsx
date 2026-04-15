@@ -24,9 +24,9 @@ const ReferencesSection = ({
             <div className="max-w-7xl mx-auto">
                     <div className="text-center space-y-4 mb-12 md:mb-16">
                         <span className="text-accent-label font-bold tracking-widest uppercase text-xs block">{label}</span>
-                        <h2 className="text-4xl md:text-5xl font-serif text-primary reveal">{title}</h2>
+                        <h2 className="text-4xl md:text-[2.75rem] lg:text-5xl font-serif text-primary reveal">{title}</h2>
                     </div>
-                <div className={`md:hidden -mx-6 px-6 overflow-x-auto scrollbar-hide ${isLoading ? 'min-h-[24rem]' : ''}`}>
+                <div className={`lg:hidden -mx-6 px-6 overflow-x-auto scrollbar-hide ${isLoading ? 'min-h-[24rem]' : ''}`}>
                     <div className="flex gap-4 w-max snap-x snap-mandatory pb-2">
                         {!isLoading && items.map((project, idx) => (
                             <div key={project.id || idx} className="w-[84vw] max-w-[26rem] flex-shrink-0 snap-center">
@@ -44,7 +44,7 @@ const ReferencesSection = ({
                         ))}
                     </div>
                 </div>
-                <div className={`hidden md:grid grid-cols-2 lg:grid-cols-3 gap-8 ${isLoading ? 'min-h-[28rem]' : ''}`}>
+                <div className={`hidden lg:grid lg:grid-cols-3 gap-8 ${isLoading ? 'min-h-[28rem]' : ''}`}>
                     {!isLoading && items.map((project, idx) => (
                         <ReferenceCard 
                             key={project.id || idx} 

@@ -17,8 +17,8 @@ import { resolveInstanceProps } from '@/cms/bridge-resolver';
     useParallax(blockRef, { ...parallaxConfig, scale: 1, desktopOnly: true });
  
     return (
-        <div ref={blockRef} className={`group ${offset ? 'md:mt-24 reveal stagger-1' : ''}`}>
-            <div className="md:hidden space-y-4 rounded-[1.75rem] px-4 py-4 bg-primary/[0.035] border border-slate-100 dark:border-slate-800 shadow-sm">
+        <div ref={blockRef} className={`group ${offset ? 'lg:mt-24 reveal stagger-1' : ''}`}>
+            <div className="lg:hidden space-y-4 rounded-[1.75rem] px-4 py-4 bg-primary/[0.035] border border-slate-100 dark:border-slate-800 shadow-sm">
                 <div className="relative rounded-[1.35rem] overflow-hidden shadow-md h-[17.5rem] sm:h-[21.5rem]">
                     <CmsImage
                         image={props.image}
@@ -40,12 +40,12 @@ import { resolveInstanceProps } from '@/cms/bridge-resolver';
                 </div>
             </div>
 
-            <div className="hidden md:block space-y-6">
+            <div className="hidden lg:block space-y-6">
                 <div className="aspect-[4/5] overflow-hidden rounded-xl bg-slate-100 shadow-xl">
                     <CmsImage
                         image={props.image}
                         alt={props.title}
-                        className="w-full h-full object-cover scale-[1.04] md:grayscale transition-[filter,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] md:group-hover:grayscale-0 md:group-hover:scale-[1.08]"
+                        className="w-full h-full object-cover scale-[1.04] lg:grayscale transition-[filter,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] lg:group-hover:grayscale-0 lg:group-hover:scale-[1.08]"
                         sizes="(max-width: 768px) 100vw, 33vw"
                     />
                 </div>

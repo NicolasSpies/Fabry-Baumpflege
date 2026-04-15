@@ -24,7 +24,7 @@ function renderServiceIcon(icon, iconVariant) {
 const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, iconVariant = 'outline', isActive = false, cardRef = null }) => {
     const isExternal = isExternalHref(href);
     const activeState = isActive
-        ? 'shadow-xl shadow-slate-200/60 -translate-y-2'
+        ? 'shadow-xl shadow-slate-200/60 -translate-y-1 md:-translate-y-2'
         : '';
     const imageState = isActive
         ? 'opacity-10'
@@ -36,7 +36,7 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
         ? 'bg-[#395824] text-white'
         : 'bg-slate-100 dark:bg-slate-800/50 text-[#395824]';
 
-    const cardClassName = `group relative bg-white dark:bg-surface-dark rounded-[2.5rem] p-8 md:p-9 transition-[transform,box-shadow] duration-500 shadow-lg md:shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full md:hover:-translate-y-2 md:hover:shadow-xl md:hover:shadow-slate-200/60 min-h-[18rem] md:min-h-[21rem] md:max-w-[320px] mx-auto ${activeState}`;
+    const cardClassName = `group relative bg-white dark:bg-surface-dark rounded-[2.5rem] p-8 md:p-6 lg:p-9 transition-[transform,box-shadow] duration-500 shadow-lg md:shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full lg:hover:-translate-y-2 lg:hover:shadow-xl lg:hover:shadow-slate-200/60 md:min-h-0 mx-auto ${activeState}`;
 
     const cardInner = (
         <>
@@ -47,24 +47,26 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
                     </div>
                 ) : null}
                 
-                <div className="relative z-10 flex flex-col flex-grow">
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 ${iconContainerState} md:group-hover:bg-[#395824] md:group-hover:text-white`}>
+                <div className="relative z-10 flex flex-row md:flex-col flex-grow gap-4 md:gap-0">
+                    <div className={`w-12 md:w-13 lg:w-14 h-12 md:h-13 lg:h-14 shrink-0 rounded-2xl flex items-center justify-center md:mb-4 lg:mb-4 transition-all duration-300 ${iconContainerState} lg:group-hover:bg-[#395824] lg:group-hover:text-white`}>
                         {renderServiceIcon(icon, iconVariant)}
                     </div>
-                    <h3 className={`text-2xl font-serif text-primary mb-4 transition-colors ${titleState} md:group-hover:text-[#395824]`}>
-                        {renderCmsInline(title)}
-                    </h3>
-                    {description && (
-                        <CmsText
-                            text={description}
-                            className="mb-8 flex-grow space-y-3 text-slate-600 dark:text-slate-400 font-sans"
-                            paragraphClassName="text-[0.9375rem] leading-relaxed"
-                        />
-                    )}
-                    <div className="flex items-center text-accent-label font-bold text-xs tracking-[0.15em] uppercase mt-auto">
-                        <span>
-                            {ctaLabel}
-                        </span>
+                    <div className="flex flex-col flex-grow min-w-0">
+                        <h3 className={`text-xl md:text-xl lg:text-2xl font-serif text-primary mb-1 md:mb-2 lg:mb-3 transition-colors ${titleState} lg:group-hover:text-[#395824]`}>
+                            {renderCmsInline(title)}
+                        </h3>
+                        {description && (
+                            <CmsText
+                                text={description}
+                                className="mb-3 md:mb-3 lg:mb-4 md:flex-grow space-y-2 lg:space-y-3 text-slate-600 dark:text-slate-400 font-sans"
+                                paragraphClassName="text-[0.8125rem] md:text-[0.8125rem] lg:text-[0.9375rem] leading-relaxed"
+                            />
+                        )}
+                        <div className="flex items-center text-accent-label font-bold text-xs tracking-[0.15em] uppercase mt-auto">
+                            <span>
+                                {ctaLabel}
+                            </span>
+                        </div>
                     </div>
                 </div>
         </>
@@ -153,8 +155,8 @@ const ServicesSection = ({
                 setActiveMobileIndex(winnerIndex);
             },
             {
-                threshold: [0.2, 0.35, 0.5, 0.65, 0.8],
-                rootMargin: '-12% 0px -12% 0px',
+                threshold: [0.3, 0.5, 0.7, 0.85, 1.0],
+                rootMargin: '-20% 0px -20% 0px',
             }
         );
 
@@ -173,13 +175,13 @@ const ServicesSection = ({
             ref={sectionRef}
             className="py-24 md:py-32 px-6 bg-white dark:bg-background-dark relative overflow-hidden"
             id="services"
-            style={{ minHeight: '900px' }}
+            style={{ minHeight: '700px' }}
         >
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
             <div className="max-w-6xl mx-auto relative z-10">
                 <div className="text-center mb-16 md:mb-24 space-y-4 soft-entrance-item">
                     <span className="text-accent-label font-bold tracking-widest uppercase text-xs">{renderCmsInline(label)}</span>
-                    <h2 className="text-4xl md:text-5xl font-serif text-primary leading-[1.15] md:leading-tight reveal">{renderCmsInline(title)}</h2>
+                    <h2 className="text-4xl md:text-[2.75rem] lg:text-5xl font-serif text-primary leading-[1.15] md:leading-tight reveal">{renderCmsInline(title)}</h2>
                 </div>
                 <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-6">
                     <div className="soft-entrance-item">
