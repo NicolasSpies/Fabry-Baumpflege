@@ -20,7 +20,7 @@ const ReferencesSection = ({
     const isExternalViewAll = isExternalHref(allRefsHref);
 
     return (
-        <section className="py-24 px-6 bg-primary/[0.035] dark:bg-surface-dark/50 border-y border-slate-100 dark:border-slate-800" id="references-preview">
+        <section className="py-24 px-6 bg-primary/[0.035] dark:bg-surface-dark/50 border-y border-slate-100 dark:border-slate-800" id="references-preview" style={{ minHeight: '680px' }}>
             <div className="max-w-7xl mx-auto">
                     <div className="text-center space-y-4 mb-12 md:mb-16">
                         <span className="text-accent-label font-bold tracking-widest uppercase text-xs block">{label}</span>

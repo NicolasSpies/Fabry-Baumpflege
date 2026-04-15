@@ -377,7 +377,7 @@ const Home = () => {
             />
 
             {/* Page: Home → Section: ReferencesSection */}
-            <Suspense fallback={<div className="h-40" />}>
+            <Suspense fallback={<div style={{ minHeight: '680px' }} />}>
                 <ReferencesSection
                     {...getProps('ReferencesSection', pageData.references)}
                     language={language}
@@ -387,7 +387,7 @@ const Home = () => {
             </Suspense>
 
             {/* Page: Home → Section: TestimonialsSection */}
-            <Suspense fallback={<div className="h-40" />}>
+            <Suspense fallback={<div style={{ minHeight: '600px' }} />}>
                 <TestimonialsSection
                     {...getProps('TestimonialsSection', pageData.testimonials)}
                     language={language}
@@ -395,7 +395,7 @@ const Home = () => {
             </Suspense>
 
             {/* Page: Home → Section: AboutSection */}
-            <Suspense fallback={<div className="h-40" />}>
+            <Suspense fallback={<div style={{ minHeight: '600px' }} />}>
                 <AboutSection
                     {...getProps('AboutSection', pageData.about)}
                 />

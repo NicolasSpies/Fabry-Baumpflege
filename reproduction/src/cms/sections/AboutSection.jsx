@@ -27,7 +27,7 @@ const expertiseImgRef = useRef(null);
     const isExternalCta = isExternalHref(ctaHref);
 
     return (
-        <section className="py-24 px-6 overflow-hidden bg-white dark:bg-surface-dark/50" id="about">
+        <section className="py-24 px-6 overflow-hidden bg-white dark:bg-surface-dark/50" id="about" style={{ minHeight: '600px' }}>
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12 md:mb-20 space-y-4">
                     <span className="text-accent-label font-bold tracking-widest uppercase text-xs block">{label}</span>

@@ -26,7 +26,8 @@
 
 # Immutable cache for hashed assets in /assets/ directory
 <IfModule mod_headers.c>
-  <FilesMatch "^assets/.+\.[a-f0-9]{8,}\.(js|css|woff2?)$">
+  # Vite hashed filenames: index-DRLhjmOc.js, style-abc12345.css, etc.
+  <FilesMatch "\-[a-zA-Z0-9_]{6,}\.(js|css|woff2?)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 

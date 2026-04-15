@@ -200,6 +200,7 @@ const Navbar = ({
                         src={logo}
                         width="130"
                         height="64"
+                        fetchpriority="high"
                         style={{ aspectRatio: '130 / 64' }}
                     />
                 </Link>
