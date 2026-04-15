@@ -85,25 +85,10 @@ export const useSoftEntrance = (ref, options = {}) => {
             return observer;
         };
 
-        let activeObserver = null;
-        let mutObs = null;
-
-        if (document.querySelector('.page-visible')) {
-            activeObserver = startObserving();
-        } else {
-            mutObs = new MutationObserver(() => {
-                if (document.querySelector('.page-visible')) {
-                    mutObs.disconnect();
-                    mutObs = null;
-                    activeObserver = startObserving();
-                }
-            });
-            mutObs.observe(document.documentElement, { attributes: true, subtree: true, attributeFilter: ['class'] });
-        }
+        const activeObserver = startObserving();
 
         return () => {
             if (activeObserver) activeObserver.disconnect();
-            if (mutObs) mutObs.disconnect();
         };
     }, [ref, threshold, staggerDelayMs, itemSelector, durationMs, easing]);
 };

@@ -39,7 +39,7 @@ const PageHeroSection = ({ title, image }) => {
                 onError={() => setIsImageReady(true)}
             />
             <div className={`absolute inset-0 bg-black/30 transition-opacity duration-500 ${isImageReady ? 'opacity-100' : 'opacity-0'}`} />
-            <div className={`relative z-10 text-center reveal transition-[opacity,transform] duration-500 ${isImageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'}`}>
+            <div className={`relative z-10 text-center reveal transition-opacity duration-500 ${isImageReady ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
                 <h1 className="text-4xl md:text-7xl font-serif text-white">{renderCmsInline(title)}</h1>
             </div>
         </section>
