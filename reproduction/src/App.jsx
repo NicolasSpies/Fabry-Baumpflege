@@ -49,7 +49,8 @@ export const previewData = definePreview({
 function App() {
   const { language, setGlobalCmsData, setGlobalSeo, pageReady } = useLanguage();
   const hasSeenLoader = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('loaderSeen');
-  const [initialLoading, setInitialLoading] = useState(!hasSeenLoader);
+  const isBot = typeof navigator !== 'undefined' && navigator.webdriver;
+  const [initialLoading, setInitialLoading] = useState(!hasSeenLoader && !isBot);
   const [globalReady, setGlobalReady] = useState(false);
   const handleLoaderComplete = useCallback(() => {
     setInitialLoading(false);
