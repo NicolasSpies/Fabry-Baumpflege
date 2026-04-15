@@ -896,6 +896,21 @@ export async function getReferenceCore(idOrSlug, language = 'DE', signal = null)
     const slugQuery = `?slug=${encodeURIComponent(idOrSlug)}&fields=${fields}`;
     const result = await fetchReferencesFromCMS(slugQuery, language, signal);
     if (Array.isArray(result) && result.length > 0) return result[0];
+
+    // Fallback: if no result in target language, try the default language (DE).
+    // This ensures untranslated references are still accessible on FR routes.
+    if (language !== 'DE') {
+        const fallbackCached = findCachedReference(idOrSlug, 'DE');
+        if (fallbackCached) return fallbackCached;
+
+        if (typeof idOrSlug === 'number' || /^\d+$/.test(String(idOrSlug))) {
+            const fbResult = await fetchReferencesFromCMS(`/${idOrSlug}${query}`, 'DE', signal, true);
+            if (fbResult && !Array.isArray(fbResult)) return fbResult;
+        }
+        const fbSlugResult = await fetchReferencesFromCMS(slugQuery, 'DE', signal);
+        if (Array.isArray(fbSlugResult) && fbSlugResult.length > 0) return fbSlugResult[0];
+    }
+
     return null;
 }
 
@@ -920,7 +935,16 @@ export async function getReference(idOrSlug, language = 'DE', signal = null) {
         if (result && !Array.isArray(result)) return result;
     }
     // Slug fallback (still through Content Core)
-    return getReferenceBySlug(idOrSlug, language, signal);
+    const result = await getReferenceBySlug(idOrSlug, language, signal);
+    if (result) return result;
+
+    // Fallback: try default language for untranslated references
+    if (language !== 'DE') {
+        const fallbackCached = findCachedReference(idOrSlug, 'DE');
+        if (fallbackCached) return fallbackCached;
+        return getReferenceBySlug(idOrSlug, 'DE', signal);
+    }
+    return null;
 }
 
 

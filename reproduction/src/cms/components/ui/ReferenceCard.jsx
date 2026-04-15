@@ -24,7 +24,9 @@ const ReferenceCard = ({
 
 
     const { t } = useLanguage();
-    const detailPath = props.path || `${ROUTES[language || 'DE'].referenceDetail.split('/:')[0]}/${props.slug || props.id}`;
+    // Always build the detail path from the active language route — never use the CMS path directly,
+    // because untranslated references would link to the DE route even on FR pages.
+    const detailPath = `${ROUTES[language || 'DE'].referenceDetail.split('/:')[0]}/${props.slug || props.id}`;
     const linkRef = useRef(null);
     const hasPrefetchedRef = useRef(false);
 
