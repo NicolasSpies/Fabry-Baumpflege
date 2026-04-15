@@ -153,9 +153,30 @@ const seoVitePlugin = {
   }
 };
 
+/** Inject font preloads into index.html from the actual bundle (runs after asset hashing). */
+const fontPreloadPlugin = {
+  name: 'font-preload',
+  enforce: 'post',
+  generateBundle(_, bundle) {
+    const criticalFonts = Object.keys(bundle).filter(f =>
+      (f.includes('Inter-latin-') || f.includes('PlayfairDisplay-700-latin-')) &&
+      f.endsWith('.woff2') && !f.includes('ext')
+    );
+    if (!criticalFonts.length) return;
+    const preloads = criticalFonts.map(f =>
+      `  <link rel="preload" as="font" href="/${f}" type="font/woff2" crossorigin />`
+    ).join('\n');
+    for (const [name, asset] of Object.entries(bundle)) {
+      if (name.endsWith('.html') && asset.type === 'asset') {
+        asset.source = String(asset.source).replace(/<\/head>/i, `${preloads}\n</head>`);
+      }
+    }
+  }
+};
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), cleanOldAssetsPlugin, cbMappingsPlugin, seoVitePlugin],
+  plugins: [react(), cleanOldAssetsPlugin, cbMappingsPlugin, seoVitePlugin, fontPreloadPlugin],
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),

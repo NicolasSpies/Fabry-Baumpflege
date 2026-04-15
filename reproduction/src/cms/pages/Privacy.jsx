@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
 import { getPage, PAGE_IDS } from '@/cms/lib/cms';
@@ -90,14 +89,13 @@ const Privacy = () => {
     const { language, t, globalCmsData, globalSeo, setPageReady } = useLanguage();
     const [content, setContent] = useState('');
     const [rawPage, setRawPage] = useState(null);
-    const location = useLocation();
     useScrollReveal([rawPage]);
 
     // Text-only page — signal ready immediately after useLanguage resets
     // pageReady to false, so no loader/overlay flashes.
     React.useEffect(() => {
         queueMicrotask(() => setPageReady(true));
-    }, [location.pathname, setPageReady]);
+    }, [language, setPageReady]);
 
     useEffect(() => {
         let cancelled = false;

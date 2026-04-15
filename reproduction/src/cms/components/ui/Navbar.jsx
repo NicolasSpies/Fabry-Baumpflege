@@ -85,13 +85,15 @@ const Navbar = ({
         }
     };
 
+    const closeTimerRef = React.useRef(null);
     const animateClose = () => {
         setIsClosing(true);
-        setTimeout(() => {
+        closeTimerRef.current = setTimeout(() => {
             setIsMenuOpen(false);
             setIsClosing(false);
         }, 280);
     };
+    React.useEffect(() => () => clearTimeout(closeTimerRef.current), []);
 
     const closeMenu = () => {
         setIsMenuOpen(false);
@@ -242,15 +244,15 @@ const Navbar = ({
                 </div>
 
                 {isMobileMode && (
-                    <div className="flex items-center gap-2 z-50 relative animate-in fade-in duration-300">
+                    <div className="flex items-center gap-3 z-50 relative animate-in fade-in duration-300">
                         <Link
                             to={getLocalizedPath('contact', language)}
-                            className="bg-primary text-white px-3 py-1.5 rounded-full transition-colors text-[0.55rem] font-bold uppercase tracking-[0.14em] whitespace-nowrap"
+                            className="bg-primary text-white px-4 py-2 rounded-full transition-colors text-[0.6rem] font-bold uppercase tracking-[0.14em] whitespace-nowrap"
                         >
                             {actualCtaLabel}
                         </Link>
                         <button
-                            className="text-primary flex items-center justify-center"
+                            className="text-primary flex items-center justify-center p-2 -mr-2 rounded-lg active:bg-primary/10 transition-colors"
                             onClick={toggleMenu}
                             aria-label={menuButtonLabel}
                             aria-expanded={isMenuOpen}

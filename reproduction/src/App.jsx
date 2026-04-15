@@ -117,10 +117,11 @@ function App() {
     <>
       {initialLoading && <PageLoader ready={globalReady && pageReady} onComplete={handleLoaderComplete} fullScreen={isHome} />}
       <ScrollToTop />
+        <a href="#main-content" className="skip-to-content">Zum Inhalt springen</a>
         <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans">
         <Navbar {...getShellProps('Navbar', globalData.navbar)} />
-        <div className="flex-1 flex flex-col relative">
-          <Suspense fallback={<div className="flex-1" />}>
+        <div id="main-content" className="flex-1 flex flex-col relative min-h-screen">
+          <Suspense fallback={<div className="min-h-screen" />}>
             <Routes>
               {/* German Routes */}
               <Route path={ROUTES.DE.home} element={<Home />} />

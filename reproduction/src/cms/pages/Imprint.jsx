@@ -7,6 +7,8 @@ import useCmsSeo from '@/cms/hooks/useCmsSeo';
 const Imprint = () => {
     const { language, t, globalCmsData, globalSeo, setPageReady } = useLanguage();
     const location = useLocation();
+    const isFR = language === 'FR';
+
     useScrollReveal([language]);
     useCmsSeo({
         title: isFR
@@ -29,8 +31,6 @@ const Imprint = () => {
     const address = opts.address || 'Halloux 16, 4830 Limbourg, BE';
     const phone = opts.phone || '+32 476 32 09 69';
     const email = opts.email || 'info@fabry-baumpflege.be';
-
-    const isFR = language === 'FR';
 
     return (
         <main className="bg-white dark:bg-background-dark">

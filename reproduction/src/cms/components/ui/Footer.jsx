@@ -121,7 +121,7 @@ const Footer = ({
                 </div>
             </div>
         </footer>
-        <div className="bg-[#2a411a] py-3 text-center text-[9px] text-white/50 tracking-[0.15em]">
+        <div className="bg-primary/90 py-3 text-center text-[9px] text-white/50 tracking-[0.15em]">
             <p>made with <span className="text-white">&#10084;</span> by <a href="https://laconis.be" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors no-underline">lac&#248;nis</a></p>
         </div>
         </>

@@ -274,7 +274,7 @@ const References = () => {
                     <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 lg:gap-8 px-4 md:px-6">
                         <button
                             onClick={() => setActiveCatId(null)}
-                            className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-full text-[0.65rem] md:text-sm font-medium uppercase tracking-[0.16em] md:tracking-widest transition-[background-color,color,box-shadow] ${activeCatId === null ? 'bg-[#2a411a] text-white shadow-lg' : 'text-muted-accessible hover:text-primary'}`}
+                            className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-full text-[0.65rem] md:text-sm font-medium uppercase tracking-[0.16em] md:tracking-widest transition-[background-color,color,box-shadow] ${activeCatId === null ? 'bg-primary/90 text-white shadow-lg' : 'text-muted-accessible hover:text-primary'}`}
                         >
                             {headerProps.all}
                         </button>
@@ -282,7 +282,7 @@ const References = () => {
                             <button
                                 key={cat.id}
                                 onClick={() => setActiveCatId(cat.id)}
-                                className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-full text-[0.65rem] md:text-sm font-medium uppercase tracking-[0.16em] md:tracking-widest transition-[background-color,color,box-shadow] ${activeCatId !== null && String(activeCatId) === String(cat.id) ? 'bg-[#2a411a] text-white shadow-lg' : 'text-muted-accessible hover:text-primary'}`}
+                                className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-full text-[0.65rem] md:text-sm font-medium uppercase tracking-[0.16em] md:tracking-widest transition-[background-color,color,box-shadow] ${activeCatId !== null && String(activeCatId) === String(cat.id) ? 'bg-primary/90 text-white shadow-lg' : 'text-muted-accessible hover:text-primary'}`}
                             >
                                 {cat.name}
                             </button>

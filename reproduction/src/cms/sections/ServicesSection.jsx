@@ -30,11 +30,11 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
         ? 'opacity-10'
         : 'opacity-0';
     const titleState = isActive
-        ? 'text-[#395824]'
+        ? 'text-primary'
         : '';
     const iconContainerState = isActive
-        ? 'bg-[#395824] text-white'
-        : 'bg-slate-100 dark:bg-slate-800/50 text-[#395824]';
+        ? 'bg-primary text-white'
+        : 'bg-slate-100 dark:bg-slate-800/50 text-primary';
 
     const cardClassName = `group relative bg-white dark:bg-surface-dark rounded-[2.5rem] p-8 md:p-6 lg:p-9 transition-[transform,box-shadow] duration-500 shadow-lg md:shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col h-full lg:hover:-translate-y-2 lg:hover:shadow-xl lg:hover:shadow-slate-200/60 md:min-h-0 mx-auto ${activeState}`;
 
@@ -42,17 +42,17 @@ const ServiceCardInternal = ({ title, description, icon, href, image, ctaLabel, 
         <>
                 {/* Visual enhancement: Show service image if available, else show gradient blob */}
                 {image ? (
-                    <div className={`absolute inset-x-0 bottom-0 top-1/2 transition-opacity duration-700 ${imageState} md:opacity-0 md:group-hover:opacity-10`}>
+                    <div className={`absolute inset-x-0 bottom-0 top-1/2 transition-opacity duration-700 ${imageState} lg:opacity-0 lg:group-hover:opacity-10`}>
                          <CmsImage image={image} size="768" className="w-full h-full object-cover grayscale" alt="" sizes="(max-width: 1024px) 100vw, 25vw" loading="lazy" maxWidth={768} />
                     </div>
                 ) : null}
                 
                 <div className="relative z-10 flex flex-row md:flex-col flex-grow gap-4 md:gap-0">
-                    <div className={`w-12 md:w-13 lg:w-14 h-12 md:h-13 lg:h-14 shrink-0 rounded-2xl flex items-center justify-center md:mb-4 lg:mb-4 transition-all duration-300 ${iconContainerState} lg:group-hover:bg-[#395824] lg:group-hover:text-white`}>
+                    <div className={`w-12 md:w-13 lg:w-14 h-12 md:h-13 lg:h-14 shrink-0 rounded-2xl flex items-center justify-center md:mb-4 lg:mb-4 transition-colors duration-300 ${iconContainerState} lg:group-hover:bg-primary lg:group-hover:text-white`}>
                         {renderServiceIcon(icon, iconVariant)}
                     </div>
                     <div className="flex flex-col flex-grow min-w-0">
-                        <h3 className={`text-xl md:text-xl lg:text-2xl font-serif text-primary mb-1 md:mb-2 lg:mb-3 transition-colors ${titleState} lg:group-hover:text-[#395824]`}>
+                        <h3 className={`text-xl md:text-xl lg:text-2xl font-serif text-primary mb-1 md:mb-2 lg:mb-3 transition-colors ${titleState} lg:group-hover:text-primary`}>
                             {renderCmsInline(title)}
                         </h3>
                         {description && (
@@ -242,7 +242,7 @@ const ServicesSection = ({
                         {isExternalHref(allServicesHref) ? (
                             <a
                                 href={allServicesHref}
-                                className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm uppercase tracking-widest"
+                                className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-colors duration-300 text-sm uppercase tracking-widest"
                                 target={allServicesHref.startsWith('http') ? '_blank' : undefined}
                                 rel={allServicesHref.startsWith('http') ? 'noreferrer' : undefined}
                             >
@@ -252,7 +252,7 @@ const ServicesSection = ({
                         ) : (
                             <Link
                                 to={allServicesHref}
-                                className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-all duration-300 text-sm uppercase tracking-widest"
+                                className="inline-flex items-center gap-3 px-10 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-white transition-colors duration-300 text-sm uppercase tracking-widest"
                             >
                                 {renderCmsInline(viewAllLabel)}
                                 <Icon name="arrow_forward" className="text-sm" />

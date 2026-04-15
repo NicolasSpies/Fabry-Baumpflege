@@ -41,7 +41,7 @@ const PhilosophySection = ({
                     <div className="absolute -top-10 -left-10 hidden md:block w-40 h-40 bg-primary/10 rounded-full blur-3xl -z-10" />
                 </div>
                 <div className="text-left order-1 md:order-2 soft-entrance-item">
-                    <h1 className="text-[2.1rem] sm:text-5xl md:text-[2.5rem] lg:text-6xl font-serif text-primary mb-5 md:mb-8 lg:mb-12 leading-[1.02] italic">
+                    <h1 className="text-[2.1rem] md:text-[2.5rem] lg:text-6xl font-serif text-primary mb-5 md:mb-8 lg:mb-12 leading-[1.02] italic">
                         <CmsText text={quote} className="space-y-2" paragraphClassName="leading-[1.02]" />
                     </h1>
                     <CmsText
