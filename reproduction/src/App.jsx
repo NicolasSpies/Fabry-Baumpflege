@@ -130,9 +130,9 @@ function App() {
     <>
       {initialLoading && <PageLoader ready={globalReady && pageReady} onComplete={handleLoaderComplete} fullScreen={isHome} />}
       <ScrollToTop />
-        <div className={`min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans transition-[colors,opacity] duration-300 opacity-100 ${pageVisible ? 'page-visible' : ''}`}>
+        <div className={`min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans ${pageVisible ? 'page-visible' : ''}`}>
         <Navbar {...getShellProps('Navbar', globalData.navbar)} />
-        <div className="flex-1 flex flex-col relative">
+        <div className={`flex-1 flex flex-col relative transition-opacity duration-300 ${pageVisible || initialLoading ? 'opacity-100' : 'opacity-0'}`}>
           {/* Light overlay during SPA page transitions */}
           {showTransition && (
             <div className="absolute inset-0 bg-white dark:bg-background-dark z-10 transition-opacity duration-300" />
@@ -164,7 +164,9 @@ function App() {
             </Routes>
           </Suspense>
         </div>
-        <Footer {...getShellProps('Footer', globalData.footer)} />
+        <footer className={`transition-opacity duration-300 ${pageVisible || initialLoading ? 'opacity-100' : 'opacity-0'}`}>
+          <Footer {...getShellProps('Footer', globalData.footer)} />
+        </footer>
       </div>
     </>
   );
