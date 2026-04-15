@@ -21,13 +21,13 @@ return (
                         {safePhone && (
                             <li>
                                 <p className="text-[9px] uppercase tracking-widest text-slate-400/70 mb-2 font-medium">{t('contact.phone')}</p>
-                                <a className="text-base md:text-lg lg:text-[1.1rem] font-sans text-slate-700 dark:text-slate-200 hover:text-primary transition-colors" href={`tel:${safePhone.replace(/\s/g, '')}`}>{safePhone}</a>
+                                <a className="text-base md:text-lg lg:text-[1.1rem] font-sans text-slate-700 dark:text-slate-200 hover:text-primary transition-colors whitespace-nowrap" href={`tel:${safePhone.replace(/\s/g, '')}`}>{safePhone}</a>
                             </li>
                         )}
                         {email && (
                             <li>
                                 <p className="text-[9px] uppercase tracking-widest text-slate-400/70 mb-2 font-medium">{t('contact.email')}</p>
-                                <a className="text-base md:text-lg lg:text-[1.1rem] font-sans text-slate-700 dark:text-slate-200 hover:text-primary transition-colors break-all" href={`mailto:${email}`}>{email}</a>
+                                <a className="text-base md:text-lg lg:text-[1.1rem] font-sans text-slate-700 dark:text-slate-200 hover:text-primary transition-colors" style={{ overflowWrap: 'anywhere' }} href={`mailto:${email}`}>{email}</a>
                             </li>
                         )}
                         {address && (

@@ -1,4 +1,33 @@
 import { useEffect } from 'react';
+import { ROUTES } from '@/cms/i18n/routes';
+
+/**
+ * Compute the alternate-language URL for a given path.
+ */
+function getAlternatePath(pathname) {
+  const normalize = (p) => decodeURIComponent(p).replace(/\/$/, '') || '/';
+  const norm = normalize(pathname);
+  const isFR = norm.startsWith('/fr');
+  const currentRoutes = isFR ? ROUTES.FR : ROUTES.DE;
+  const targetRoutes = isFR ? ROUTES.DE : ROUTES.FR;
+
+  for (const [key, path] of Object.entries(currentRoutes)) {
+    if (!path.includes(':') && normalize(path) === norm) {
+      return { de: isFR ? targetRoutes[key] : norm, fr: isFR ? norm : targetRoutes[key] };
+    }
+  }
+
+  // Detail route matching
+  const detailBase = normalize(currentRoutes.referenceDetail?.split('/:')[0] || '');
+  if (detailBase && (norm === detailBase || norm.startsWith(`${detailBase}/`))) {
+    const slug = norm.slice(detailBase.length).replace(/^\//, '');
+    const targetBase = normalize(targetRoutes.referenceDetail?.split('/:')[0] || '');
+    const targetPath = slug ? `${targetBase}/${slug}` : targetBase;
+    return { de: isFR ? targetPath : norm, fr: isFR ? norm : targetPath };
+  }
+
+  return { de: '/', fr: '/fr' };
+}
 
 /**
  * Hook to apply SEO metadata from Content Core API to the page head.
@@ -30,10 +59,10 @@ export function useCmsSeo(seo) {
 
     // Description
     updateOrCreateMeta('description', null, seo.description);
-    
+
     // OG Image
     updateOrCreateMeta(null, 'og:image', seo.og_image_url);
-    
+
     // Robots
     updateOrCreateMeta('robots', null, seo.robots);
 
@@ -50,6 +79,26 @@ export function useCmsSeo(seo) {
 
     // og:url
     updateOrCreateMeta(null, 'og:url', currentUrl);
+
+    // 4. hreflang alternate links (DE ↔ FR)
+    const host = `https://${currentUrlHost}`;
+    const alts = getAlternatePath(window.location.pathname);
+
+    const updateOrCreateHreflang = (lang, href) => {
+        const selector = `link[rel="alternate"][hreflang="${lang}"]`;
+        let el = head.querySelector(selector);
+        if (!el) {
+            el = document.createElement('link');
+            el.setAttribute('rel', 'alternate');
+            el.setAttribute('hreflang', lang);
+            head.appendChild(el);
+        }
+        el.setAttribute('href', href);
+    };
+
+    updateOrCreateHreflang('de', `${host}${alts.de}`);
+    updateOrCreateHreflang('fr', `${host}${alts.fr}`);
+    updateOrCreateHreflang('x-default', `${host}${alts.de}`);
 
   }, [seo]);
 }

@@ -119,7 +119,17 @@ const Privacy = () => {
         return () => { cancelled = true; };
     }, [language, globalCmsData]);
 
-    useCmsSeo(rawPage?.seo || globalSeo);
+    const isFR = language === 'FR';
+    const privacySeo = {
+        title: isFR
+            ? 'Fabry Baumpflege | Politique de confidentialité'
+            : 'Fabry Baumpflege | Datenschutzerklärung',
+        description: isFR
+            ? 'Politique de confidentialité de Fabry Baumpflege. Informations sur le traitement de vos données personnelles.'
+            : 'Datenschutzerklärung von Fabry Baumpflege. Informationen zur Verarbeitung Ihrer personenbezogenen Daten.',
+        ...(rawPage?.seo?.og_image_url ? { og_image_url: rawPage.seo.og_image_url } : {}),
+    };
+    useCmsSeo(privacySeo);
 
     return (
         <main className="bg-white dark:bg-background-dark">

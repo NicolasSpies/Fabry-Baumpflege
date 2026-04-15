@@ -71,12 +71,13 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
             <div className={`relative z-10 max-w-7xl mx-auto px-6 md:px-10 w-full flex items-end md:items-center h-full pb-16 md:pb-0 md:pt-0 transition-[opacity,transform] duration-700 opacity-100 translate-y-0`}>
                 <div className="w-full md:max-w-2xl space-y-4 md:space-y-7 text-left flex flex-col items-start min-h-[200px] md:min-h-[280px]">
                     <h1 className="font-serif text-white leading-tight md:leading-[0.95] hero-enter hero-enter-1">
-                        <div className="text-[1.8rem] md:text-[2.25rem] lg:text-[2.5rem] mb-1 md:mb-1 text-white/85 font-light tracking-wide italic">
+                        <span className="block text-[1.8rem] md:text-[2.25rem] lg:text-[2.5rem] mb-1 md:mb-1 text-white/85 font-light tracking-wide italic">
                             {renderCmsInline(title_top)}
-                        </div>
-                        <div className="text-[3.25rem] md:text-[5rem] lg:text-[6.5rem] font-bold tracking-tight">
+                        </span>
+                        {' '}
+                        <span className="block text-[3.25rem] md:text-[5rem] lg:text-[6.5rem] font-bold tracking-tight">
                             {renderCmsInline(title_main)}
-                        </div>
+                        </span>
                     </h1>
                     <p className="text-[0.875rem] md:text-base text-white/75 font-sans font-normal max-w-[250px] md:max-w-md leading-[1.5] md:leading-relaxed hero-enter hero-enter-2">
                         {renderTextWithBreaks(description)}

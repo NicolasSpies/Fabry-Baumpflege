@@ -354,7 +354,7 @@ const Home = () => {
     // We render the shell and core sections immediately with localized fallbacks.
 
     return (
-        <main>
+        <main className="overflow-x-hidden">
             {/* Page: Home → Section: HeroSection */}
             <HeroSection
                 {...getProps('HeroSection', pageData.hero)}

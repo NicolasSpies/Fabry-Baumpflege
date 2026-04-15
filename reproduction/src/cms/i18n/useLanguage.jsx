@@ -106,6 +106,11 @@ export function LanguageProvider({ children }) {
         setPageReady(false);
     }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    // Sync <html lang="..."> attribute with active language
+    useEffect(() => {
+        document.documentElement.lang = language === 'FR' ? 'fr' : 'de';
+    }, [language]);
+
     // t(key) — look up a string in the active locale, fall back to DE
     const t = useCallback((key) => {
         const langCode = language.toLowerCase();

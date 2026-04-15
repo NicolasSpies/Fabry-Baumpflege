@@ -8,7 +8,14 @@ const Imprint = () => {
     const { language, t, globalCmsData, globalSeo, setPageReady } = useLanguage();
     const location = useLocation();
     useScrollReveal([language]);
-    useCmsSeo(globalSeo);
+    useCmsSeo({
+        title: isFR
+            ? 'Fabry Baumpflege | Mentions légales'
+            : 'Fabry Baumpflege | Impressum',
+        description: isFR
+            ? 'Mentions légales et informations de contact de Fabry Baumpflege, service professionnel d\'entretien des arbres en Belgique orientale.'
+            : 'Impressum und Kontaktdaten von Fabry Baumpflege, Ihrem Fachbetrieb für Baumpflege in Ostbelgien.',
+    });
 
     // Imprint is pure text — no CMS fetch needed. Signal ready immediately
     // after useLanguage's own effect resets pageReady to false.
