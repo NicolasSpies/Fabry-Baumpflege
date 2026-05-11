@@ -8,6 +8,7 @@ import { definePreview } from '@/cms/lib/preview';
 import ServicesIntroSection from '@/cms/sections/ServicesIntroSection';
 import ServicesBlocksSection from '@/cms/sections/ServicesBlocksSection';
 import StatsSection from '@/cms/sections/StatsSection';
+import ServicesFaqSection from '@/cms/sections/ServicesFaqSection';
 import { resolveInstanceProps, resolveInstancePropsAsync, awaitMappings } from '@/cms/bridge-resolver';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
 
@@ -186,6 +187,8 @@ const Services = () => {
 
             {/* Combined Static Service Blocks */}
             <ServicesBlocksSection {...getProps('ServicesBlocksSection', pageData.blocks)} />
+
+            <ServicesFaqSection />
 
             {/* Page: Services → Section: StatsSection */}
         </main>

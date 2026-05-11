@@ -13,6 +13,7 @@ import ServicesSection from '@/cms/sections/ServicesSection';
 import ReferencesSection from '@/cms/sections/ReferencesSection';
 import TestimonialsSection from '@/cms/sections/TestimonialsSection';
 import AboutSection from '@/cms/sections/AboutSection';
+import FaqSection from '@/cms/sections/FaqSection';
 
 import { resolveInstanceProps, resolveInstancePropsAsync, awaitMappings } from '@/cms/bridge-resolver';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
@@ -378,6 +379,9 @@ const Home = () => {
                 {...getProps('TestimonialsSection', pageData.testimonials)}
                 language={language}
             />
+
+            {/* Page: Home → Section: FaqSection */}
+            <FaqSection />
 
             {/* Page: Home → Section: AboutSection */}
             <AboutSection

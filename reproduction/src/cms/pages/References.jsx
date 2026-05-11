@@ -199,7 +199,7 @@ const References = () => {
 
 
 
-    const [displayCount, setDisplayCount] = useState(4);
+    const [displayCount, setDisplayCount] = useState(6);
     const loadMoreTriggerRef = React.useRef(null);
 
     // Memoized filtering and list slicing
@@ -220,7 +220,7 @@ const References = () => {
     }, [filteredRefs, displayCount]);
 
     const handleLoadMore = () => {
-        setDisplayCount(prev => prev + 12);
+        setDisplayCount(prev => prev + 3);
     };
 
 

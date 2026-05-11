@@ -13,9 +13,9 @@ return (
             <div className="bg-white dark:bg-surface-dark p-6 md:p-9 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-6 md:space-y-8">
                 <section>
                     {contact_person && (
-                        <h1 className="text-2xl md:text-[1.65rem] font-serif text-primary mb-6 leading-tight break-words">
+                        <p className="text-2xl md:text-[1.65rem] font-serif text-primary mb-6 leading-tight break-words">
                             {contact_person}
-                        </h1>
+                        </p>
                     )}
                     <ul className="space-y-7">
                         {safePhone && (

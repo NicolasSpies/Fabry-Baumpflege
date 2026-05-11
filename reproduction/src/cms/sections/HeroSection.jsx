@@ -62,6 +62,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
                     sizes="(max-width: 768px) 100vw, 1280px"
                     loading="eager"
                     fetchPriority="high"
+                    noFade
                     onLoad={() => setIsImageReady(true)}
                     onError={() => setIsImageReady(true)}
                 />

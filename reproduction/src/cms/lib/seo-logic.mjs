@@ -153,12 +153,11 @@ export function injectMetadata(html, metadata) {
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "LocalBusiness",
+  "@type": ["LocalBusiness", "ProfessionalService"],
   "name": "Fabry Baumpflege",
   "url": "https://fabry-baumpflege.be",
   "image": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/Baumpflege-Fabry-Logo-Komplett-verlauf.svg",
   "telephone": "+32476320969",
-  "areaServed": "Ostbelgien",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Halloux 16",
@@ -166,10 +165,24 @@ export function injectMetadata(html, metadata) {
     "addressLocality": "Limbourg",
     "addressCountry": "BE"
   },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 50.6124,
+    "longitude": 5.9987
+  },
+  "areaServed": [
+    "Eupen", "Raeren", "Kelmis", "Lontzen",
+    "Sankt-Vith", "Malmedy", "Bütgenbach", "Büllingen",
+    "Ostbelgien"
+  ],
+  "serviceType": [
+    "Baumpflege", "Baumfällung", "Kronenpflege",
+    "Baumkontrolle", "Gartenpflege", "Bepflanzung"
+  ],
   "openingHoursSpecification": [
     {
       "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
       "opens": "08:00",
       "closes": "17:00"
     }

@@ -428,6 +428,13 @@ export function getCmsImageProps(image, options = {}) {
     let src = getUrl(hintSource) || normalized.src;
     let srcSet = normalized.srcSet;
 
+    // When an explicit size is requested, remove the matching srcSet entry to prevent
+    // the browser fetching the same URL twice (once via src, once via srcset).
+    if (options.size && srcSet && src) {
+        const filtered = srcSet.split(',').map(e => e.trim()).filter(e => e.split(/\s+/)[0] !== src);
+        srcSet = filtered.join(', ');
+    }
+
     // Apply maxWidth constraint to limit resolution (e.g. for cards)
     if (options.maxWidth && normalized.rawSrcSetEntries) {
         const filteredEntries = normalized.rawSrcSetEntries.filter(s => (s.width || 0) <= options.maxWidth);
