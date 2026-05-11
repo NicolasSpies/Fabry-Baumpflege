@@ -266,17 +266,17 @@ const ReferenceDetail = () => {
                 setStatus('ready');
                 setPageReady(true);
 
-                // ─── Phase 2: Deferred Full Data & Asset Loading ───────────────────────────────
-                // We load the full reference (with _embed=1) and heavy images after the core is visible
-                const loadDeferredAssets = async () => {
+                // ─── Phase 2: Full Data & Asset Loading ───────────────────────────────────────
+                // Starts immediately after Phase 1 — hero is already visible, now load gallery.
+                // Using ref.id (from Phase 1) for a direct fetch instead of slug lookup.
+                const refId = ref.id || ref.ID;
+                (async () => {
                     try {
-                        // 1. Fetch the full object for gallery/before-after data
-                        const fullRef = await getReference(slug, language, controller.signal);
+                        const fullRef = await getReference(refId || slug, language, controller.signal);
                         if (controller.signal.aborted || !fullRef) return;
 
                         const fullCf = fullRef.customFields || fullRef.acf || fullRef.meta || {};
 
-                        // 2. Resolve the heavy images
                         const rawGallery = fullCf.galerie || fullRef.acf?.gallery || [];
                         const [beforeUrl, afterUrl, resolvedGallery] = await Promise.all([
                             resolveMedia(fullCf.bild_vorher || fullRef.acf?.before_image),
@@ -284,7 +284,7 @@ const ReferenceDetail = () => {
                             Promise.all((Array.isArray(rawGallery) ? rawGallery : []).map(img => resolveMedia(img)))
                         ]);
 
-                        if (cancelledAssets || controller.signal.aborted) return;
+                        if (controller.signal.aborted) return;
 
                         setRawProject(fullRef);
                         setProject(prev => {
@@ -306,15 +306,7 @@ const ReferenceDetail = () => {
                             console.warn('[ReferenceDetail] Deferred assets failed:', deferErr);
                         }
                     }
-                };
-
-                // Use idle period if available, otherwise minor delay
-                let cancelledAssets = false;
-                if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-                    window.requestIdleCallback(() => loadDeferredAssets());
-                } else {
-                    setTimeout(() => loadDeferredAssets(), 200);
-                }
+                })();
 
             } catch (err) {
                 if (err.name === 'AbortError') return;
@@ -475,7 +467,7 @@ const ReferenceDetail = () => {
                             <CmsImage
                                 image={projectGallery[activeImageIndex]}
                                 alt="Project Gallery"
-                                size="original"
+                                size="1280"
                                 className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-500"
                                 sizes="100vw"
                                 onClick={(e) => e.stopPropagation()}
