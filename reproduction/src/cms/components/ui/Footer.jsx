@@ -116,13 +116,13 @@ const Footer = ({
 
                 <p>© {new Date().getFullYear()} Fabry Baumpflege. {t('footer.rights')}</p>
                 <div className="flex gap-8 items-center">
-                    <Link className="hover:text-white transition-colors no-underline" to={getLocalizedPath('imprint', language)}>{t('footer.imprint')}</Link>
-                    <Link className="hover:text-white transition-colors no-underline" to={getLocalizedPath('privacy', language)}>{t('footer.privacy')}</Link>
+                    <Link className="hover:text-white transition-colors underline decoration-white/40 hover:decoration-white" to={getLocalizedPath('imprint', language)}>{t('footer.imprint')}</Link>
+                    <Link className="hover:text-white transition-colors underline decoration-white/40 hover:decoration-white" to={getLocalizedPath('privacy', language)}>{t('footer.privacy')}</Link>
                 </div>
             </div>
         </footer>
-        <div className="bg-primary/90 py-3 text-center text-[9px] text-white/50 tracking-[0.15em]">
-            <p>made with <span className="text-white">&#10084;</span> by <a href="https://laconis.be" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors no-underline">lac&#248;nis</a></p>
+        <div className="bg-primary/90 py-3 text-center text-[9px] text-white/80 tracking-[0.15em]">
+            <p>made with <span className="text-white">&#10084;</span> by <a href="https://laconis.be" target="_blank" rel="noopener noreferrer" className="text-white underline decoration-white/40 hover:decoration-white transition-colors">lac&#248;nis</a></p>
         </div>
         </>
     );

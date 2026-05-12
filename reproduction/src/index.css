@@ -94,7 +94,7 @@
 
 @layer base {
   :root {
-    --accent-label: #9BB221; /* Brand Second Accent */
+    --accent-label: #4A7000; /* Brand Second Accent — darkened for WCAG AA 4.5:1 on white */
     --muted-accessible: #475569; /* slate-600 — 6.1:1 on white */
   }
 
