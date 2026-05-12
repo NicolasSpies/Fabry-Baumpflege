@@ -33,8 +33,7 @@ const PhilosophySection = ({
                             size="768"
                             className="w-full h-full object-cover"
                             sizes="(max-width: 768px) 85vw, (max-width: 1024px) 45vw, 40vw"
-                            loading="eager"
-                            fetchPriority="high"
+                            loading="lazy"
                             style={{ transition: 'none' }}
                         />
                     </div>
