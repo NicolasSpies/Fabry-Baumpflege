@@ -32,7 +32,7 @@
   <!-- OpenGraph / Social SEO -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Fabry Baumpflege" />
-  <meta property="og:locale" content="de_DE" />
+  <meta property="og:locale" content="de_BE" />
   <meta property="og:locale:alternate" content="fr_BE" />
   <meta property="og:title" content="Fabry Baumpflege | Baumpflege & Baumfällung in Ostbelgien" />
   <meta property="og:description" content="Professionelle Baumpflege, Baumfällung, Gartenpflege & Bepflanzung in Eupen, Raeren, Kelmis, Sankt-Vith, Malmedy und ganz Ostbelgien. Zertifiziert, sicher, zuverlässig." />
@@ -50,6 +50,7 @@
   {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "ProfessionalService"],
+    "@id": "https://fabry-baumpflege.be/#business",
     "name": "Fabry Baumpflege",
     "url": "https://fabry-baumpflege.be",
     "email": "info@fabry-baumpflege.be",
@@ -62,11 +63,6 @@
       "jobTitle": "Zertifizierter Baumpflegeexperte",
       "telephone": "+32476320969",
       "email": "info@fabry-baumpflege.be"
-    },
-    "hasCredential": {
-      "@type": "EducationalOccupationalCredential",
-      "credentialCategory": "certification",
-      "name": "Seilklettertechnik (SKT) Zertifizierung"
     },
     "address": {
       "@type": "PostalAddress",
@@ -153,10 +149,10 @@
     ],
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "5",
-      "bestRating": "5",
-      "worstRating": "1",
-      "reviewCount": "5"
+      "ratingValue": 5,
+      "bestRating": 5,
+      "worstRating": 1,
+      "reviewCount": 5
     },
     "sameAs": [
       "https://maps.app.goo.gl/syziuAu3hqbNM2tP6",
@@ -171,12 +167,14 @@
   {
     "@context": "https://schema.org",
     "@type": "Person",
+    "@id": "https://fabry-baumpflege.be/#vincent-fabry",
     "name": "Vincent Fabry",
     "jobTitle": "Zertifizierter Baumpflegeexperte",
-    "worksFor": {
-      "@type": "LocalBusiness",
-      "name": "Fabry Baumpflege",
-      "url": "https://fabry-baumpflege.be"
+    "worksFor": { "@id": "https://fabry-baumpflege.be/#business" },
+    "hasCredential": {
+      "@type": "EducationalOccupationalCredential",
+      "credentialCategory": "certification",
+      "name": "Seilklettertechnik (SKT) Zertifizierung"
     },
     "address": {
       "@type": "PostalAddress",
@@ -201,14 +199,11 @@
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": "https://fabry-baumpflege.be/#website",
     "name": "Fabry Baumpflege",
     "url": "https://fabry-baumpflege.be",
     "inLanguage": ["de", "fr"],
-    "publisher": {
-      "@type": "LocalBusiness",
-      "name": "Fabry Baumpflege",
-      "url": "https://fabry-baumpflege.be"
-    }
+    "publisher": { "@id": "https://fabry-baumpflege.be/#business" }
   }
   </script>
 
@@ -231,7 +226,7 @@
         "name": "Was kostet eine Baumfällung in Ostbelgien?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Die Kosten hängen von Baumhöhe, Standort, Zugänglichkeit und gewünschter Entsorgung ab. Kleine Bäume starten ab ca. 150 €, bei großen oder schwer zugänglichen Bäumen kann der Preis deutlich höher sein. Nach einer kostenlosen Vor-Ort-Besichtigung wird ein unverbindliches Angebot erstellt."
+          "text": "Die Kosten hängen von Baumhöhe, Standort, Zugänglichkeit und gewünschter Entsorgung ab. Nach einer kostenlosen Vor-Ort-Besichtigung wird ein unverbindliches Angebot erstellt."
         }
       },
       {
