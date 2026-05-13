@@ -12,7 +12,7 @@ const FAQ_CONTENT = {
             },
             {
                 q: 'Was kostet eine Baumfällung?',
-                a: 'Die Kosten hängen von Baumhöhe, Standort, Zugänglichkeit und gewünschter Entsorgung ab. Kleine Bäume starten ab ca. 150 €, bei großen oder schwer zugänglichen Bäumen kann der Preis deutlich höher sein. Nach einer kostenlosen Vor-Ort-Besichtigung wird ein unverbindliches Angebot erstellt.'
+                a: 'Die Kosten hängen von Baumhöhe, Standort, Zugänglichkeit und gewünschter Entsorgung ab. Nach einer kostenlosen Vor-Ort-Besichtigung wird ein unverbindliches Angebot erstellt.'
             },
             {
                 q: 'Welche Gemeinden und Regionen werden abgedeckt?',
@@ -50,7 +50,7 @@ const FAQ_CONTENT = {
             },
             {
                 q: "Quel est le coût d'un abattage d'arbre ?",
-                a: "Les coûts dépendent de la hauteur de l'arbre, de l'emplacement, de l'accessibilité et de l'élimination souhaitée. Les petits arbres commencent à partir d'environ 150 €. Après une visite gratuite sur place, un devis sans engagement est établi."
+                a: "Les coûts dépendent de la hauteur de l'arbre, de l'emplacement, de l'accessibilité et de l'élimination souhaitée. Après une visite gratuite sur place, un devis sans engagement est établi."
             },
             {
                 q: "Quelles communes et régions sont couvertes ?",
