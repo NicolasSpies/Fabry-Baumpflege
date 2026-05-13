@@ -87,6 +87,35 @@ const cleanOldAssetsPlugin = {
 
 import { resolveRouteContext, injectMetadata, resolveMetadata, CMS_HOST, DEFAULT_SEO } from './src/cms/lib/seo-logic.mjs';
 
+// ─── Testimonial Rating Cache ─────────────────────────────────────────────────
+// Fetched once per build; auto-updates aggregateRating in LocalBusiness schema.
+// No manual edits to index.html needed when new Kundenstimmen are added to CMS.
+let _testimonialRatingCache = null;
+async function fetchTestimonialRating() {
+  if (_testimonialRatingCache !== null) return _testimonialRatingCache;
+  try {
+    const res = await fetch(
+      `${CMS_HOST}/wp-json/content-core/v1/posts/kundenstimmen?per_page=50&lang=de`
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data) || !data.length) return null;
+    const ratings = data
+      .map(t => parseFloat((t.customFields || t.acf || t.meta || {}).sterne || '5'))
+      .filter(r => !isNaN(r) && r >= 1 && r <= 5);
+    const count = data.length;
+    const avgRating = ratings.length > 0
+      ? Math.round((ratings.reduce((a, b) => a + b, 0) / ratings.length) * 10) / 10
+      : 5;
+    _testimonialRatingCache = { count, avgRating };
+    console.log(`[seo-plugin] aggregateRating → ${count} Kundenstimmen, Ø ${avgRating} Sterne`);
+    return _testimonialRatingCache;
+  } catch (e) {
+    console.warn('[seo-plugin] Kundenstimmen-Fetch fehlgeschlagen (aggregateRating unverändert):', e.message);
+    return null;
+  }
+}
+
 /**
  * SEO Injection Plugin for Vite (Dev and Build)
  */
@@ -95,10 +124,13 @@ const seoVitePlugin = {
   async transformIndexHtml(html, ctx) {
     const route = resolveRouteContext(ctx.originalUrl || ctx.path);
     const defaults = DEFAULT_SEO[route.lang];
-    
+
     let apiData = null;
     let globalSeo = null;
     let ogType = 'website';
+
+    // Start testimonial fetch in parallel with other CMS calls (cached after first call)
+    const testimonialRatingPromise = fetchTestimonialRating();
 
     try {
         const fetchers = [
@@ -172,7 +204,14 @@ const seoVitePlugin = {
     const debugMarker = `<meta name="x-seo-runtime" content="api-vite-${route.lang}-${route.type}">`;
     const markedHtml = html.replace(/<\/head>/i, `  ${debugMarker}\n${heroPreload}</head>`);
 
-    return injectMetadata(markedHtml, metadata);
+    const testimonialRating = await testimonialRatingPromise;
+    let finalHtml = injectMetadata(markedHtml, metadata);
+    if (testimonialRating) {
+      finalHtml = finalHtml
+        .replace(/"reviewCount":\s*\d+/, `"reviewCount": ${testimonialRating.count}`)
+        .replace(/"ratingValue":\s*[\d.]+/, `"ratingValue": ${testimonialRating.avgRating}`);
+    }
+    return finalHtml;
   }
 };
 
