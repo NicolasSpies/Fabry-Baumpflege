@@ -92,7 +92,7 @@ export function resolveMetadata(route, apiData, globalSeo) {
 
     const metadata = {
         lang: route.lang.toLowerCase(),
-        locale: route.lang === 'FR' ? 'fr_FR' : 'de_DE',
+        locale: route.lang === 'FR' ? 'fr_BE' : 'de_BE',
         title: title,
         description: description,
         ogImage: ogImage,
@@ -148,49 +148,8 @@ export function injectMetadata(html, metadata) {
         output = output.replace('</head>', `${canonicalLine}</head>`);
     }
 
-    // 5. Local Business Schema (Global JSON-LD)
-    const localBusinessSchema = `
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": ["LocalBusiness", "ProfessionalService"],
-  "name": "Fabry Baumpflege",
-  "url": "https://fabry-baumpflege.be",
-  "image": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/Baumpflege-Fabry-Logo-Komplett-verlauf.svg",
-  "telephone": "+32476320969",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Halloux 16",
-    "postalCode": "4830",
-    "addressLocality": "Limbourg",
-    "addressCountry": "BE"
-  },
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": 50.6124,
-    "longitude": 5.9987
-  },
-  "areaServed": [
-    "Eupen", "Raeren", "Kelmis", "Lontzen",
-    "Sankt-Vith", "Malmedy", "Bütgenbach", "Büllingen",
-    "Ostbelgien"
-  ],
-  "serviceType": [
-    "Baumpflege", "Baumfällung", "Kronenpflege",
-    "Baumkontrolle", "Gartenpflege", "Bepflanzung"
-  ],
-  "openingHoursSpecification": [
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-      "opens": "08:00",
-      "closes": "17:00"
-    }
-  ]
-}
-</script>
-`;
-    output = output.replace('</head>', `${localBusinessSchema}</head>`);
+    // 5. LocalBusiness schema is fully defined in the HTML template (reproduction/index.html).
+    // Injecting a second stripped-down block here would create a duplicate — skip.
 
     return output;
 }

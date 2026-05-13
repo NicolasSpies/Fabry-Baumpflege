@@ -173,6 +173,8 @@
     "@type": "Person",
     "@id": "https://fabry-baumpflege.be/#vincent-fabry",
     "name": "Vincent Fabry",
+    "givenName": "Vincent",
+    "familyName": "Fabry",
     "jobTitle": "Zertifizierter Baumpflegeexperte",
     "worksFor": { "@id": "https://fabry-baumpflege.be/#business" },
     "hasCredential": {
@@ -207,7 +209,15 @@
     "name": "Fabry Baumpflege",
     "url": "https://fabry-baumpflege.be",
     "inLanguage": ["de", "fr"],
-    "publisher": { "@id": "https://fabry-baumpflege.be/#business" }
+    "publisher": { "@id": "https://fabry-baumpflege.be/#business" },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://fabry-baumpflege.be/?s={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
   }
   </script>
 
@@ -344,16 +354,35 @@
           "@type": "Answer",
           "text": "Das Fällen großer Bäume ohne Fachkenntnisse und geeignete Ausrüstung ist sehr gefährlich. Bei geschützten Bäumen ist es ohne Genehmigung zudem strafbar. Für Bäume über 5 Meter und in der Nähe von Gebäuden, Leitungen oder öffentlichen Wegen empfiehlt sich stets ein zugelassener Fachbetrieb."
         }
+      },
+      {
+        "@type": "Question",
+        "name": "Ist Fabry Baumpflege zertifiziert?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ja. Vincent Fabry ist zertifizierter Baumpflegeexperte mit anerkannter Ausbildung in Seilklettertechnik (SKT). Alle Arbeiten werden nach geltenden Sicherheitsstandards und den Umweltschutzvorschriften in Belgien ausgeführt."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Wie schnell kommt Fabry Baumpflege vor Ort?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Bei normalen Anfragen wird ein Vor-Ort-Termin innerhalb weniger Werktage vereinbart, das Angebot folgt in der Regel innerhalb von 24 bis 48 Stunden. Bei Notfällen — zum Beispiel nach Sturmschäden — ist eine kurzfristige Reaktion in Ostbelgien möglich."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Arbeitet Fabry Baumpflege auch für Gemeinden und Gewerbebetriebe?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ja. Fabry Baumpflege übernimmt Aufträge für Privatpersonen, Gemeinden, Gewerbebetriebe und landwirtschaftliche Betriebe in der gesamten Deutschsprachigen Gemeinschaft Belgiens und angrenzenden Regionen."
+        }
       }
     ]
   }
   </script>
 
-  <!-- Non-CORS preconnect for images (hero LCP) -->
-  <link rel="preconnect" href="https://cms.fabry-baumpflege.be" />
-  <!-- CORS preconnect for fetch() API calls -->
-  <link rel="preconnect" href="https://cms.fabry-baumpflege.be" crossorigin />
-  <link rel="dns-prefetch" href="https://cms.fabry-baumpflege.be" />
 
 </head>
 

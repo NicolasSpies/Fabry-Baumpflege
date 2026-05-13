@@ -36,7 +36,7 @@
   <!-- OpenGraph / Social SEO -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Fabry Baumpflege" />
-  <meta property="og:locale" content="de_DE" />
+  <meta property="og:locale" content="de_BE" />
   <meta property="og:locale:alternate" content="fr_BE" />
   <meta property="og:title" content="Fabry Baumpflege | Baum und Gartenpflege in Ostbelgien" />
   <meta property="og:description" content="Baumpflege, Baumfällung, Gartenpflege und Bepflanzung in Ostbelgien und Umgebung. Zuverlässiger Baumdienst, sauber umgesetzt und direkt vor Ort betreut." />
@@ -173,6 +173,8 @@
     "@type": "Person",
     "@id": "https://fabry-baumpflege.be/#vincent-fabry",
     "name": "Vincent Fabry",
+    "givenName": "Vincent",
+    "familyName": "Fabry",
     "jobTitle": "Zertifizierter Baumpflegeexperte",
     "worksFor": { "@id": "https://fabry-baumpflege.be/#business" },
     "hasCredential": {
@@ -207,7 +209,15 @@
     "name": "Fabry Baumpflege",
     "url": "https://fabry-baumpflege.be",
     "inLanguage": ["de", "fr"],
-    "publisher": { "@id": "https://fabry-baumpflege.be/#business" }
+    "publisher": { "@id": "https://fabry-baumpflege.be/#business" },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://fabry-baumpflege.be/?s={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
   }
   </script>
 
@@ -344,61 +354,40 @@
           "@type": "Answer",
           "text": "Das Fällen großer Bäume ohne Fachkenntnisse und geeignete Ausrüstung ist sehr gefährlich. Bei geschützten Bäumen ist es ohne Genehmigung zudem strafbar. Für Bäume über 5 Meter und in der Nähe von Gebäuden, Leitungen oder öffentlichen Wegen empfiehlt sich stets ein zugelassener Fachbetrieb."
         }
+      },
+      {
+        "@type": "Question",
+        "name": "Ist Fabry Baumpflege zertifiziert?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ja. Vincent Fabry ist zertifizierter Baumpflegeexperte mit anerkannter Ausbildung in Seilklettertechnik (SKT). Alle Arbeiten werden nach geltenden Sicherheitsstandards und den Umweltschutzvorschriften in Belgien ausgeführt."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Wie schnell kommt Fabry Baumpflege vor Ort?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Bei normalen Anfragen wird ein Vor-Ort-Termin innerhalb weniger Werktage vereinbart, das Angebot folgt in der Regel innerhalb von 24 bis 48 Stunden. Bei Notfällen — zum Beispiel nach Sturmschäden — ist eine kurzfristige Reaktion in Ostbelgien möglich."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Arbeitet Fabry Baumpflege auch für Gemeinden und Gewerbebetriebe?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ja. Fabry Baumpflege übernimmt Aufträge für Privatpersonen, Gemeinden, Gewerbebetriebe und landwirtschaftliche Betriebe in der gesamten Deutschsprachigen Gemeinschaft Belgiens und angrenzenden Regionen."
+        }
       }
     ]
   }
   </script>
 
-  <!-- Non-CORS preconnect for images (hero LCP) -->
-  <link rel="preconnect" href="https://cms.fabry-baumpflege.be" />
-  <!-- CORS preconnect for fetch() API calls -->
-  <link rel="preconnect" href="https://cms.fabry-baumpflege.be" crossorigin />
-  <link rel="dns-prefetch" href="https://cms.fabry-baumpflege.be" />
 
-  <script type="module" crossorigin src="/assets/index-BGS67uqp.js"></script>
+  <script type="module" crossorigin src="/assets/index-C5xzAveD.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-DVgfv5zY.css">
   <meta name="x-seo-runtime" content="api-vite-DE-page">
   <link rel="preload" as="image" href="https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/fabry-baumplege-header-1-1280.webp?v=1774535717" imagesrcset="https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/fabry-baumplege-header-1-480.webp?v=1774535717 480w, https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/fabry-baumplege-header-1-768.webp?v=1774535717 768w, https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/fabry-baumplege-header-1-1280.webp?v=1774535717 1280w, https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/fabry-baumplege-header-1.webp?v=1774535717 2000w" imagesizes="(max-width: 768px) 100vw, (max-width: 1280px) 1280px, 100vw" fetchpriority="high" />
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": ["LocalBusiness", "ProfessionalService"],
-  "name": "Fabry Baumpflege",
-  "url": "https://fabry-baumpflege.be",
-  "image": "https://cms.fabry-baumpflege.be/wp-content/uploads/2026/03/Baumpflege-Fabry-Logo-Komplett-verlauf.svg",
-  "telephone": "+32476320969",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Halloux 16",
-    "postalCode": "4830",
-    "addressLocality": "Limbourg",
-    "addressCountry": "BE"
-  },
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": 50.6124,
-    "longitude": 5.9987
-  },
-  "areaServed": [
-    "Eupen", "Raeren", "Kelmis", "Lontzen",
-    "Sankt-Vith", "Malmedy", "Bütgenbach", "Büllingen",
-    "Ostbelgien"
-  ],
-  "serviceType": [
-    "Baumpflege", "Baumfällung", "Kronenpflege",
-    "Baumkontrolle", "Gartenpflege", "Bepflanzung"
-  ],
-  "openingHoursSpecification": [
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-      "opens": "08:00",
-      "closes": "17:00"
-    }
-  ]
-}
-</script>
   <link rel="preload" as="font" href="/assets/PlayfairDisplay-700-latin-DV_BSE7M.woff2" type="font/woff2" crossorigin />
   <link rel="preload" as="font" href="/assets/Inter-latin-8kRkwJBP.woff2" type="font/woff2" crossorigin />
 </head>
