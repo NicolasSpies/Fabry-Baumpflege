@@ -8,7 +8,7 @@ import path from 'path'
 // then automatically picks up the new host for the dev proxy.
 import { createRequire } from 'module'
 const _require = createRequire(import.meta.url)
-import { readFileSync, copyFileSync, mkdirSync, readdirSync, unlinkSync, existsSync } from 'fs'
+import { readFileSync, writeFileSync, copyFileSync, mkdirSync, readdirSync, unlinkSync, existsSync } from 'fs'
 
 const MAPPINGS_SRC = path.resolve(import.meta.dirname, 'src/cms/config/mappings.json');
 
@@ -39,6 +39,29 @@ const cbMappingsPlugin = {
       mkdirSync(path.resolve(import.meta.dirname, 'dist'), { recursive: true });
       copyFileSync(MAPPINGS_SRC, path.resolve(import.meta.dirname, 'dist/cb-mappings.json'));
     } catch { /* non-fatal — fallback to bundled mappings */ }
+  },
+};
+
+/**
+ * Plugin that updates all <lastmod> dates in sitemap.xml to today's build date.
+ * Runs after the bundle is written so the sitemap in the output dir is always fresh.
+ */
+const sitemapLastmodPlugin = {
+  name: 'sitemap-lastmod',
+  closeBundle() {
+    const sitemapPath = path.resolve(import.meta.dirname, '..', 'sitemap.xml');
+    if (!existsSync(sitemapPath)) return;
+    try {
+      const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+      const original = readFileSync(sitemapPath, 'utf8');
+      const updated = original.replace(/<lastmod>[^<]+<\/lastmod>/g, `<lastmod>${today}</lastmod>`);
+      if (updated !== original) {
+        writeFileSync(sitemapPath, updated, 'utf8');
+        console.log(`[sitemap-lastmod] Updated all <lastmod> to ${today}`);
+      }
+    } catch (e) {
+      console.warn('[sitemap-lastmod] Failed to update sitemap.xml:', e.message);
+    }
   },
 };
 
@@ -176,7 +199,7 @@ const fontPreloadPlugin = {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), cleanOldAssetsPlugin, cbMappingsPlugin, seoVitePlugin, fontPreloadPlugin],
+  plugins: [react(), cleanOldAssetsPlugin, cbMappingsPlugin, seoVitePlugin, fontPreloadPlugin, sitemapLastmodPlugin],
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),

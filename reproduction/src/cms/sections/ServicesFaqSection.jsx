@@ -37,6 +37,18 @@ const FAQ_CONTENT = {
             {
                 q: 'Kann man einen Baum selbst fällen?',
                 a: 'Das Fällen großer Bäume ohne Fachkenntnisse und geeignete Ausrüstung ist sehr gefährlich. Bei geschützten Bäumen ist es ohne Genehmigung zudem strafbar. Für Bäume über 5 Meter und in der Nähe von Gebäuden, Leitungen oder öffentlichen Wegen empfiehlt sich stets ein zugelassener Fachbetrieb.'
+            },
+            {
+                q: 'Ist Fabry Baumpflege zertifiziert?',
+                a: 'Ja. Vincent Fabry ist zertifizierter Baumpflegeexperte mit anerkannter Ausbildung in Seilklettertechnik (SKT). Alle Arbeiten werden nach geltenden Sicherheitsstandards und den Umweltschutzvorschriften in Belgien ausgeführt.'
+            },
+            {
+                q: 'Wie schnell kommt Fabry Baumpflege vor Ort?',
+                a: 'Bei normalen Anfragen wird ein Vor-Ort-Termin innerhalb weniger Werktage vereinbart, das Angebot folgt in der Regel innerhalb von 24 bis 48 Stunden. Bei Notfällen — zum Beispiel nach Sturmschäden — ist eine kurzfristige Reaktion in Ostbelgien möglich.'
+            },
+            {
+                q: 'Arbeitet Fabry Baumpflege auch für Gemeinden und Gewerbebetriebe?',
+                a: 'Ja. Fabry Baumpflege übernimmt Aufträge für Privatpersonen, Gemeinden, Gewerbebetriebe und landwirtschaftliche Betriebe in der gesamten Deutschsprachigen Gemeinschaft Belgiens und angrenzenden Regionen.'
             }
         ]
     },
@@ -75,6 +87,18 @@ const FAQ_CONTENT = {
             {
                 q: "Peut-on abattre soi-même un arbre ?",
                 a: "L'abattage de grands arbres sans connaissances spécialisées et sans équipement adapté est très dangereux. Pour les arbres protégés, c'est également punissable sans autorisation. Pour les arbres de plus de 5 mètres et à proximité de bâtiments, de lignes ou de voies publiques, il est toujours recommandé de faire appel à un prestataire agréé."
+            },
+            {
+                q: "Fabry Baumpflege est-il certifié ?",
+                a: "Oui. Vincent Fabry est expert arboricole certifié avec une formation reconnue en technique de grimpe encordée (SKT). Tous les travaux sont réalisés conformément aux normes de sécurité en vigueur et aux réglementations environnementales belges."
+            },
+            {
+                q: "Dans quel délai Fabry Baumpflege intervient-il ?",
+                a: "Pour les demandes normales, un rendez-vous sur place est organisé dans les quelques jours ouvrables, et le devis suit généralement dans les 24 à 48 heures. En cas d'urgence — par exemple après des dégâts de tempête — une intervention rapide en Ostbelgien est possible."
+            },
+            {
+                q: "Fabry Baumpflege travaille-t-il aussi pour les communes et les entreprises ?",
+                a: "Oui. Fabry Baumpflege réalise des travaux pour les particuliers, les communes, les entreprises et les exploitations agricoles dans toute la Communauté germanophone de Belgique et les régions limitrophes."
             }
         ]
     }
