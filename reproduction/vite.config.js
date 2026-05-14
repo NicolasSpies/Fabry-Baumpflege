@@ -224,7 +224,7 @@ const fontPreloadPlugin = {
   generateBundle(_, bundle) {
     const criticalFonts = Object.keys(bundle).filter(f =>
       (f.includes('Inter-latin-') || f.includes('PlayfairDisplay-700-latin-')) &&
-      f.endsWith('.woff2') && !f.includes('ext')
+      f.endsWith('.woff2')
     );
     if (!criticalFonts.length) return;
     const preloads = criticalFonts.map(f =>
@@ -253,6 +253,17 @@ export default defineConfig({
     // Output to repo root for Hostinger git deployment
     outDir: path.resolve(import.meta.dirname, '..'),
     emptyOutDir: false,
+    rollupOptions: {
+      output: {
+        // Split React/router into a separate vendor chunk for better cache reuse.
+        // The vendor chunk changes rarely; app chunks change on every deploy.
+        manualChunks(id) {
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router')) {
+            return 'vendor-react';
+          }
+        },
+      },
+    },
   },
   base: '/',
   server: {
