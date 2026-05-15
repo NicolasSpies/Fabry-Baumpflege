@@ -31,21 +31,6 @@ const StatCounter = ({ statValue, statLabel, className = "", compact = false, da
 
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !hasAnimated.current) {
-                const el = countRef.current;
-                const isVisible = el && getComputedStyle(el.closest('.soft-entrance-item') || el).opacity !== '0';
-
-                if (!isVisible) {
-                    const retryInterval = setInterval(() => {
-                        const nowVisible = el && getComputedStyle(el.closest('.soft-entrance-item') || el).opacity !== '0';
-                        if (nowVisible && !hasAnimated.current) {
-                            clearInterval(retryInterval);
-                            startAnimation();
-                        }
-                    }, 100);
-                    setTimeout(() => clearInterval(retryInterval), 5000);
-                    return;
-                }
-
                 startAnimation();
             }
         }, { threshold: 0.05, rootMargin: '0px 0px -5% 0px' });

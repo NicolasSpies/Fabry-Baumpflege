@@ -22,15 +22,9 @@ export const useSoftEntrance = (ref, options = {}) => {
         const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
-        if (prefersReducedMotion || isMobile) {
-            items.forEach((item) => {
-                item.style.opacity = '1';
-                item.style.transform = 'none';
-                item.style.willChange = 'auto';
-                item.style.transition = 'none';
-            });
-            return;
-        }
+        // On mobile: items are visible by default — skip all style mutations to
+        // avoid forced reflows from invalidating styles on dozens of elements.
+        if (prefersReducedMotion || isMobile) return;
 
         items.forEach((item) => {
             item.style.opacity = '0';
