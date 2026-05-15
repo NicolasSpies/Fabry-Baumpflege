@@ -427,9 +427,36 @@ const ContactFormSection = ({
         }
     };
 
+    const isLoadingSchema = fields.length === 0 && submitState === 'idle';
+
     return (
         <div id="contact-form" className="lg:col-span-8 reveal stagger-1 scroll-margin-top-[120px]">
             <div className="bg-white dark:bg-surface-dark p-6 md:p-9 border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl">
+                {isLoadingSchema ? (
+                    <div className="space-y-6 md:space-y-8 animate-pulse" aria-hidden="true">
+                        <div className="h-7 w-48 bg-slate-200 dark:bg-slate-700 rounded-lg" />
+                        <div className="grid grid-cols-2 gap-4">
+                            {[...Array(4)].map((_, i) => (
+                                <div key={i} className="h-28 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700" />
+                            ))}
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {[...Array(4)].map((_, i) => (
+                                <div key={i} className="space-y-2">
+                                    <div className="h-3 w-24 bg-slate-200 dark:bg-slate-700 rounded" />
+                                    <div className="h-12 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700" />
+                                </div>
+                            ))}
+                        </div>
+                        <div className="space-y-2">
+                            <div className="h-3 w-24 bg-slate-200 dark:bg-slate-700 rounded" />
+                            <div className="h-24 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700" />
+                        </div>
+                        <div className="flex justify-end">
+                            <div className="h-12 w-40 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                        </div>
+                    </div>
+                ) : (
                 <form ref={formRef} className="space-y-6 md:space-y-8" onSubmit={handleSubmit}>
                     <fieldset disabled={isSubmitting} className="space-y-6 md:space-y-8 disabled:opacity-70">
                         <div className="space-y-5 md:space-y-6">
@@ -512,6 +539,7 @@ const ContactFormSection = ({
                         </div>
                     </fieldset>
                 </form>
+                )}
             </div>
         </div>
     );
