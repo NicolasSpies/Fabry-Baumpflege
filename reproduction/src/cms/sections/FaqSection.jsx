@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 
 const FAQ_CONTENT = {
@@ -114,15 +115,30 @@ const FaqItem = ({ question, answer, isOpen, onToggle }) => (
             <span className={`font-sans font-semibold text-[0.95rem] md:text-base leading-snug transition-colors duration-200 ${isOpen ? 'text-primary' : 'text-slate-800 dark:text-slate-100 group-hover:text-primary'}`}>
                 {question}
             </span>
-            <span className={`flex-shrink-0 text-2xl font-light leading-none transition-all duration-300 select-none ${isOpen ? 'text-primary rotate-45' : 'text-primary/40 group-hover:text-primary'}`}>
+            <motion.span
+                animate={{ rotate: isOpen ? 45 : 0 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                className={`flex-shrink-0 text-2xl font-light leading-none select-none transition-colors duration-200 ${isOpen ? 'text-primary' : 'text-primary/40 group-hover:text-primary'}`}
+            >
                 +
-            </span>
+            </motion.span>
         </button>
-        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-            <p className="font-sans text-slate-600 dark:text-slate-300 text-[0.875rem] md:text-[0.95rem] leading-relaxed pb-5 pr-10">
-                {answer}
-            </p>
-        </div>
+        <AnimatePresence initial={false}>
+            {isOpen && (
+                <motion.div
+                    key="answer"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ overflow: 'hidden' }}
+                >
+                    <p className="font-sans text-slate-600 dark:text-slate-300 text-[0.875rem] md:text-[0.95rem] leading-relaxed pb-5 pr-10">
+                        {answer}
+                    </p>
+                </motion.div>
+            )}
+        </AnimatePresence>
     </div>
 );
 

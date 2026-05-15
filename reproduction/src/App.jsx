@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from '@/cms/components/ui/Navbar';
 import Footer from '@/cms/components/ui/Footer';
 import PageLoader from '@/cms/components/ui/PageLoader';
@@ -121,32 +122,43 @@ function App() {
         <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans">
         <Navbar {...getShellProps('Navbar', globalData.navbar)} />
         <div id="main-content" className="flex-1 flex flex-col relative min-h-screen">
-          <Suspense fallback={<div className="min-h-screen" />}>
-            <Routes>
-              {/* German Routes */}
-              <Route path={ROUTES.DE.home} element={<Home />} />
-              <Route path={ROUTES.DE.services} element={<Services />} />
-              <Route path={ROUTES.DE.references} element={<References />} />
-              <Route path={ROUTES.DE.referenceDetail} element={<ReferenceDetail />} />
-              <Route path={ROUTES.DE.contact} element={<Contact />} />
-              <Route path={ROUTES.DE.about} element={<AboutMe />} />
-              <Route path={ROUTES.DE.imprint} element={<Imprint />} />
-              <Route path={ROUTES.DE.privacy} element={<Privacy />} />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="flex-1 flex flex-col"
+            >
+              <Suspense fallback={<div className="min-h-screen" />}>
+                <Routes location={location}>
+                  {/* German Routes */}
+                  <Route path={ROUTES.DE.home} element={<Home />} />
+                  <Route path={ROUTES.DE.services} element={<Services />} />
+                  <Route path={ROUTES.DE.references} element={<References />} />
+                  <Route path={ROUTES.DE.referenceDetail} element={<ReferenceDetail />} />
+                  <Route path={ROUTES.DE.contact} element={<Contact />} />
+                  <Route path={ROUTES.DE.about} element={<AboutMe />} />
+                  <Route path={ROUTES.DE.imprint} element={<Imprint />} />
+                  <Route path={ROUTES.DE.privacy} element={<Privacy />} />
 
-              {/* French Routes */}
-              <Route path={ROUTES.FR.home} element={<Home />} />
-              <Route path={ROUTES.FR.services} element={<Services />} />
-              <Route path={ROUTES.FR.references} element={<References />} />
-              <Route path={ROUTES.FR.referenceDetail} element={<ReferenceDetail />} />
-              <Route path={ROUTES.FR.contact} element={<Contact />} />
-              <Route path={ROUTES.FR.about} element={<AboutMe />} />
-              <Route path={ROUTES.FR.imprint} element={<Imprint />} />
-              <Route path={ROUTES.FR.privacy} element={<Privacy />} />
+                  {/* French Routes */}
+                  <Route path={ROUTES.FR.home} element={<Home />} />
+                  <Route path={ROUTES.FR.services} element={<Services />} />
+                  <Route path={ROUTES.FR.references} element={<References />} />
+                  <Route path={ROUTES.FR.referenceDetail} element={<ReferenceDetail />} />
+                  <Route path={ROUTES.FR.contact} element={<Contact />} />
+                  <Route path={ROUTES.FR.about} element={<AboutMe />} />
+                  <Route path={ROUTES.FR.imprint} element={<Imprint />} />
+                  <Route path={ROUTES.FR.privacy} element={<Privacy />} />
 
-              <Route path="/ueber-uns" element={<Navigate to="/ueber-mich" replace />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
+                  <Route path="/ueber-uns" element={<Navigate to="/ueber-mich" replace />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </motion.div>
+          </AnimatePresence>
         </div>
         <footer>
           <Footer {...getShellProps('Footer', globalData.footer)} />

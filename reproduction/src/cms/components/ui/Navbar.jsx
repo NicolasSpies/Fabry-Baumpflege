@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { getLocalizedPath } from '@/cms/i18n/routes';
@@ -75,33 +76,11 @@ const Navbar = ({
     const deLanguageLabel = language === 'FR' ? 'Passer en allemand' : 'Sprache auf Deutsch wechseln';
     const frLanguageLabel = language === 'FR' ? 'Passer en français' : 'Sprache auf Französisch wechseln';
 
-    const [isClosing, setIsClosing] = useState(false);
-
-    const toggleMenu = () => {
-        if (isMenuOpen) {
-            animateClose();
-        } else {
-            setIsMenuOpen(true);
-        }
-    };
-
-    const closeTimerRef = React.useRef(null);
-    const animateClose = () => {
-        setIsClosing(true);
-        closeTimerRef.current = setTimeout(() => {
-            setIsMenuOpen(false);
-            setIsClosing(false);
-        }, 280);
-    };
-    React.useEffect(() => () => clearTimeout(closeTimerRef.current), []);
-
-    const closeMenu = () => {
-        setIsMenuOpen(false);
-        setIsClosing(false);
-    };
+    const toggleMenu = () => setIsMenuOpen(prev => !prev);
+    const closeMenu = () => setIsMenuOpen(false);
 
     useEffect(() => {
-        if (isMenuOpen && !isClosing && isMobileMode) {
+        if (isMenuOpen && isMobileMode) {
             document.body.style.overflow = 'hidden';
             window.scrollTo({ top: 0, behavior: 'instant' });
         } else {
@@ -110,7 +89,7 @@ const Navbar = ({
         return () => {
             document.body.style.overflow = 'unset';
         };
-    }, [isMenuOpen, isClosing, isMobileMode]);
+    }, [isMenuOpen, isMobileMode]);
 
     useEffect(() => {
         if (!isMobileMode && isMenuOpen) {
@@ -124,12 +103,10 @@ const Navbar = ({
         e.preventDefault();
         const href = e.currentTarget.getAttribute('href');
         setTappedIdx(idx);
-        // Navigate immediately so page starts loading in background
         navigate(href);
-        // Brief tap highlight, then animate menu closed
         setTimeout(() => {
             setTappedIdx(null);
-            animateClose();
+            setIsMenuOpen(false);
         }, 100);
     };
 
@@ -264,50 +241,54 @@ const Navbar = ({
                 )}
             </div>
 
-            {((isMenuOpen || isClosing) && isMobileMode) && (
-                <div
-                    id="mobile-navigation"
-                    className={`absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl border-b border-slate-100 dark:border-slate-800 flex flex-col items-center py-8 gap-8 z-[100] transition-[transform,opacity] duration-300 ease-out origin-top ${
-                        isClosing
-                            ? 'opacity-0 -translate-y-4 scale-y-95 pointer-events-none'
-                            : 'opacity-100 translate-y-0 scale-y-100 animate-in slide-in-from-top duration-300'
-                    }`}
-                >
-                    <div className="flex flex-col items-center gap-6 w-full px-6">
-                        {renderLinks(true)}
-                    </div>
+            <AnimatePresence>
+                {isMenuOpen && isMobileMode && (
+                    <motion.div
+                        id="mobile-navigation"
+                        key="mobile-nav"
+                        initial={{ opacity: 0, y: -12, scaleY: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scaleY: 1 }}
+                        exit={{ opacity: 0, y: -12, scaleY: 0.96 }}
+                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                        style={{ originY: 0 }}
+                        className="absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl border-b border-slate-100 dark:border-slate-800 flex flex-col items-center py-8 gap-8 z-[100]"
+                    >
+                        <div className="flex flex-col items-center gap-6 w-full px-6">
+                            {renderLinks(true)}
+                        </div>
 
-                    <div className="w-full px-6 flex justify-center mt-2">
-                        <Link
-                            to={getLocalizedPath('contact', language)}
-                            onClick={(e) => { e.preventDefault(); navigate(getLocalizedPath('contact', language)); animateClose(); }}
-                            className="bg-primary text-white px-8 py-3 rounded-full text-sm uppercase tracking-widest font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-[transform,box-shadow,background-color] text-center w-full max-w-[200px]"
-                        >
-                            {actualCtaLabel}
-                        </Link>
-                    </div>
+                        <div className="w-full px-6 flex justify-center mt-2">
+                            <Link
+                                to={getLocalizedPath('contact', language)}
+                                onClick={(e) => { e.preventDefault(); navigate(getLocalizedPath('contact', language)); setIsMenuOpen(false); }}
+                                className="bg-primary text-white px-8 py-3 rounded-full text-sm uppercase tracking-widest font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-[transform,box-shadow,background-color] text-center w-full max-w-[200px]"
+                            >
+                                {actualCtaLabel}
+                            </Link>
+                        </div>
 
-                    <div className="flex items-center justify-center gap-6 mt-4 pt-6 border-t border-slate-100 dark:border-slate-800/50 w-full text-sm tracking-[0.3em] font-bold">
-                        <button
-                            onClick={() => { setLanguage('DE'); animateClose(); }}
-                            aria-label={deLanguageLabel}
-                            aria-pressed={language === 'DE'}
-                            className={`transition-[opacity,color,transform] duration-300 ${language === 'DE' ? 'opacity-100 text-primary scale-110' : 'opacity-70 hover:opacity-100'}`}
-                        >
-                            DE
-                        </button>
-                        <span className="opacity-20 text-xl font-light">|</span>
-                        <button
-                            onClick={() => { setLanguage('FR'); animateClose(); }}
-                            aria-label={frLanguageLabel}
-                            aria-pressed={language === 'FR'}
-                            className={`transition-[opacity,color,transform] duration-300 ${language === 'FR' ? 'opacity-100 text-primary scale-110' : 'opacity-70 hover:opacity-100'}`}
-                        >
-                            FR
-                        </button>
-                    </div>
-                </div>
-            )}
+                        <div className="flex items-center justify-center gap-6 mt-4 pt-6 border-t border-slate-100 dark:border-slate-800/50 w-full text-sm tracking-[0.3em] font-bold">
+                            <button
+                                onClick={() => { setLanguage('DE'); setIsMenuOpen(false); }}
+                                aria-label={deLanguageLabel}
+                                aria-pressed={language === 'DE'}
+                                className={`transition-[opacity,color,transform] duration-300 ${language === 'DE' ? 'opacity-100 text-primary scale-110' : 'opacity-70 hover:opacity-100'}`}
+                            >
+                                DE
+                            </button>
+                            <span className="opacity-20 text-xl font-light">|</span>
+                            <button
+                                onClick={() => { setLanguage('FR'); setIsMenuOpen(false); }}
+                                aria-label={frLanguageLabel}
+                                aria-pressed={language === 'FR'}
+                                className={`transition-[opacity,color,transform] duration-300 ${language === 'FR' ? 'opacity-100 text-primary scale-110' : 'opacity-70 hover:opacity-100'}`}
+                            >
+                                FR
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </nav>
     );
 };

@@ -25,8 +25,15 @@ function renderTextWithBreaks(text) {
 const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, objectPosition = 'object-top' }) => {
     const heroRef = useRef(null);
     const [isImageReady, setIsImageReady] = useState(false);
+    const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
     const imageKey = typeof image === 'string' ? image : image?.src || image?.url || image?.full?.url || '';
-    const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 767px)');
+        const handler = (e) => setIsMobile(e.matches);
+        mq.addEventListener('change', handler);
+        return () => mq.removeEventListener('change', handler);
+    }, []);
     useParallax(heroRef, { 
         speed: 0.08, 
         maxTravel: 40, 
