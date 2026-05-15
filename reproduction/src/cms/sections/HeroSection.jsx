@@ -58,7 +58,7 @@ const HeroSection = ({ title_top, title_main, description, cta, image, ctaHref, 
     const isExternalCta = isExternalHref(ctaHref);
 
     return (
-        <section className="relative h-[580px] md:h-[75vh] lg:h-screen w-full overflow-hidden flex items-center">
+        <section className="relative h-[580px] md:h-[75vh] lg:h-screen w-full overflow-hidden flex items-center bg-primary">
             <div className="absolute inset-0 z-0">
                 <CmsImage
                     image={image}

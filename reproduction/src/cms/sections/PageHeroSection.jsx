@@ -25,7 +25,7 @@ const PageHeroSection = ({ title, image }) => {
     }, [imageKey]);
 
     return (
-        <section className="relative h-[38svh] min-h-[15rem] md:h-[60vh] flex items-end md:items-center justify-center pt-20 pb-6 md:pb-0 overflow-hidden">
+        <section className="relative h-[38svh] min-h-[15rem] md:h-[60vh] flex items-end md:items-center justify-center pt-20 pb-6 md:pb-0 overflow-hidden bg-primary">
             <CmsImage
                 image={image}
                 ref={heroRef}
@@ -38,8 +38,8 @@ const PageHeroSection = ({ title, image }) => {
                 onLoad={() => setIsImageReady(true)}
                 onError={() => setIsImageReady(true)}
             />
-            <div className={`absolute inset-0 bg-black/30 transition-opacity duration-500 ${isImageReady ? 'opacity-100' : 'opacity-0'}`} />
-            <div className={`relative z-10 text-center reveal transition-opacity duration-500 ${isImageReady ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <div className="absolute inset-0 bg-black/30" />
+            <div className="relative z-10 text-center reveal">
                 <h1 className="text-4xl md:text-7xl font-serif text-white">{renderCmsInline(title)}</h1>
             </div>
         </section>

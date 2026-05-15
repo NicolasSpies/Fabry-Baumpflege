@@ -122,13 +122,13 @@ function App() {
         <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans">
         <Navbar {...getShellProps('Navbar', globalData.navbar)} />
         <div id="main-content" className="flex-1 flex flex-col relative min-h-screen">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="sync">
             <motion.div
               key={location.pathname}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
+              exit={{ opacity: 0, position: 'absolute', width: '100%' }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
               className="flex-1 flex flex-col"
             >
               <Suspense fallback={<div className="min-h-screen" />}>
