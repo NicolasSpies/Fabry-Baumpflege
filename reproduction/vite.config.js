@@ -226,10 +226,19 @@ const fontPreloadPlugin = {
       (f.includes('Inter-latin-') || f.includes('PlayfairDisplay-700-latin-')) &&
       f.endsWith('.woff2')
     );
-    if (!criticalFonts.length) return;
-    const preloads = criticalFonts.map(f =>
+    // The Navbar logo is the LCP element — preload it so the browser can fetch it
+    // immediately from HTML, without waiting for React JS to render the Navbar.
+    const logoFiles = Object.keys(bundle).filter(f =>
+      f.includes('Baumpflege-Fabry-Logo') && f.endsWith('.svg')
+    );
+    if (!criticalFonts.length && !logoFiles.length) return;
+    const fontPreloads = criticalFonts.map(f =>
       `  <link rel="preload" as="font" href="/${f}" type="font/woff2" crossorigin />`
     ).join('\n');
+    const logoPreloads = logoFiles.map(f =>
+      `  <link rel="preload" as="image" href="/${f}" type="image/svg+xml" />`
+    ).join('\n');
+    const preloads = [logoPreloads, fontPreloads].filter(Boolean).join('\n');
     for (const [name, asset] of Object.entries(bundle)) {
       if (name.endsWith('.html') && asset.type === 'asset') {
         asset.source = String(asset.source).replace(/<\/head>/i, `${preloads}\n</head>`);
