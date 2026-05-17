@@ -270,6 +270,7 @@ export default defineConfig({
   },
   base: '/',
   server: {
+    port: parseInt(process.env.PORT) || 5174,
     proxy: {
       // Proxy /cms/* → CMS_HOST/wp-json/*
       // Host is read from src/cms/lib/cmsConfig.js — the single source of truth.

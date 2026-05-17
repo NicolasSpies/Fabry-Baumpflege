@@ -10,7 +10,7 @@ export const translations = {
         // Hero
         'hero.precision': 'Präzision',
         'hero.meets': 'trifft Natur',
-        'hero.description': 'Nachhaltige Baumpflege und Fällarbeiten mit höchster Sorgfalt und Expertise. Für gesunde Bäume und sichere Gärten.',
+        'hero.description': 'Ihr zertifizierter Baumpfleger und Baumfäller in Ostbelgien. Nachhaltige Baumpflege und Fällarbeiten mit höchster Sorgfalt und Expertise.',
         'hero.cta': 'Jetzt Kontakt aufnehmen',
 
         // Expertise / Services
@@ -26,9 +26,9 @@ export const translations = {
             'Seilklettertechnik (SKT) für schwierige Lagen',
             'Erhalt der natürlichen Baumarchitektur'
         ],
-        'services.page_intro': 'Vier klar definierte Leistungsbereiche. Präzise Baumpflege, sichere Abtragung, strukturierte Gartenpflege und nachhaltige Bepflanzung.',
+        'services.page_intro': 'Vier klar definierte Leistungsbereiche Ihres Baumpflegers und Baumfällers in Ostbelgien. Präzise Baumpflege, sichere Baumfällung, strukturierte Gartenpflege und nachhaltige Bepflanzung.',
         'services.baumfaellung.title': 'Baumfällung',
-        'services.baumfaellung.desc': 'Sichere Fällungen auch an schwierigen Standorten mittels Seilklettertechnik oder Hubsteiger.',
+        'services.baumfaellung.desc': 'Als erfahrener Baumfäller führe ich sichere Fällungen auch an schwierigen Standorten mittels Seilklettertechnik oder Hubsteiger durch.',
         'services.baumfaellung.features': [
             'Gefahrenbaumfällung & Sturmschäden',
             'Abtragen mittels Seilablassverfahren',
@@ -60,7 +60,7 @@ export const translations = {
         // About Me Page
         'aboutme.philosophy.label': 'Die Philosophie',
         'aboutme.philosophy.quote': '"Ein Baum ist mehr als nur Holz. Er ist ein Vermächtnis."',
-        'aboutme.philosophy.text': 'Mit Leidenschaft und Fachkenntnis klettere ich in die Kronen, um das Gleichgewicht zwischen urbaner Entwicklung und natürlichem Erhalt zu wahren. Meine Arbeit ist geprägt von tiefem Respekt vor der Vitalität jedes einzelnen Baumes.',
+        'aboutme.philosophy.text': 'Als Baumpfleger und Baumfäller klettere ich mit Leidenschaft in die Kronen, um das Gleichgewicht zwischen urbaner Entwicklung und natürlichem Erhalt zu wahren. Meine Arbeit ist geprägt von tiefem Respekt vor der Vitalität jedes einzelnen Baumes.',
         'aboutme.values.precision.title': 'Präzision',
         'aboutme.values.precision.text': 'Jeder Schnitt folgt einer biologischen Notwendigkeit. Seilklettertechnik erlaubt uns, auch die sensibelsten Bereiche sicher zu erreichen.',
         'aboutme.values.sustainability.title': 'Nachhaltigkeit',
@@ -84,7 +84,7 @@ export const translations = {
         // About Teaser
         'about.teaser_label': 'Tradition trifft Präzision',
         'about.teaser_title': 'Expertise in jedem Astschlag',
-        'about.teaser_text': 'Mit Leidenschaft und Fachkenntnis widmet sich Vincent Fabry dem Erhalt und der Pflege urbaner Naturräume. Ich verstehe Bäume nicht nur als Gestaltungselemente, sondern als wertvolle Lebewesen.',
+        'about.teaser_text': 'Als zertifizierter Baumpfleger und Baumfäller widmet sich Vincent Fabry dem Erhalt und der Pflege urbaner Naturräume in Ostbelgien. Ich verstehe Bäume nicht nur als Gestaltungselemente, sondern als wertvolle Lebewesen.',
         'about.teaser_cta': 'Erfahre mehr über mich',
         'about.quote': '"Sorgfalt bis ins Detail"',
 
@@ -92,7 +92,7 @@ export const translations = {
         'common.testimonial': 'Kundenstimme',
 
         // Footer
-        'footer.description': 'Zertifizierter Fachbetrieb für Baumpflege und Gartengestaltung in Ostbelgien. Qualität und Nachhaltigkeit für dein Grün.',
+        'footer.description': 'Zertifizierter Baumpfleger und Baumfäller in Eupen, Raeren, Kelmis, Lontzen, Kettenis und ganz Ostbelgien. Professionelle Baumpflege, Baumfällung und Gartengestaltung.',
         'footer.nav': 'Navigation',
         'footer.contact': 'Kontakt',
         'footer.rights': 'Alle Rechte vorbehalten.',
@@ -143,7 +143,7 @@ export const translations = {
         'contact.form.gartenpflege.sub': 'Gesamtkonzepte',
         'contact.form.bepflanzung.label': 'Bepflanzung',
         'contact.form.bepflanzung.sub': 'Nachhaltige Neuanlage',
-        'contact.area_text': 'Ich bin in der gesamten Region Ostbelgien und Umgebung für dich im Einsatz und berate dich fachgerecht direkt vor Ort.',
+        'contact.area_text': 'Als Baumpfleger und Baumfäller bin ich in Eupen, Raeren, Kelmis, Lontzen, Kettenis, Sankt-Vith und der gesamten Deutschsprachigen Gemeinschaft Belgiens für dich im Einsatz.',
         'contact.turnstile_missing': 'Sicherheitsprüfung (Turnstile) fehlt.',
         'contact.success_title': 'Anfrage versendet.',
         'contact.success_body': 'Danke. Ich melde mich schnellstmöglich zurück.',
@@ -155,7 +155,7 @@ export const translations = {
         'refs.all': 'Alle',
         'refs.load_more': 'Mehr Projekte laden',
         'refs.reload': 'Neu laden',
-        'refs.intro': 'Entdecke eine Auswahl meiner Arbeiten. Von präziser Baumpflege bis hin zu komplexen Fällungen und hochwertiger Gartengestaltung.',
+        'refs.intro': 'Entdecke eine Auswahl meiner Arbeiten als Baumpfleger und Baumfäller in Eupen, Raeren, Kelmis und ganz Ostbelgien. Von präziser Kronenpflege bis hin zu komplexen Fällungen und hochwertiger Gartengestaltung.',
         'refs.error_loading': 'Fehler beim Laden der Referenzen.',
         'refs.error_retry': 'Bitte versuchen Sie es später noch einmal.',
         'refs.back_to_overview': 'Zurück zur Übersicht',
@@ -185,7 +185,7 @@ export const translations = {
         // Hero
         'hero.precision': 'Précision rencontre',
         'hero.meets': 'Nature',
-        'hero.description': 'Entretien durable des arbres et abattages effectués avec le plus grand soin et expertise. Pour des arbres sains et des jardins sécurisés.',
+        'hero.description': 'Votre arboriste et élagueur certifié en Ostbelgique. Entretien durable des arbres et abattages réalisés avec le plus grand soin et expertise.',
         'hero.cta': 'Nous contacter',
 
         // Expertise / Services
@@ -201,9 +201,9 @@ export const translations = {
             'Grimpe (SKT) pour les endroits difficiles',
             "Préservation de l'architecture naturelle de l'arbre"
         ],
-        'services.page_intro': "Quatre domaines de service clairement structurés. Entretien des arbres, abattage sécurisé, entretien de jardin précis et plantation durable.",
+        'services.page_intro': "Quatre domaines de service de votre arboriste et élagueur en Ostbelgique. Entretien des arbres, abattage sécurisé, entretien de jardin précis et plantation durable.",
         'services.baumfaellung.title': 'Abattage',
-        'services.baumfaellung.desc': "Abattages sécurisés, même dans des endroits difficiles, grâce à la technique de grimpe encordée ou à la nacelle élévatrice.",
+        'services.baumfaellung.desc': "En tant qu'élagueur expérimenté, je réalise des abattages sécurisés même dans des endroits difficiles, grâce à la grimpe encordée ou à la nacelle élévatrice.",
         'services.baumfaellung.features': [
             "Abattage d'arbres dangereux & dégâts de tempête",
             'Démontage par rétention',
@@ -235,7 +235,7 @@ export const translations = {
         // About Me Page
         'aboutme.philosophy.label': 'La Philosophie',
         'aboutme.philosophy.quote': '"Un arbre est plus que du bois. C\'est un héritage."',
-        'aboutme.philosophy.text': 'C\'est avec passion et expertise que je grimpe dans les cimes pour maintenir l\'équilibre entre le développement urbain et la préservation naturelle. Mon travail est imprégné d\'un profond respect pour la vitalité de chaque arbre.',
+        'aboutme.philosophy.text': 'Arboriste et élagueur passionné, je grimpe dans les cimes pour maintenir l\'équilibre entre le développement urbain et la préservation naturelle. Mon travail est imprégné d\'un profond respect pour la vitalité de chaque arbre.',
         'aboutme.values.precision.title': 'Précision',
         'aboutme.values.precision.text': 'Chaque coupe suit une nécessité biologique. Les techniques de grimpe nous permettent d\'atteindre en toute sécurité même les zones les plus sensibles.',
         'aboutme.values.sustainability.title': 'Durabilité',
@@ -259,12 +259,12 @@ export const translations = {
         // About Teaser
         'about.teaser_label': 'Tradition rencontre Précision',
         'about.teaser_title': "Expertise dans chaque coupe d'onglet",
-        'about.teaser_text': "Avec passion et expertise, Vincent Fabry se consacre à la préservation et à l'entretien des espaces naturels urbains. Je considère les arbres non seulement comme des éléments de conception, mais comme des êtres livants précieux.",
+        'about.teaser_text': "Arboriste et élagueur certifié, Vincent Fabry se consacre à la préservation et à l'entretien des espaces naturels urbains en Ostbelgique. Je considère les arbres non seulement comme des éléments de conception, mais comme des êtres vivants précieux.",
         'about.teaser_cta': 'En savoir plus sur moi',
         'about.quote': '"La qualité qui grandit au fil des générations."',
 
         // Footer
-        'footer.description': 'Entreprise spécialisée certifiée en arboriculture et aménagement paysager. Qualité et durabilité pour vos espaces verts.',
+        'footer.description': 'Arboriste et élagueur certifié à Eupen, Raeren, Kelmis, Lontzen et toute l\'Ostbelgique. Entretien des arbres, abattage et aménagement paysager.',
         'footer.nav': 'Navigation',
         // Common
         'common.testimonial': 'Témoignage',
@@ -318,7 +318,7 @@ export const translations = {
         'contact.form.gartenpflege.sub': 'Concepts Globaux',
         'contact.form.bepflanzung.label': 'Plantation',
         'contact.form.bepflanzung.sub': 'Nouvelle Plantation',
-        'contact.area_text': 'Je suis à votre service dans toute la région d’Ostbelgie et ses environs, et je vous conseille professionnellement directement sur place.',
+        'contact.area_text': "Arboriste et élagueur, j'interviens à Eupen, Raeren, Kelmis, Lontzen, Kettenis, Saint-Vith et dans toute la Communauté germanophone de Belgique.",
         'contact.turnstile_missing': 'Validation de sécurité (Turnstile) manquante.',
         'contact.success_title': 'Demande envoyée.',
         'contact.success_body': 'Merci. Je reviens vers vous rapidement.',
@@ -330,7 +330,7 @@ export const translations = {
         'refs.all': 'Tous',
         'refs.load_more': 'Charger plus de projets',
         'refs.reload': 'Recharger',
-        'refs.intro': "Découvrez une sélection de nos travaux. De l'Taille raisonnée précise aux abattages complexes et à l'aménagement paysager de haute qualité.",
+        'refs.intro': "Découvrez une sélection de mes travaux d'arboriste et d'élagueur à Eupen, Raeren, Kelmis et toute l'Ostbelgique. De l'entretien précis des arbres aux abattages complexes et à l'aménagement paysager.",
         'refs.error_loading': 'Erreur lors du chargement des références.',
         'refs.error_retry': 'Veuillez réessayer plus tard.',
         'refs.back_to_overview': "Retour à l'aperçu",
