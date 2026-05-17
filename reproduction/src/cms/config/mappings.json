@@ -11,12 +11,12 @@
         "HeroSection": {
           "component": "HeroSection",
           "props": {
-            "title_top": {
+            "title_main": {
               "fieldPath": "customFields.startseite_first_headline_h1",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
             },
-            "title_main": {
+            "title_top": {
               "fieldPath": "customFields.startseite_second_headline_h1",
               "sourceId": "nnnd3pjq",
               "isUnstable": false
