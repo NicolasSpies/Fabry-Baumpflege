@@ -241,7 +241,20 @@ const fontPreloadPlugin = {
     const preloads = [logoPreloads, fontPreloads].filter(Boolean).join('\n');
     for (const [name, asset] of Object.entries(bundle)) {
       if (name.endsWith('.html') && asset.type === 'asset') {
-        asset.source = String(asset.source).replace(/<\/head>/i, `${preloads}\n</head>`);
+        let html = String(asset.source);
+        // 1. Inject preloads (logo + fonts) before </head>
+        html = html.replace(/<\/head>/i, `${preloads}\n</head>`);
+        // 2. Make the main CSS non-render-blocking.
+        //    Safe for this React SPA: CSS downloads in ~145 ms; React takes >1 s to
+        //    execute on mobile. The stylesheet is always ready before first paint.
+        html = html.replace(
+          /<link rel="stylesheet"( crossorigin)? href="(\/assets\/index-[^"]+\.css)">/,
+          (_, co, href) => {
+            const attrs = co || '';
+            return `<link rel="preload" as="style"${attrs} href="${href}" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet"${attrs} href="${href}"></noscript>`;
+          }
+        );
+        asset.source = html;
       }
     }
   }
