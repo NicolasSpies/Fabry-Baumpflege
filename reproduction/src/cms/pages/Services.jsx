@@ -186,8 +186,6 @@ const Services = () => {
             <ServicesBlocksSection {...getProps('ServicesBlocksSection', pageData.blocks)} />
 
             <ServicesFaqSection />
-
-            {/* Page: Services → Section: StatsSection */}
         </main>
     );
 };
