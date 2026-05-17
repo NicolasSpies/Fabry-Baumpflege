@@ -7,6 +7,7 @@ import { definePreview } from '@/cms/lib/preview';
 import logo from '@/assets/Baumpflege-Fabry-Logo.svg';
 import { resolveInstanceProps } from '@/cms/bridge-resolver';
 import Icon from '@/cms/components/ui/Icon';
+import MenuToggleIcon from '@/cms/components/ui/MenuToggleIcon';
 
 /**
  * Preview Metadata for ContentBridge scanning.
@@ -24,7 +25,7 @@ const Navbar = ({
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMode, setIsMobileMode] = useState(() => (
-        typeof window !== 'undefined' ? window.innerWidth < 1180 : false
+        typeof window !== 'undefined' ? window.innerWidth < 1024 : false
     ));
 
     const containerRef = useRef(null);
@@ -39,7 +40,7 @@ const Navbar = ({
             const logoWidth = logoRef.current.getBoundingClientRect().width;
             const navWidth = desktopNavRef.current.scrollWidth;
             const requiredWidth = logoWidth + navWidth + 24;
-            setIsMobileMode(window.innerWidth < 1180 || requiredWidth >= availableWidth);
+            setIsMobileMode(window.innerWidth < 1024 || requiredWidth >= availableWidth);
         };
 
         checkCollision();
@@ -235,7 +236,7 @@ const Navbar = ({
                             aria-expanded={isMenuOpen}
                             aria-controls="mobile-navigation"
                         >
-                            <Icon name={isMenuOpen ? 'close' : 'menu'} className={`text-[1.7rem] transition-transform duration-300 ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`} />
+                            <MenuToggleIcon open={isMenuOpen} className="w-7 h-7" strokeWidth={2} />
                         </button>
                     </div>
                 )}
@@ -246,18 +247,17 @@ const Navbar = ({
                     <motion.div
                         id="mobile-navigation"
                         key="mobile-nav"
-                        initial={{ opacity: 0, y: -12, scaleY: 0.96 }}
-                        animate={{ opacity: 1, y: 0, scaleY: 1 }}
-                        exit={{ opacity: 0, y: -12, scaleY: 0.96 }}
-                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                        style={{ originY: 0 }}
-                        className="absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl border-b border-slate-100 dark:border-slate-800 flex flex-col items-center py-8 gap-8 z-[100]"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.22, ease: 'easeOut' }}
+                        className="fixed top-16 md:top-20 inset-x-0 bottom-0 bg-white dark:bg-slate-900 flex flex-col items-center justify-center gap-8 z-[99] overflow-y-auto"
                     >
                         <div className="flex flex-col items-center gap-6 w-full px-6">
                             {renderLinks(true)}
                         </div>
 
-                        <div className="w-full px-6 flex justify-center mt-2">
+                        <div className="w-full px-6 flex justify-center">
                             <Link
                                 to={getLocalizedPath('contact', language)}
                                 onClick={(e) => { e.preventDefault(); navigate(getLocalizedPath('contact', language)); setIsMenuOpen(false); }}
@@ -267,7 +267,7 @@ const Navbar = ({
                             </Link>
                         </div>
 
-                        <div className="flex items-center justify-center gap-6 mt-4 pt-6 border-t border-slate-100 dark:border-slate-800/50 w-full text-sm tracking-[0.3em] font-bold">
+                        <div className="flex items-center justify-center gap-6 pt-6 border-t border-slate-100 dark:border-slate-800/50 w-full text-sm tracking-[0.3em] font-bold">
                             <button
                                 onClick={() => { setLanguage('DE'); setIsMenuOpen(false); }}
                                 aria-label={deLanguageLabel}

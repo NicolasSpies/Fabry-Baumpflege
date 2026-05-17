@@ -350,9 +350,6 @@ const Home = () => {
                 {...getProps('HeroSection', pageData.hero)}
             />
 
-            {/* Page: Home → Section: StatsSection */}
-            <StatsSection {...getProps('StatsSection', pageData.stats)} compact={true} />
-
             {/* Page: Home → Section: HomeIntroSection */}
             <HomeIntroSection {...getProps('HomeIntroSection', pageData.intro)} />
 
