@@ -50,7 +50,7 @@ const Navbar = ({
         if (desktopNavRef.current) resizeObserver.observe(desktopNavRef.current);
 
         return () => resizeObserver.disconnect();
-    }, [language, isScrolled]);
+    }, [language]);
 
     useEffect(() => {
         const handleScroll = () => {

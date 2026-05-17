@@ -332,7 +332,7 @@ const References = () => {
                                 )}
                             </button>
                             <p className="text-xs text-muted-accessible uppercase tracking-widest">
-                                {displayCount} von {filteredRefs.length} Projekten angezeigt
+                                {t('refs.count').replace('{count}', displayCount).replace('{total}', filteredRefs.length)}
                             </p>
                         </div>
                     )}

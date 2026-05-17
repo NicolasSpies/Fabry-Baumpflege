@@ -86,7 +86,7 @@ const renderContent = (text) => {
 };
 
 const Privacy = () => {
-    const { language, t, globalCmsData, globalSeo, setPageReady } = useLanguage();
+    const { language, t, globalCmsData, setPageReady } = useLanguage();
     const [content, setContent] = useState('');
     const [rawPage, setRawPage] = useState(null);
     useScrollReveal([rawPage]);

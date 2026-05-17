@@ -220,14 +220,29 @@ function getRouteKeyFromPath(pathname: string = ''): string | null {
   return null;
 }
 
+/**
+ * Returns '/' for any href beginning with the javascript: scheme (case-insensitive).
+ * This prevents CMS-supplied values from becoming executable javascript: URIs in
+ * <a href> or React Router <Link to> props.
+ */
+function sanitizeHref(href: string): string {
+  if (/^javascript:/i.test(href.trim())) {
+    console.warn('[Bridge] Blocked javascript: URI — replaced with /');
+    return '/';
+  }
+  return href;
+}
+
 export function isExternalHref(href: string = ''): boolean {
-  return /^(https?:)?\/\//i.test(href) || /^(mailto:|tel:)/i.test(href);
+  const safe = sanitizeHref(href);
+  if (safe === '/') return false; // javascript: URIs were neutralised; treat as internal '/'
+  return /^(https?:)?\/\//i.test(safe) || /^(mailto:|tel:)/i.test(safe);
 }
 
 export function resolveFrontendHref(value: string, lang: string = _language): string {
   if (!value || typeof value !== 'string') return value;
 
-  const href = value.trim();
+  const href = sanitizeHref(value.trim());
   if (!href) return href;
   if (/^(mailto:|tel:|#)/i.test(href)) return href;
   if (!/^(https?:)?\/\//i.test(href) && href.startsWith('/')) {

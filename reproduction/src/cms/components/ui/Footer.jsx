@@ -67,7 +67,7 @@ const Footer = ({
                 </div>
 
                 <div className="hidden lg:flex flex-col items-center">
-                    <h3 className="font-bold text-[10px] mb-4 tracking-widest uppercase text-white">{language === 'FR' ? 'Mes réseaux' : 'Meine Netzwerke'}</h3>
+                    <h3 className="font-bold text-[10px] mb-4 tracking-widest uppercase text-white">{t('footer.social')}</h3>
                     <div className="flex gap-3">
                         {actualInstaUrl && (
                             <a className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-all" href={actualInstaUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram">

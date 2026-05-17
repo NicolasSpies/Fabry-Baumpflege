@@ -84,17 +84,28 @@ const stopLoop = () => {
     }
 };
 
-if (typeof window !== 'undefined') {
+let _listenersRegistered = false;
+
+if (typeof window !== 'undefined' && !_listenersRegistered) {
+    _listenersRegistered = true;
+
     const handleScroll = () => {
         startLoop();
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(stopLoop, 1000); // Keep running for 1s after scroll
     };
 
+    let _resizeRafId = null;
+    const handleResize = () => {
+        if (_resizeRafId) return;
+        _resizeRafId = requestAnimationFrame(() => {
+            _resizeRafId = null;
+            updateLayouts();
+        });
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', () => {
-        updateLayouts();
-    }, { passive: true });
+    window.addEventListener('resize', handleResize, { passive: true });
 }
 
 export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, disabled = false, desktopOnly = true } = {}) => {

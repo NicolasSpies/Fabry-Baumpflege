@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { ROUTES } from '@/cms/i18n/routes';
+import useCmsSeo from '@/cms/hooks/useCmsSeo';
 
 const texts = {
     DE: {
@@ -19,6 +20,11 @@ const texts = {
 const NotFound = () => {
     const { language, setPageReady } = useLanguage();
     const t = texts[language] || texts.DE;
+
+    useCmsSeo({
+        title: language === 'FR' ? 'Page introuvable | Fabry Baumpflege' : 'Seite nicht gefunden | Fabry Baumpflege',
+        description: language === 'FR' ? 'La page que vous cherchez n\'existe pas.' : 'Die gesuchte Seite existiert nicht.',
+    });
 
     useEffect(() => { setPageReady(true); }, []);
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { translations } from './translations';
 import { ROUTES } from './routes';
@@ -126,21 +126,22 @@ export function LanguageProvider({ children }) {
         navigate(targetPath);
     }, [language, location.pathname, navigate, alternates]);
 
-    return (
-        <LanguageContext.Provider value={{ 
-            language, 
-            setLanguage, 
-            t, 
-            globalCmsData,
-            setGlobalCmsData,
-            globalSeo,
-            setGlobalSeo,
-            alternates,
-            setAlternates,
-            pageReady,
-            setPageReady
-        }}>
+    const contextValue = useMemo(() => ({
+        language,
+        setLanguage,
+        t,
+        globalCmsData,
+        setGlobalCmsData,
+        globalSeo,
+        setGlobalSeo,
+        alternates,
+        setAlternates,
+        pageReady,
+        setPageReady,
+    }), [language, t, globalCmsData, globalSeo, alternates, pageReady]); // setters are stable — omitted from deps
 
+    return (
+        <LanguageContext.Provider value={contextValue}>
             {children}
         </LanguageContext.Provider>
     );

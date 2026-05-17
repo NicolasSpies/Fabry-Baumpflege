@@ -108,6 +108,19 @@ export function resolveMetadata(route, apiData, globalSeo) {
 }
 
 /**
+ * Escapes characters that are special in HTML attribute values and tag content.
+ * Prevents CMS-supplied strings from breaking out of their injection context.
+ */
+function escapeHtml(str) {
+    return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+/**
  * Perform the Actual Injection Logic on an HTML string
  */
 export function injectMetadata(html, metadata) {
@@ -115,24 +128,24 @@ export function injectMetadata(html, metadata) {
 
     // 1. HTML Lang (Handles multi-line or complicated attributes)
     const htmlPattern = /<html([^>]*?)lang=".*?"([^>]*?)>/is;
-    output = output.replace(htmlPattern, `<html$1lang="${metadata.lang}"$2>`);
+    output = output.replace(htmlPattern, `<html$1lang="${escapeHtml(metadata.lang)}"$2>`);
 
     // 2. Title (Handles multi-line titles)
-    output = output.replace(/<title>.*?<\/title>/is, `<title>${metadata.title}</title>`);
+    output = output.replace(/<title>.*?<\/title>/is, `<title>${escapeHtml(metadata.title)}</title>`);
 
     // 3. Meta Tags (Grouped for reliability)
     const metaReplacements = [
-        { pattern: /<meta name="description" content=".*?" \/>/is, value: `<meta name="description" content="${metadata.description}" />` },
-        { pattern: /<meta name="robots" content=".*?" \/>/is, value: `<meta name="robots" content="${metadata.robots}" />` },
-        { pattern: /<meta property="og:title" content=".*?" \/>/is, value: `<meta property="og:title" content="${metadata.ogTitle}" />` },
-        { pattern: /<meta property="og:description" content=".*?" \/>/is, value: `<meta property="og:description" content="${metadata.ogDescription}" />` },
-        { pattern: /<meta property="og:image" content=".*?" \/>/is, value: `<meta property="og:image" content="${metadata.ogImage}" />` },
-        { pattern: /<meta property="og:url" content=".*?" \/>/is, value: `<meta property="og:url" content="${metadata.url}" />` },
-        { pattern: /<meta property="og:type" content=".*?" \/>/is, value: `<meta property="og:type" content="${metadata.type}" />` },
-        { pattern: /<meta property="og:locale" content=".*?" \/>/is, value: `<meta property="og:locale" content="${metadata.locale}" />` },
-        { pattern: /<meta name="twitter:title" content=".*?" \/>/is, value: `<meta name="twitter:title" content="${metadata.ogTitle}" />` },
-        { pattern: /<meta name="twitter:description" content=".*?" \/>/is, value: `<meta name="twitter:description" content="${metadata.ogDescription}" />` },
-        { pattern: /<meta name="twitter:image" content=".*?" \/>/is, value: `<meta name="twitter:image" content="${metadata.ogImage}" />` }
+        { pattern: /<meta name="description" content=".*?" \/>/is, value: `<meta name="description" content="${escapeHtml(metadata.description)}" />` },
+        { pattern: /<meta name="robots" content=".*?" \/>/is, value: `<meta name="robots" content="${escapeHtml(metadata.robots)}" />` },
+        { pattern: /<meta property="og:title" content=".*?" \/>/is, value: `<meta property="og:title" content="${escapeHtml(metadata.ogTitle)}" />` },
+        { pattern: /<meta property="og:description" content=".*?" \/>/is, value: `<meta property="og:description" content="${escapeHtml(metadata.ogDescription)}" />` },
+        { pattern: /<meta property="og:image" content=".*?" \/>/is, value: `<meta property="og:image" content="${escapeHtml(metadata.ogImage)}" />` },
+        { pattern: /<meta property="og:url" content=".*?" \/>/is, value: `<meta property="og:url" content="${escapeHtml(metadata.url)}" />` },
+        { pattern: /<meta property="og:type" content=".*?" \/>/is, value: `<meta property="og:type" content="${escapeHtml(metadata.type)}" />` },
+        { pattern: /<meta property="og:locale" content=".*?" \/>/is, value: `<meta property="og:locale" content="${escapeHtml(metadata.locale)}" />` },
+        { pattern: /<meta name="twitter:title" content=".*?" \/>/is, value: `<meta name="twitter:title" content="${escapeHtml(metadata.ogTitle)}" />` },
+        { pattern: /<meta name="twitter:description" content=".*?" \/>/is, value: `<meta name="twitter:description" content="${escapeHtml(metadata.ogDescription)}" />` },
+        { pattern: /<meta name="twitter:image" content=".*?" \/>/is, value: `<meta name="twitter:image" content="${escapeHtml(metadata.ogImage)}" />` }
     ];
 
     for (const { pattern, value } of metaReplacements) {
@@ -140,7 +153,7 @@ export function injectMetadata(html, metadata) {
     }
 
     // 4. Canonical (Replace if exists, else inject before </head>)
-    const canonicalLine = `  <link rel="canonical" href="${metadata.canonical}" />\n`;
+    const canonicalLine = `  <link rel="canonical" href="${escapeHtml(metadata.canonical)}" />\n`;
     const canonicalPattern = /<link rel="canonical" href=".*?" \/>/is;
     if (canonicalPattern.test(output)) {
         output = output.replace(canonicalPattern, canonicalLine.trim());

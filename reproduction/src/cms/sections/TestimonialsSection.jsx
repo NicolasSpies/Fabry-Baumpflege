@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { getTestimonials, decodeHtmlEntities } from '@/cms/lib/cms';
+import { decodeHtmlEntities } from '@/cms/lib/cms';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import TestimonialCard from '@/cms/components/ui/TestimonialCard';
 import { renderCmsInline } from '@/cms/components/ui/CmsText';
@@ -71,21 +71,6 @@ const TestimonialsSection = ({
     useEffect(() => {
         setItems(fallbackItems ?? []);
     }, [fallbackItems, language]);
-
-    useEffect(() => {
-        let cancelled = false;
-        async function load() {
-            try {
-                const raw = await getTestimonials(language ?? 'DE');
-                if (cancelled || !raw || !Array.isArray(raw) || !raw.length) return;
-                setItems(raw.map(mapTestimonial).filter(Boolean));
-            } catch (err) {
-                console.error('[TestimonialsSection] CMS load failed:', err);
-            }
-        }
-        load();
-        return () => { cancelled = true; };
-    }, [language]);
 
     // Initialize mobile scroll to middle set (without animation)
     useEffect(() => {

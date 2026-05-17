@@ -287,7 +287,17 @@ const ContactFormSection = ({
                 settings.redirect_url;
 
             if (redirectTarget && typeof window !== 'undefined') {
-                window.location.assign(redirectTarget);
+                // Only follow same-origin or relative redirects to prevent open-redirect attacks.
+                const isSafeRedirect = (url) => {
+                    if (!url) return false;
+                    if (url.startsWith('/') && !url.startsWith('//')) return true;
+                    try {
+                        return new URL(url).origin === window.location.origin;
+                    } catch {
+                        return false;
+                    }
+                };
+                window.location.assign(isSafeRedirect(redirectTarget) ? redirectTarget : '/');
                 return;
             }
 

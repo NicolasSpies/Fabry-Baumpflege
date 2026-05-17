@@ -93,13 +93,14 @@ function cloneCmsPayload(payload) {
     return JSON.parse(JSON.stringify(payload));
 }
 
+const _decodeEl = typeof document !== 'undefined' ? document.createElement('textarea') : null;
+
 export function decodeHtmlEntities(value) {
     if (typeof value !== 'string' || !value.includes('&')) return value;
 
-    if (typeof document !== 'undefined') {
-        const textarea = document.createElement('textarea');
-        textarea.innerHTML = value;
-        return textarea.value;
+    if (_decodeEl) {
+        _decodeEl.innerHTML = value;
+        return _decodeEl.value;
     }
 
     return value

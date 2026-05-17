@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, mapPageContent, getForm, resolveMedia, PAGE_IDS } from '@/cms/lib/cms';
+import { getPage, mapPageContent, getForm, PAGE_IDS } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
@@ -87,17 +87,15 @@ const Contact = () => {
                     }
 
                     // ─── Hydration ───
-                    const [hero, sidebar, form] = await Promise.all([
-                        resolveInstancePropsAsync('Contact', 'PageHeroSection', mappedContact.hero, page),
+                    const [sidebar, formHydration] = await Promise.all([
                         resolveInstancePropsAsync('Contact', 'ContactSidebarSection', mappedContact.sidebar, page),
                         resolveInstancePropsAsync('Contact', 'ContactFormSection', mappedContact.form, page)
                     ]);
 
                     if (!cancelled) {
                         setHydratedProps({
-                            PageHeroSection: hero,
                             ContactSidebarSection: sidebar,
-                            ContactFormSection: form
+                            ContactFormSection: formHydration
                         });
                         setPageReady(true);
                     }

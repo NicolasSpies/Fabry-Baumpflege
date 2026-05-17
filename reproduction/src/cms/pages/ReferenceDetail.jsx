@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { ROUTES } from '@/cms/i18n/routes';
-import { getReference, getReferenceCore, getTermsByIds, resolveMedia, decodeHtmlEntities, translateTaxonomy } from '@/cms/lib/cms';
+import { getReference, getReferenceCore, resolveMedia, decodeHtmlEntities, translateTaxonomy } from '@/cms/lib/cms';
 
 import { resolveInstanceProps, resolveInstancePropsAsync } from '@/cms/bridge-resolver';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
@@ -229,7 +229,7 @@ const ReferenceDetail = () => {
                                         resolvedAlternates[lang] = { url: path };
                                     }
                                 } catch (err) {
-                                    console.trace(`[ReferenceDetail] Failed to resolve translation ID ${value} for ${lang}`);
+                                    console.warn(`[ReferenceDetail] Failed to resolve translation ID ${value} for ${lang}`, err);
                                 }
                             }
                         })
@@ -438,24 +438,27 @@ const ReferenceDetail = () => {
                     className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-300"
                     onClick={closeLightbox}
                 >
-                    <button 
+                    <button
                         onClick={closeLightbox}
                         className="absolute top-8 right-8 text-white/70 hover:text-white transition-colors z-50"
+                        aria-label={language === 'FR' ? 'Fermer' : 'Schließen'}
                     >
                         <Icon name="close" className="text-4xl" />
                     </button>
 
                     {projectGallery.length > 1 && (
                         <>
-                            <button 
+                            <button
                                 onClick={prevImage}
                                 className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-all z-50 group"
+                                aria-label={language === 'FR' ? 'Précédent' : 'Zurück'}
                             >
                                 <Icon name="arrow_back_ios_new" className="text-3xl md:text-4xl group-hover:-translate-x-1 transition-transform" />
                             </button>
-                            <button 
+                            <button
                                 onClick={nextImage}
                                 className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-all z-50 group"
+                                aria-label={language === 'FR' ? 'Suivant' : 'Weiter'}
                             >
                                 <Icon name="arrow_forward_ios" className="text-3xl md:text-4xl group-hover:translate-x-1 transition-transform" />
                             </button>
@@ -466,7 +469,7 @@ const ReferenceDetail = () => {
                         {projectGallery[activeImageIndex] && (
                             <CmsImage
                                 image={projectGallery[activeImageIndex]}
-                                alt="Project Gallery"
+                                alt={project?.hero?.title || (language === 'FR' ? 'Galerie' : 'Galerie')}
                                 size="1280"
                                 className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-500"
                                 sizes="100vw"

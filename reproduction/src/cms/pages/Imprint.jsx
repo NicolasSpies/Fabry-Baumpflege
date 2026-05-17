@@ -5,7 +5,7 @@ import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
 
 const Imprint = () => {
-    const { language, t, globalCmsData, globalSeo, setPageReady } = useLanguage();
+    const { language, t, globalCmsData, setPageReady } = useLanguage();
     const location = useLocation();
     const isFR = language === 'FR';
 

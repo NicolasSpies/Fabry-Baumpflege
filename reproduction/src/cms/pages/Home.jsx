@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { getLocalizedPath } from '@/cms/i18n/routes';
 import { useScrollReveal } from '@/cms/hooks/useScrollReveal';
-import { getPage, getLatestReferences, getReferences, getTestimonials, mapReferenceCard, mapPageContent, resolveMedia, PAGE_IDS, decodeHtmlEntities, getSSRData } from '@/cms/lib/cms';
+import { getPage, getLatestReferences, getTestimonials, mapReferenceCard, mapPageContent, resolveMedia, PAGE_IDS, decodeHtmlEntities, getSSRData } from '@/cms/lib/cms';
 import { definePreview } from '@/cms/lib/preview';
 
 // ── Sections ────────────────────────────────────────────────────────────────
 import HeroSection from '@/cms/sections/HeroSection';
-import StatsSection from '@/cms/sections/StatsSection';
 import HomeIntroSection from '@/cms/sections/HomeIntroSection';
 import ServicesSection from '@/cms/sections/ServicesSection';
 import ReferencesSection from '@/cms/sections/ReferencesSection';
@@ -220,9 +219,8 @@ const Home = () => {
 
                     // ─── Async Hydration (Primary Content) ───
                     // These sections are critical for immediate render or soon-after visibility.
-                    const [hero, stats, intro, services, about] = await Promise.all([
+                    const [hero, intro, services, about] = await Promise.all([
                         resolveInstancePropsAsync('Home', 'HeroSection', mappedWithServices.hero, page),
-                        resolveInstancePropsAsync('Home', 'StatsSection', mappedWithServices.stats, page),
                         resolveInstancePropsAsync('Home', 'HomeIntroSection', mappedWithServices.intro, page),
                         resolveInstancePropsAsync('Home', 'ServicesSection', mappedWithServices.services, page),
                         resolveInstancePropsAsync('Home', 'AboutSection', mappedWithServices.about, page)
@@ -232,7 +230,6 @@ const Home = () => {
                         setHydratedProps(prev => ({
                             ...prev,
                             HeroSection: hero,
-                            StatsSection: stats,
                             HomeIntroSection: intro,
                             ServicesSection: services,
                             AboutSection: about

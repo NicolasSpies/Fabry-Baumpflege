@@ -7,7 +7,6 @@ import { definePreview } from '@/cms/lib/preview';
 // ── Sections ────────────────────────────────────────────────────────────────
 import ServicesIntroSection from '@/cms/sections/ServicesIntroSection';
 import ServicesBlocksSection from '@/cms/sections/ServicesBlocksSection';
-import StatsSection from '@/cms/sections/StatsSection';
 import ServicesFaqSection from '@/cms/sections/ServicesFaqSection';
 import { resolveInstanceProps, resolveInstancePropsAsync, awaitMappings } from '@/cms/bridge-resolver';
 import useCmsSeo from '@/cms/hooks/useCmsSeo';
@@ -146,17 +145,15 @@ const Services = () => {
         async function hydrate() {
             if (!rawPage) return;
             try {
-                const [intro, blocks, stats] = await Promise.all([
+                const [intro, blocks] = await Promise.all([
                     resolveInstancePropsAsync('Services', 'ServicesIntroSection', pageData.intro, rawPage),
-                    resolveInstancePropsAsync('Services', 'ServicesBlocksSection', pageData.blocks, rawPage),
-                    resolveInstancePropsAsync('Services', 'StatsSection', pageData.stats, statsCmsData || rawPage || globalCmsData)
+                    resolveInstancePropsAsync('Services', 'ServicesBlocksSection', pageData.blocks, rawPage)
                 ]);
 
                 if (!cancelled) {
                     setHydratedProps({
                         ServicesIntroSection: intro,
-                        ServicesBlocksSection: blocks,
-                        StatsSection: stats
+                        ServicesBlocksSection: blocks
                     });
                     setPageReady(true);
                 }

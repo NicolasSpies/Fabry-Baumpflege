@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Icon from '@/cms/components/ui/Icon';
 import CmsImage from '@/cms/components/ui/CmsImage';
 import CmsText, { renderCmsInline } from '@/cms/components/ui/CmsText';
+import { useLanguage } from '@/cms/i18n/useLanguage';
 
 const ReferenceContentSection = ({ 
     challengeTitle, 
@@ -15,6 +16,7 @@ const ReferenceContentSection = ({
     sidebar,
     onOpenLightbox
 }) => {
+    const { language } = useLanguage();
     const [sliderValue, setSliderValue] = useState(50);
     const hasBeforeAfter = beforeImage || afterImage;
 
@@ -82,7 +84,7 @@ const ReferenceContentSection = ({
                             max="100" 
                             value={sliderValue} 
                             onChange={(e) => setSliderValue(Number(e.target.value))} 
-                            aria-label="Vorher-Nachher-Vergleich" 
+                            aria-label={language === 'FR' ? 'Comparaison avant-après' : 'Vorher-Nachher-Vergleich'}
                             className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-30 touch-pan-y appearance-none" 
                         />
                     </div>
@@ -103,7 +105,7 @@ const ReferenceContentSection = ({
                            >
                                <CmsImage
                                    image={img}
-                                   alt={`Project Gallery ${idx + 1}`}
+                                   alt={`${galleryTitle || (language === 'FR' ? 'Galerie' : 'Galerie')} ${idx + 1}`}
                                    size="480"
                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                    sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"

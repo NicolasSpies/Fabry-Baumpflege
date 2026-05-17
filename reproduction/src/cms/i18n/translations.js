@@ -95,6 +95,7 @@ export const translations = {
         'footer.description': 'Zertifizierter Baumpfleger und Baumfäller in Eupen, Raeren, Kelmis, Lontzen, Kettenis und ganz Ostbelgien. Professionelle Baumpflege, Baumfällung und Gartengestaltung.',
         'footer.nav': 'Navigation',
         'footer.contact': 'Kontakt',
+        'footer.social': 'Meine Netzwerke',
         'footer.rights': 'Alle Rechte vorbehalten.',
         'footer.imprint': 'Impressum',
         'footer.privacy': 'Datenschutz',
@@ -133,7 +134,7 @@ export const translations = {
         'contact.email': 'Email-Adresse',
         'contact.phone_field': 'Telefonnummer',
         'contact.note': 'Notiz',
-        'contact.placeholder': 'How can I help you?',
+        'contact.placeholder': 'Womit kann ich dir helfen?',
         'contact.send': 'Anfrage senden',
         'contact.form.baumpflege.label': 'Baumpflege',
         'contact.form.baumpflege.sub': 'Kronenschnitt & Erhalt',
@@ -173,6 +174,7 @@ export const translations = {
         'refs.try_again': 'Erneut versuchen',
         'refs.reference_project': 'Referenzprojekt',
         'refs.gallery': 'Projektgalerie',
+        'refs.count': '{count} von {total} Projekten angezeigt',
     },
     fr: {
         // Navigation
@@ -270,6 +272,7 @@ export const translations = {
         'common.testimonial': 'Témoignage',
 
         'footer.contact': 'Contact',
+        'footer.social': 'Mes réseaux',
         'footer.rights': 'Tous droits réservés.',
         'footer.imprint': 'Mentions légales',
         'footer.privacy': 'Confidentialité',
@@ -348,5 +351,6 @@ export const translations = {
         'refs.try_again': 'Réessayer',
         'refs.reference_project': 'Projet de Référence',
         'refs.gallery': 'Galerie du projet',
+        'refs.count': '{count} sur {total} projets affichés',
     }
 };

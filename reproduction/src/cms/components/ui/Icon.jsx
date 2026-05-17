@@ -161,6 +161,14 @@ const Icon = ({ name, className = '', ...props }) => {
                     <path d="M12 2.8l2.7 5.48 6.05.88-4.38 4.27 1.03 6.03L12 16.63 6.6 19.46l1.03-6.03-4.38-4.27 6.05-.88L12 2.8Z" />
                 </Svg>
             );
+        case 'image':
+            return (
+                <Svg className={className} {...props}>
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <path d="M3 15l5-5 4 4 3-3 6 6" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                </Svg>
+            );
         default:
             return null;
     }
