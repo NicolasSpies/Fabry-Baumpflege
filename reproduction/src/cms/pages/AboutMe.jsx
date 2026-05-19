@@ -60,7 +60,16 @@ const AboutMe = () => {
         },
     });
 
-    const [pageData, setPageData] = useState(getInitialContent());
+    const [pageData, setPageData] = useState(() => {
+        // Restore cached text content on second visits to prevent CLS.
+        // Text fields (quote, text, labels) go from empty to loaded, causing height growth
+        // and layout shift in PhilosophySection + ValuesSection. Cache key is language-scoped.
+        try {
+            const cached = sessionStorage.getItem(`cms_about_${language}`);
+            if (cached) return { ...getInitialContent(), ...JSON.parse(cached) };
+        } catch {}
+        return getInitialContent();
+    });
     const [rawPage, setRawPage] = useState(null);
     const [hydratedProps, setHydratedProps] = useState({});
     useScrollReveal([rawPage]);
@@ -79,6 +88,7 @@ const AboutMe = () => {
                     setRawPage(page);
                     const mappedAbout = mapPageContent(page, getInitialContent(), 'AboutMe');
                     setPageData(prev => ({ ...prev, ...mappedAbout }));
+                    try { sessionStorage.setItem(`cms_about_${language}`, JSON.stringify(mappedAbout)); } catch {}
 
                     if (page.cc_alternates || page.pll_translations) {
                         setAlternates(page.cc_alternates || page.pll_translations);
