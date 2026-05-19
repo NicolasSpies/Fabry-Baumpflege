@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { getLocalizedPath } from '@/cms/i18n/routes';
@@ -31,8 +31,10 @@ const Navbar = ({
     const logoRef = useRef(null);
     const desktopNavRef = useRef(null);
 
-    // Dynamic collision detection
-    useLayoutEffect(() => {
+    // Dynamic collision detection — useEffect (not useLayoutEffect) to avoid
+    // forced reflow on the main-thread critical path. Initial isMobileMode state
+    // already uses window.innerWidth < 1024, so no visible flash on first paint.
+    useEffect(() => {
         const checkCollision = () => {
             if (!containerRef.current || !logoRef.current || !desktopNavRef.current) return;
             const availableWidth = containerRef.current.clientWidth - 48;

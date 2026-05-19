@@ -7,6 +7,18 @@
   animation: pageFadeIn 0.15s ease-out both;
 }
 
+/* ── Soft entrance — initial hidden state via CSS, not JS useLayoutEffect ────
+   This prevents the forced reflow that useLayoutEffect caused by writing
+   inline styles after the Navbar had already read layout geometry.
+   useEffect in useSoftEntrance.js enables transitions + reveals via observer.
+   Mobile (<768px) and prefers-reduced-motion: items stay visible (no animation). */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .soft-entrance-item {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
 @font-face {
   font-family: 'Playfair Display';
   font-style: normal;

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect } from 'react';
 
 export const useSoftEntrance = (ref, options = {}) => {
     const {
@@ -10,31 +10,10 @@ export const useSoftEntrance = (ref, options = {}) => {
         easing = 'cubic-bezier(0.22, 1, 0.36, 1)'
     } = options;
 
-    // Set initial hidden state BEFORE browser paints — prevents flash of
-    // unstyled content that then jumps down before animating up.
-    useLayoutEffect(() => {
-        const container = ref.current;
-        if (!container) return;
-
-        const items = Array.from(container.querySelectorAll(itemSelector));
-        if (items.length === 0) return;
-
-        const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-
-        // On mobile: items are visible by default — skip all style mutations to
-        // avoid forced reflows from invalidating styles on dozens of elements.
-        if (prefersReducedMotion || isMobile) return;
-
-        items.forEach((item) => {
-            item.style.opacity = '0';
-            item.style.transform = 'translateY(16px)';
-            item.style.willChange = 'transform, opacity';
-            item.style.transition = 'none'; // No transition during init
-        });
-    }, [ref, itemSelector]);
-
-    // Observe and animate after page is visible.
+    // Initial hidden state is now set by CSS (.soft-entrance-item in index.css),
+    // scoped to desktop + prefers-reduced-motion: no-preference.
+    // This eliminates the useLayoutEffect that previously wrote inline styles
+    // synchronously, causing forced reflow after Navbar had read layout geometry.
     useEffect(() => {
         const container = ref.current;
         if (!container) return;
@@ -47,42 +26,38 @@ export const useSoftEntrance = (ref, options = {}) => {
 
         if (prefersReducedMotion || isMobile) return;
 
-        // Enable transitions now (after layout effect set initial state without transition)
+        // Enable transitions — CSS already hides items before first paint,
+        // so adding transition here won't cause a visible jump.
         items.forEach((item) => {
             item.style.transition = `opacity ${durationMs}ms ${easing}, transform ${durationMs}ms ${easing}`;
         });
 
-        const startObserving = () => {
-            const observer = new IntersectionObserver((entries) => {
-                const [entry] = entries;
+        const observer = new IntersectionObserver((entries) => {
+            const [entry] = entries;
 
-                if (entry.isIntersecting) {
-                    items.forEach((item, index) => {
+            if (entry.isIntersecting) {
+                items.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.style.willChange = 'transform, opacity';
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateY(0)';
+
                         setTimeout(() => {
-                            item.style.opacity = '1';
-                            item.style.transform = 'translateY(0)';
+                            if (item.style) {
+                                item.style.willChange = 'auto';
+                            }
+                        }, durationMs);
 
-                            setTimeout(() => {
-                                if (item.style) {
-                                    item.style.willChange = 'auto';
-                                }
-                            }, durationMs);
+                    }, index * staggerDelayMs);
+                });
 
-                        }, index * staggerDelayMs);
-                    });
+                observer.disconnect();
+            }
+        }, { threshold, rootMargin });
 
-                    observer.disconnect();
-                }
-            }, { threshold, rootMargin });
-
-            observer.observe(container);
-            return observer;
-        };
-
-        const activeObserver = startObserving();
-
+        observer.observe(container);
         return () => {
-            if (activeObserver) activeObserver.disconnect();
+            if (observer) observer.disconnect();
         };
     }, [ref, threshold, staggerDelayMs, itemSelector, durationMs, easing]);
 };
