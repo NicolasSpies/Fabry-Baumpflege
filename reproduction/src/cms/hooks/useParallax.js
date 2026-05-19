@@ -141,19 +141,16 @@ export const useParallax = (ref, { speed = 0.05, maxTravel = 20, scale = 1.1, di
         updateItem();
         registry.add(item);
 
-        // Re-calculate after short delays for lazy-loaded images or reveals
-        // Only if not already destroyed
-        const t1 = setTimeout(() => updateItem(), 500);
-        const t2 = setTimeout(() => updateItem(), 1500);
-        const t3 = setTimeout(() => updateItem(), 2500);
+        // Re-calculate layout whenever the element resizes (e.g. lazy-loaded images settling).
+        // ResizeObserver fires after layout, so getBoundingClientRect inside updateItem is safe.
+        const resizeObs = new ResizeObserver(() => updateItem());
+        resizeObs.observe(el);
 
         // Ensure loop starts on first use
         startLoop();
 
         return () => {
-            clearTimeout(t1);
-            clearTimeout(t2);
-            clearTimeout(t3);
+            resizeObs.disconnect();
             registry.delete(item);
             if (registry.size === 0) {
                 stopLoop();

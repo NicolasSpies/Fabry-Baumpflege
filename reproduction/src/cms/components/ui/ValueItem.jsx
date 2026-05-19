@@ -3,10 +3,10 @@ import { useParallax } from '@/cms/hooks/useParallax';
 import CmsImage from '@/cms/components/ui/CmsImage';
 import CmsText, { renderCmsInline } from '@/cms/components/ui/CmsText';
 
-import { resolveInstanceProps } from '@/cms/bridge-resolver';
- 
- const ValueItem = ({ title, text, image, offset, idx, data, page = 'AboutMe', section = 'ValuesSection' }) => {
-    const props = resolveInstanceProps(page, `${section}/ValueItem`, { title, text, image }, data);
+const ValueItem = ({ title, text, image, offset, idx, page = 'AboutMe', section = 'ValuesSection' }) => {
+    // `data` is never passed from ValuesSection so the resolver returned localProps unchanged.
+    // Using props directly avoids the synchronous resolver call on every render.
+    const props = { title, text, image };
     const blockRef = useRef(null);
     const parallaxConfig =
         idx === 1

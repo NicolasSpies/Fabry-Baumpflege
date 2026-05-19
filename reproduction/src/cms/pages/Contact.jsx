@@ -97,7 +97,6 @@ const Contact = () => {
                             ContactSidebarSection: sidebar,
                             ContactFormSection: formHydration
                         });
-                        setPageReady(true);
                     }
                 }
                 if (form) {
@@ -105,6 +104,8 @@ const Contact = () => {
                 }
             } catch (err) {
                 console.error('[Contact] CMS load failed:', err);
+            } finally {
+                if (!cancelled) setPageReady(true);
             }
         }
         loadContent();

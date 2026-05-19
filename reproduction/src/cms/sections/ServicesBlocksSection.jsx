@@ -48,8 +48,7 @@ const ServiceBlockInternal = ({ id, title, description, list, image, reverse, to
     return (
         <section
             id={id}
-            className={`${isFirst ? 'pt-4 md:pt-14 pb-9 md:pb-28' : 'py-9 md:py-32'} px-4 md:px-6 overflow-hidden ${toneClass}`}
-            style={{ minHeight: isFirst ? (typeof window !== 'undefined' && window.innerWidth < 768 ? '400px' : '650px') : '750px' }}
+            className={`${isFirst ? 'pt-4 md:pt-14 pb-9 md:pb-28 min-h-[400px] md:min-h-[650px]' : 'py-9 md:py-32 min-h-[750px]'} px-4 md:px-6 overflow-hidden ${toneClass}`}
         >
             <div className="max-w-7xl mx-auto">
                 <div

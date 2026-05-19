@@ -65,6 +65,8 @@ const AboutMe = () => {
     const [hydratedProps, setHydratedProps] = useState({});
     useScrollReveal([rawPage]);
 
+    // Effect 1: Fetch — signals PageLoader as soon as text data arrives.
+    // Image hydration happens in a separate effect so it never blocks the loader.
     useEffect(() => {
         let cancelled = false;
         async function loadContent() {
@@ -81,30 +83,44 @@ const AboutMe = () => {
                     if (page.cc_alternates || page.pll_translations) {
                         setAlternates(page.cc_alternates || page.pll_translations);
                     }
-
-                    // ─── Hydration ───
-                    const [philosophy, values, signature] = await Promise.all([
-                        resolveInstancePropsAsync('AboutMe', 'PhilosophySection', mappedAbout.philosophy, page),
-                        resolveInstancePropsAsync('AboutMe', 'ValuesSection', mappedAbout.values, page),
-                        resolveInstancePropsAsync('AboutMe', 'SignatureSection', mappedAbout.signature, page)
-                    ]);
-
-                    if (!cancelled) {
-                        setHydratedProps({
-                            PhilosophySection: philosophy,
-                            ValuesSection: values,
-                            SignatureSection: signature
-                        });
-                        setPageReady(true);
-                    }
                 }
             } catch (err) {
                 console.error('[AboutMe] CMS load failed:', err);
+            } finally {
+                if (!cancelled) setPageReady(true);
             }
         }
         loadContent();
         return () => { cancelled = true; };
     }, [language, t, setAlternates]);
+
+    // Effect 2: Hydrate — resolves image URLs after rawPage is available.
+    // Runs after the PageLoader is already dismissed, so never delays page reveal.
+    useEffect(() => {
+        if (!rawPage) return;
+        let cancelled = false;
+        async function hydrate() {
+            try {
+                const mappedAbout = mapPageContent(rawPage, getInitialContent(), 'AboutMe');
+                const [philosophy, values, signature] = await Promise.all([
+                    resolveInstancePropsAsync('AboutMe', 'PhilosophySection', mappedAbout.philosophy, rawPage),
+                    resolveInstancePropsAsync('AboutMe', 'ValuesSection', mappedAbout.values, rawPage),
+                    resolveInstancePropsAsync('AboutMe', 'SignatureSection', mappedAbout.signature, rawPage)
+                ]);
+                if (!cancelled) {
+                    setHydratedProps({
+                        PhilosophySection: philosophy,
+                        ValuesSection: values,
+                        SignatureSection: signature
+                    });
+                }
+            } catch (err) {
+                console.error('[AboutMe] Hydration failed:', err);
+            }
+        }
+        hydrate();
+        return () => { cancelled = true; };
+    }, [rawPage]);
 
     useCmsSeo(rawPage?.seo || globalSeo);
 
@@ -118,15 +134,15 @@ const AboutMe = () => {
     return (
         <main className="pt-24 md:pt-28 lg:pt-0">
             {/* Page: AboutMe → Section: PhilosophySection */}
-            <PhilosophySection 
-                {...getProps('PhilosophySection', pageData.philosophy)} 
+            <PhilosophySection
+                {...getProps('PhilosophySection', pageData.philosophy)}
                 page="AboutMe"
                 section="PhilosophySection"
             />
 
             {/* Page: AboutMe → Section: ValuesSection */}
-            <ValuesSection 
-                {...getProps('ValuesSection', pageData.values)} 
+            <ValuesSection
+                {...getProps('ValuesSection', pageData.values)}
                 page="AboutMe"
                 section="ValuesSection"
             />

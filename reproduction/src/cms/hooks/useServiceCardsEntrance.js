@@ -88,21 +88,24 @@ export const useServiceCardsEntrance = (ref, options = {}) => {
                         // Apply inline transition for entrance
                         item.style.transition = `opacity ${durationMs}ms ${easing}, transform ${durationMs}ms ${easing}`;
 
-                        // Force a reflow to ensure the transition takes effect cleanly
-                        void item.offsetWidth;
+                        // Double-rAF: let the browser commit the transition style in one frame,
+                        // then apply the final state in the next. Avoids `void offsetWidth` forced reflow.
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                if (!item.style) return;
+                                item.style.opacity = '1';
+                                item.style.transform = 'translateY(0)';
 
-                        // Apply final resting state
-                        item.style.opacity = '1';
-                        item.style.transform = 'translateY(0)';
-
-                        // Clean up transition and will-change after animation completes
-                        // This ensures our inline transition string doesn't fight Tailwind's `hover:transition-transform` later.
-                        setTimeout(() => {
-                            if (item.style) {
-                                item.style.willChange = 'auto';
-                                item.style.transition = '';
-                            }
-                        }, durationMs + 50);
+                                // Clean up transition and will-change after animation completes
+                                // so the inline transition string doesn't fight Tailwind hover classes.
+                                setTimeout(() => {
+                                    if (item.style) {
+                                        item.style.willChange = 'auto';
+                                        item.style.transition = '';
+                                    }
+                                }, durationMs + 50);
+                            });
+                        });
 
                     }, index * staggerDelayMs);
                 });
