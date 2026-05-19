@@ -245,6 +245,7 @@ const Navbar = ({
                     <div
                         id="mobile-navigation"
                         aria-hidden={!isMenuOpen}
+                        inert={!isMenuOpen ? "" : undefined}
                         className={`fixed top-16 md:top-20 inset-x-0 bottom-0 bg-white dark:bg-slate-900 flex flex-col items-center justify-center gap-8 z-[99] overflow-y-auto transition-opacity duration-[220ms] ease-out ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                     >
                         <div className="flex flex-col items-center gap-6 w-full px-6">
