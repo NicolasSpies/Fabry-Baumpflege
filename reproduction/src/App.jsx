@@ -1,6 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from '@/cms/components/ui/Navbar';
 import Footer from '@/cms/components/ui/Footer';
 import PageLoader from '@/cms/components/ui/PageLoader';
@@ -122,15 +121,7 @@ function App() {
         <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans">
         <Navbar {...getShellProps('Navbar', globalData.navbar)} />
         <div id="main-content" className="flex-1 flex flex-col relative min-h-screen">
-          <AnimatePresence mode="sync">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, position: 'absolute', width: '100%' }}
-              transition={{ duration: 0.15, ease: 'easeOut' }}
-              className="flex-1 flex flex-col"
-            >
+          <div key={location.pathname} className="flex-1 flex flex-col page-fade-in">
               <Suspense fallback={<div className="min-h-screen" />}>
                 <Routes location={location}>
                   {/* German Routes */}
@@ -157,8 +148,7 @@ function App() {
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
-            </motion.div>
-          </AnimatePresence>
+            </div>
         </div>
         <footer>
           <Footer {...getShellProps('Footer', globalData.footer)} />

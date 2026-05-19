@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/cms/i18n/useLanguage';
 import { getLocalizedPath } from '@/cms/i18n/routes';
@@ -242,16 +241,11 @@ const Navbar = ({
                 )}
             </div>
 
-            <AnimatePresence>
-                {isMenuOpen && isMobileMode && (
-                    <motion.div
+            {isMobileMode && (
+                    <div
                         id="mobile-navigation"
-                        key="mobile-nav"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.22, ease: 'easeOut' }}
-                        className="fixed top-16 md:top-20 inset-x-0 bottom-0 bg-white dark:bg-slate-900 flex flex-col items-center justify-center gap-8 z-[99] overflow-y-auto"
+                        aria-hidden={!isMenuOpen}
+                        className={`fixed top-16 md:top-20 inset-x-0 bottom-0 bg-white dark:bg-slate-900 flex flex-col items-center justify-center gap-8 z-[99] overflow-y-auto transition-opacity duration-[220ms] ease-out ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                     >
                         <div className="flex flex-col items-center gap-6 w-full px-6">
                             {renderLinks(true)}
@@ -286,9 +280,8 @@ const Navbar = ({
                                 FR
                             </button>
                         </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    </div>
+            )}
         </nav>
     );
 };

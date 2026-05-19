@@ -1,3 +1,12 @@
+/* ── Page & nav transitions (replaces framer-motion in App + Navbar) ──────── */
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.page-fade-in {
+  animation: pageFadeIn 0.15s ease-out both;
+}
+
 @font-face {
   font-family: 'Playfair Display';
   font-style: normal;
