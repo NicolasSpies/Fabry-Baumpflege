@@ -537,9 +537,18 @@ export async function fetchFromCMS(endpoint, language = 'DE', signal = null) {
     }
 
     const requestPromise = (async () => {
+        // Guard against hanging requests on slow mobile networks (e.g. iPhone on 4G/weak signal).
+        // If no external signal is provided, apply an internal 10-second timeout.
+        let _ctrl = null;
+        let _tid = null;
+        if (!signal) {
+            _ctrl = new AbortController();
+            _tid = setTimeout(() => _ctrl.abort(), 10_000);
+        }
         try {
-            const response = await fetch(url, signal ? { signal } : undefined);
-            
+            const response = await fetch(url, { signal: signal ?? _ctrl?.signal });
+            if (_tid) clearTimeout(_tid);
+
             // Non-critical HTTP errors: return safe empty result without noisy console errors
             if (response.status === 401 || response.status === 403 || response.status === 404) {
                 if (import.meta.env?.DEV) {
@@ -554,8 +563,14 @@ export async function fetchFromCMS(endpoint, language = 'DE', signal = null) {
 
             return response.json();
         } catch (err) {
-            if (err.name === 'AbortError') throw err;
-            console.error(`[CMS] Network failure for ${url}:`, err.message);
+            if (_tid) clearTimeout(_tid);
+            if (err.name === 'AbortError') {
+                if (signal) throw err; // External abort — propagate to caller
+                // Internal 10s timeout — treat as network failure and return safe fallback
+                console.warn(`[CMS] Request timed out (10s): ${cleanEndpoint}`);
+            } else {
+                console.error(`[CMS] Network failure for ${url}:`, err.message);
+            }
             return endpoint.includes('include=') || endpoint.includes('posts/') || endpoint.includes('v1/terms') ? [] : null;
         }
     })();

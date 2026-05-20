@@ -35,10 +35,11 @@ function mapTestimonial(raw) {
     };
 }
 
-const TestimonialsSection = ({ 
-    label, title, 
-    items: fallbackItems, 
+const TestimonialsSection = ({
+    label, title,
+    items: fallbackItems,
     language,
+    isLoading = false,
     page = 'Home',
     section = 'TestimonialsSection'
 }) => {
@@ -180,24 +181,62 @@ const TestimonialsSection = ({
 
             {/* Desktop Marquee (lg+ only — tablets use slider for touch UX) */}
             <div className="hidden lg:block relative overflow-hidden">
-                <div ref={trackRef} className="flex gap-8 px-8 w-max items-center pb-4 will-change-transform">
-                    {displayItems.map((tm, idx) => (
-                        <TestimonialCard
-                            key={idx}
-                            author={tm.author}
-                            rating_raw={tm.rating_raw}
-                            text={tm.text}
-                            data={tm.data}
-                            page={page}
-                            section={section}
-                        />
-                    ))}
-                </div>
+                {isLoading ? (
+                    <div className="flex gap-8 px-8 pb-4">
+                        {[0, 1, 2, 3].map((i) => (
+                            <div key={i} className="flex-shrink-0 w-[28rem] bg-white dark:bg-surface-dark rounded-2xl border border-slate-100 dark:border-slate-800 px-9 py-9 animate-pulse">
+                                <div className="flex gap-1 mb-4">
+                                    {[...Array(5)].map((_, s) => <div key={s} className="w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-700" />)}
+                                </div>
+                                <div className="space-y-2 mb-8">
+                                    <div className="bg-slate-200 dark:bg-slate-700 h-4 rounded w-full" />
+                                    <div className="bg-slate-200 dark:bg-slate-700 h-4 rounded w-5/6" />
+                                    <div className="bg-slate-200 dark:bg-slate-700 h-4 rounded w-4/6" />
+                                </div>
+                                <div className="bg-slate-200 dark:bg-slate-700 h-5 rounded w-1/3 mt-auto" />
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div ref={trackRef} className="flex gap-8 px-8 w-max items-center pb-4 will-change-transform">
+                        {displayItems.map((tm, idx) => (
+                            <TestimonialCard
+                                key={idx}
+                                author={tm.author}
+                                rating_raw={tm.rating_raw}
+                                text={tm.text}
+                                data={tm.data}
+                                page={page}
+                                section={section}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Mobile + Tablet Slider */}
             <div className="lg:hidden relative">
-                <div 
+                {isLoading ? (
+                    <div className="flex overflow-x-auto no-scrollbar px-[12vw] gap-4 pb-12">
+                        {[0, 1, 2].map((i) => (
+                            <div key={i} className="flex-shrink-0 w-[78vw] sm:w-[30rem] bg-white dark:bg-surface-dark rounded-2xl border border-slate-100 dark:border-slate-800 px-6 py-7 animate-pulse">
+                                <div className="flex gap-1 mb-3">
+                                    {[...Array(5)].map((_, s) => <div key={s} className="w-3.5 h-3.5 rounded-full bg-slate-200 dark:bg-slate-700" />)}
+                                </div>
+                                <div className="space-y-2 mb-7">
+                                    <div className="bg-slate-200 dark:bg-slate-700 h-4 rounded w-full" />
+                                    <div className="bg-slate-200 dark:bg-slate-700 h-4 rounded w-5/6" />
+                                    <div className="bg-slate-200 dark:bg-slate-700 h-4 rounded w-3/4" />
+                                    <div className="bg-slate-200 dark:bg-slate-700 h-4 rounded w-4/6" />
+                                </div>
+                                <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+                                    <div className="bg-slate-200 dark:bg-slate-700 h-5 rounded w-1/3" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                <div
                     ref={scrollRef}
                     onScroll={handleMobileScroll}
                     className="flex items-center overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar px-[12vw] gap-4 pb-12 cursor-grab active:cursor-grabbing"
@@ -215,6 +254,7 @@ const TestimonialsSection = ({
                         </div>
                     ))}
                 </div>
+                )}
                 {items.length > 1 && (
                     <div className="flex justify-center gap-2.5 mt-2">
                         {items.map((_, idx) => (

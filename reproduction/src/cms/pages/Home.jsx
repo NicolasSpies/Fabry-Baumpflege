@@ -158,6 +158,7 @@ const Home = () => {
 
     const [pageData, setPageData] = useState(() => {
         const base = getInitialContent();
+        // 1) SSR-injected data (fastest path)
         try {
             const ssr = getSSRData();
             if (ssr && ssr.page) {
@@ -166,6 +167,15 @@ const Home = () => {
         } catch (e) {
             console.warn('[Home] SSR State recovery failed:', e);
         }
+        // 2) sessionStorage cache — restore text content on second visits to prevent
+        //    the blank-page flash caused by CMS data loading slowly on mobile.
+        try {
+            const cached = sessionStorage.getItem(`cms_home_${language}`);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                return { ...base, ...parsed };
+            }
+        } catch {}
         return base;
     });
 
@@ -204,7 +214,22 @@ const Home = () => {
                         mapPageContent(page, getFallbackContent(), 'Home'),
                         servicesPage
                     );
-                    
+
+                    // Persist text-only fields to sessionStorage so second visits render
+                    // instantly instead of showing a blank page while CMS re-fetches.
+                    try {
+                        const cachePayload = {
+                            hero: mappedWithServices.hero,
+                            stats: mappedWithServices.stats,
+                            intro: mappedWithServices.intro,
+                            services: mappedWithServices.services,
+                            about: mappedWithServices.about,
+                            references: { ...mappedWithServices.references, items: [] },
+                            testimonials: { ...mappedWithServices.testimonials, items: [] },
+                        };
+                        sessionStorage.setItem(`cms_home_${language}`, JSON.stringify(cachePayload));
+                    } catch {}
+
                     setPageData(prev => ({
                         ...prev,
                         ...mappedWithServices,
@@ -373,6 +398,7 @@ const Home = () => {
             <TestimonialsSection
                 {...getProps('TestimonialsSection', pageData.testimonials)}
                 language={language}
+                isLoading={refsLoading}
             />
 
             {/* Page: Home → Section: FaqSection */}

@@ -26,38 +26,61 @@ const ReferencesSection = ({
                         <span className="text-accent-label font-bold tracking-widest uppercase text-xs block">{label}</span>
                         <h2 className="text-4xl md:text-[2.75rem] lg:text-5xl font-serif text-primary reveal">{title}</h2>
                     </div>
-                <div className={`lg:hidden -mx-6 px-6 overflow-x-auto scrollbar-hide ${isLoading ? 'min-h-[24rem]' : ''}`}>
+                <div className="lg:hidden -mx-6 px-6 overflow-x-auto scrollbar-hide">
                     <div className="flex gap-4 w-max snap-x snap-mandatory pb-2">
-                        {!isLoading && items.map((project, idx) => (
-                            <div key={project.id || idx} className="w-[84vw] max-w-[26rem] flex-shrink-0 snap-center">
-                                <ReferenceCard
-                                    {...project}
-                                    language={language}
-
-                                    data={project.data}
-                                    page={page}
-                                    section={section}
-                                    loading="lazy" // Never eager on home to let Hero win
-                                    sizes="(max-width: 768px) 85vw, 400px"
-                                />
-                            </div>
-                        ))}
+                        {isLoading
+                            ? [0, 1, 2].map((i) => (
+                                <div key={i} className="w-[84vw] max-w-[26rem] flex-shrink-0 snap-center">
+                                    <div className="rounded-xl overflow-hidden animate-pulse">
+                                        <div className="bg-slate-200 dark:bg-slate-700 aspect-[4/3] w-full" />
+                                        <div className="p-4 space-y-2 bg-white dark:bg-surface-dark">
+                                            <div className="bg-slate-200 dark:bg-slate-700 h-4 rounded w-3/4" />
+                                            <div className="bg-slate-200 dark:bg-slate-700 h-3 rounded w-1/2" />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                            : items.map((project, idx) => (
+                                <div key={project.id || idx} className="w-[84vw] max-w-[26rem] flex-shrink-0 snap-center">
+                                    <ReferenceCard
+                                        {...project}
+                                        language={language}
+                                        data={project.data}
+                                        page={page}
+                                        section={section}
+                                        loading="lazy"
+                                        sizes="(max-width: 768px) 85vw, 400px"
+                                    />
+                                </div>
+                            ))
+                        }
                     </div>
                 </div>
                 <div className={`hidden lg:grid lg:grid-cols-3 gap-8 ${isLoading ? 'min-h-[28rem]' : ''}`}>
-                    {!isLoading && items.map((project, idx) => (
-                        <ReferenceCard 
-                            key={project.id || idx} 
-                            {...project} 
-                            language={language} 
-                            forceSquare={true} 
-                            data={project.data} 
-                            page={page}
-                            section={section}
-                            loading="lazy" // Never eager on home to let Hero win
-                            sizes="(max-width: 1024px) 45vw, 30vw"
-                        />
-                    ))}
+                    {isLoading
+                        ? [0, 1, 2].map((i) => (
+                            <div key={i} className="rounded-xl overflow-hidden animate-pulse">
+                                <div className="bg-slate-200 dark:bg-slate-700 aspect-square w-full" />
+                                <div className="p-5 space-y-2 bg-white dark:bg-surface-dark">
+                                    <div className="bg-slate-200 dark:bg-slate-700 h-5 rounded w-3/4" />
+                                    <div className="bg-slate-200 dark:bg-slate-700 h-4 rounded w-1/2" />
+                                </div>
+                            </div>
+                        ))
+                        : items.map((project, idx) => (
+                            <ReferenceCard
+                                key={project.id || idx}
+                                {...project}
+                                language={language}
+                                forceSquare={true}
+                                data={project.data}
+                                page={page}
+                                section={section}
+                                loading="lazy"
+                                sizes="(max-width: 1024px) 45vw, 30vw"
+                            />
+                        ))
+                    }
                 </div>
                 {view_all && allRefsHref && (
                     <div className="text-center mt-16">
