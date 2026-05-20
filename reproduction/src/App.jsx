@@ -100,9 +100,10 @@ function App() {
         setGlobalCmsData(options);
         setGlobalSeo(seo);
         setBridgeGlobalData(options);
-        setGlobalReady(true);
       } catch (err) {
         console.error('[App] Global load failed:', err);
+      } finally {
+        if (!cancelled) setGlobalReady(true);
       }
     }
     loadGlobal();

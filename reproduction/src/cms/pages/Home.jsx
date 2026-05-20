@@ -234,11 +234,12 @@ const Home = () => {
                             ServicesSection: services,
                             AboutSection: about
                         }));
-                        setPageReady(true);
                     }
                 }
             } catch (err) {
                 console.error('[Home] CMS load failed:', err);
+            } finally {
+                if (!cancelled) setPageReady(true);
             }
         }
 
