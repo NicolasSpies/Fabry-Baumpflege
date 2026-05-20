@@ -77,78 +77,80 @@ const HomeIntroSection = ({
         >
             <div className="max-w-7xl mx-auto">
                 <div className="max-w-[72rem] mx-auto">
-                    {title && (
-                        <div className="soft-entrance-item mb-12 md:mb-16 text-center">
+                    <div className="soft-entrance-item mb-12 md:mb-16 text-center">
+                        {title && (
                             <h2 className="text-4xl md:text-[2.75rem] lg:text-5xl font-serif text-primary leading-[1.15] md:leading-tight reveal">
                                 {renderCmsInline(title)}
                             </h2>
-                        </div>
-                    )}
-                    
-                    {safeParagraphs.length > 0 && (
-                        <div ref={timelineRef} className="soft-entrance-item relative max-w-[48rem] mx-auto">
-                            {/* Guide Track */}
-                            <div
-                                className="absolute w-[3px] rounded-full bg-primary/10"
-                                style={{
-                                    top: `${lineMetrics.top}px`,
-                                    height: `${lineMetrics.height}px`,
-                                    left: 'calc(1rem - 1.5px)',
-                                }}
-                            />
-                            {/* Actual Growing Line */}
-                            <div
-                                className="absolute w-[3px] rounded-full bg-primary origin-top will-change-transform"
-                                style={{
-                                    top: `${lineMetrics.top}px`,
-                                    height: `${lineMetrics.height}px`,
-                                    left: 'calc(1rem - 1.5px)',
-                                    transform: `scaleY(${lineProgress})`,
-                                }}
-                            />
-                            
-                            <div className="space-y-8 md:space-y-10">
-                                {safeParagraphs.map((paragraph, index) => {
-                                    const progressThreshold = safeParagraphs.length <= 1 ? 0 : index / (safeParagraphs.length - 1);
-                                    const isActive = lineProgress >= (progressThreshold - 0.01); // 1% earlier for better feel
-                                    
-                                    return (
-                                        <div
-                                            key={`intro-paragraph-${index}`}
-                                            className="grid grid-cols-[2rem_minmax(0,1fr)] items-start gap-5 md:gap-7"
-                                        >
-                                            <div className="relative flex items-center justify-center pt-[0.7rem]">
-                                                {/* Active Glow Ring — centered on the dot */}
-                                                <div
-                                                    className={`absolute h-4 w-4 rounded-full border border-primary transition-all duration-700 ease-out ${
-                                                        isActive ? 'opacity-100 scale-150' : 'opacity-0 scale-50'
-                                                    }`}
-                                                />
-                                                {/* Solid Dot */}
-                                                <span
-                                                    ref={(node) => {
-                                                        dotRefs.current[index] = node;
-                                                    }}
-                                                    className={`relative z-10 h-3.5 w-3.5 rounded-full bg-primary transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1) ${
-                                                        isActive ? 'opacity-100 scale-100 shadow-[0_0_8px_rgba(62,95,37,0.5)]' : 'opacity-75 scale-75'
-                                                    }`}
-                                                />
-                                            </div>
-                                            <p
-                                                className={`max-w-[48rem] text-[0.875rem] md:text-[1.1rem] leading-[1.5] md:leading-[1.72] transition-all duration-700 ease-out font-normal ${
-                                                    isActive 
-                                                        ? 'text-slate-800 dark:text-slate-100 opacity-100 translate-x-1' 
-                                                        : 'text-slate-600 dark:text-slate-400 opacity-85 translate-x-0'
-                                                }`}
+                        )}
+                    </div>
+
+                    <div ref={timelineRef} className="soft-entrance-item relative max-w-[48rem] mx-auto">
+                        {safeParagraphs.length > 0 && (
+                            <>
+                                {/* Guide Track */}
+                                <div
+                                    className="absolute w-[3px] rounded-full bg-primary/10"
+                                    style={{
+                                        top: `${lineMetrics.top}px`,
+                                        height: `${lineMetrics.height}px`,
+                                        left: 'calc(1rem - 1.5px)',
+                                    }}
+                                />
+                                {/* Actual Growing Line */}
+                                <div
+                                    className="absolute w-[3px] rounded-full bg-primary origin-top will-change-transform"
+                                    style={{
+                                        top: `${lineMetrics.top}px`,
+                                        height: `${lineMetrics.height}px`,
+                                        left: 'calc(1rem - 1.5px)',
+                                        transform: `scaleY(${lineProgress})`,
+                                    }}
+                                />
+
+                                <div className="space-y-8 md:space-y-10">
+                                    {safeParagraphs.map((paragraph, index) => {
+                                        const progressThreshold = safeParagraphs.length <= 1 ? 0 : index / (safeParagraphs.length - 1);
+                                        const isActive = lineProgress >= (progressThreshold - 0.01); // 1% earlier for better feel
+
+                                        return (
+                                            <div
+                                                key={`intro-paragraph-${index}`}
+                                                className="grid grid-cols-[2rem_minmax(0,1fr)] items-start gap-5 md:gap-7"
                                             >
-                                                {renderCmsInline(paragraph)}
-                                            </p>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    )}
+                                                <div className="relative flex items-center justify-center pt-[0.7rem]">
+                                                    {/* Active Glow Ring — centered on the dot */}
+                                                    <div
+                                                        className={`absolute h-4 w-4 rounded-full border border-primary transition-all duration-700 ease-out ${
+                                                            isActive ? 'opacity-100 scale-150' : 'opacity-0 scale-50'
+                                                        }`}
+                                                    />
+                                                    {/* Solid Dot */}
+                                                    <span
+                                                        ref={(node) => {
+                                                            dotRefs.current[index] = node;
+                                                        }}
+                                                        className={`relative z-10 h-3.5 w-3.5 rounded-full bg-primary transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1) ${
+                                                            isActive ? 'opacity-100 scale-100 shadow-[0_0_8px_rgba(62,95,37,0.5)]' : 'opacity-75 scale-75'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <p
+                                                    className={`max-w-[48rem] text-[0.875rem] md:text-[1.1rem] leading-[1.5] md:leading-[1.72] transition-all duration-700 ease-out font-normal ${
+                                                        isActive
+                                                            ? 'text-slate-800 dark:text-slate-100 opacity-100 translate-x-1'
+                                                            : 'text-slate-600 dark:text-slate-400 opacity-85 translate-x-0'
+                                                    }`}
+                                                >
+                                                    {renderCmsInline(paragraph)}
+                                                </p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
         </section>
