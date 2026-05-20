@@ -160,7 +160,7 @@ const Navbar = ({
     return (
         <nav className={`fixed top-0 w-full z-[100] transition-[background-color,border-color,box-shadow,padding] duration-300 ease-out ${isScrolled || isMenuOpen
             ? 'bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 py-0 shadow-sm'
-            : 'bg-white dark:bg-slate-900 border-b border-slate-100/60 dark:border-slate-800/60 py-2'
+            : `bg-white dark:bg-slate-900 border-b border-slate-100/60 dark:border-slate-800/60 ${isMobileMode ? 'py-0' : 'py-2'}`
             }`}>
             <div ref={containerRef} className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
                 <Link
